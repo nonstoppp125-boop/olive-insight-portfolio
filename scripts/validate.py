@@ -20,6 +20,26 @@ def main():
     css = CSS.read_text(encoding="utf-8")
     js = JS.read_text(encoding="utf-8")
 
+    # Guard the lightweight, local-first delivery contract.
+    for path, limit in ((HTML, 150_000), (CSS, 100_000), (JS, 80_000)):
+        size = path.stat().st_size
+        if size > limit:
+            errors.append(f"{path.relative_to(ROOT)} exceeds {limit} byte budget ({size})")
+    if not re.search(r'<html\\b[^>]*lang="en"', html, re.I):
+        errors.append("document language must be declared")
+    if not re.search(r'<meta\\b[^>]*name="viewport"', html, re.I):
+        errors.append("responsive viewport metadata is required")
+    if not re.search(r'<meta\\b[^>]*name="description"', html, re.I):
+        errors.append("search description metadata is required")
+    if re.search(r'<(?:script|link)\\b[^>]*(?:src|href)="https?://', html, re.I):
+        errors.append("critical scripts and styles must remain local")
+    if re.search(r'<img\\b(?![^>]*\\balt=)[^>]*>', html, re.I):
+        errors.append("every image element must include alternative text")
+    for match in re.finditer(r'<a\\b([^>]*target="_blank"[^>]*)>', html, re.I):
+        if not re.search(r'\\brel="[^"]*noopener', match.group(1), re.I):
+            errors.append("new-tab links must include rel=noopener")
+            break
+
     ids = re.findall(r'\bid="([^"]+)"', html)
     duplicates = sorted({item for item in ids if ids.count(item) > 1})
     if duplicates:
@@ -102,8 +122,9 @@ def main():
             print("FAIL:", error)
         return 1
 
-    print("PASS: portfolio structure, centered capsule orbit, draggable companion, RGB/HEX mixer, super-thin animated edges, Liquid Glass and settings import/export.")
+    print("PASS: structure, local-first assets, metadata, link safety, responsive budget, capsule orbit, draggable companion, RGB/HEX, hairline edges and Liquid Glass.")
     print(f"Audited {len(ids)} IDs, {len(targets)} in-page links and {len(local_assets)} local assets.")
+    print(f"Size budget: HTML {HTML.stat().st_size}B / 150000B, CSS {CSS.stat().st_size}B / 100000B, JS {JS.stat().st_size}B / 80000B.")
     return 0
 
 if __name__ == "__main__":
