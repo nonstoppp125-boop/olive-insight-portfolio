@@ -54,22 +54,22 @@ def main():
         if marker not in html + js + css:
             errors.append(f"missing expected feature marker: {marker}")
 
-    background_character = re.search(r'<div\\b[^>]*id="bgCompanion"[^>]*>', html)
+    background_character = re.search(r'<div\b[^>]*id="bgCompanion"[^>]*>', html)
     if not background_character or 'aria-hidden="true"' not in background_character.group(0):
         errors.append("background character must be decorative and accessible")
-    if html.find(background_character.group(0)) < html.find("</main>"):
+    elif html.find(background_character.group(0)) < html.find("</main>"):
         errors.append("background character must be outside main content")
-    if not re.search(r'\\.bg-companion\\s*\\{[^}]*position:\\s*fixed', css):
+    if not re.search(r'\.bg-companion\s*\{[^}]*position:\s*fixed', css):
         errors.append("background character must remain fixed across all sections")
-    if not re.search(r'window\\.addEventListener\\("pointerdown",reactBackgroundCompanion', js):
+    if 'window.addEventListener("pointerdown",reactBackgroundCompanion' not in js:
         errors.append("background character must react to touch and pointer input")
-    if not re.search(r'window\\.addEventListener\\("pointermove",moveBackgroundCompanion', js):
+    if 'window.addEventListener("pointermove",moveBackgroundCompanion' not in js:
         errors.append("background character must respond to pointer movement")
-    if re.search(r'fonts\\.googleapis|fonts\\.gstatic|unpkg\\.com', html + css):
+    if re.search(r'fonts\.googleapis|fonts\.gstatic|unpkg\.com', html + css):
         errors.append("avoid remote font/icon dependencies on the critical render path")
     if "backdrop-filter:blur(var(--blur))" in css:
         errors.append("glass surfaces must avoid expensive full-surface backdrop blur")
-    if not re.search(r'\\.glass:before\\s*\\{[^}]*animation:border-turn', css):
+    if not re.search(r'\.glass:before\s*\{[^}]*animation:border-turn', css):
         errors.append("glass cards must retain animated border treatment")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
