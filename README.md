@@ -37,10 +37,10 @@ The prompt panel recognizes a limited set of visual instructions locally. It is 
 
 ## Ambient visual system
 
-- A centered capsule rotates behind the page content, with an independent speed control.
+- A small capsule follows a clock-like elliptical orbit around the full viewport behind the page content, with an independent speed control.
 - Content surfaces use layered translucent Liquid Glass, restrained blur, specular highlights and subtle inset lighting.
-- Cards share a super-thin animated edge; off-screen edge animation pauses where IntersectionObserver is available.
-- The decorative companion can be dragged with mouse or touch. Pointer updates are coalesced to the latest animation frame to avoid dropping intermediate movement; its normalized screen position is saved in this browser.
+- Cards and Design Studio controls use a super-thin animated perimeter stroke (never a rotating fill over the content); off-screen card-edge animation pauses where IntersectionObserver is available.
+- The decorative companion can be dragged freely with mouse or touch, then magnetically snaps to the nearest screen edge. Pointer updates use GPU-friendly transforms and are coalesced to the latest animation frame; its normalized screen position is saved in this browser.
 - Reduced-motion preferences are respected.
 
 ## Accessibility
