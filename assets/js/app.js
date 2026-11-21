@@ -27,7 +27,7 @@
     root.style.setProperty("--accent",accent);
     root.style.setProperty("--accent-bright",palette.bright);
     root.style.setProperty("--accent-rgb",hexToRgb(accent));
-    root.style.setProperty("--blur",settings.blur+"px");
+    root.style.setProperty("--blur",settings.blur+"px");root.style.setProperty("--ambient-blur",Math.max(18,settings.blur*2)+"px");
     root.style.setProperty("--glass-alpha",String(settings.opacity/100));
     root.style.setProperty("--radius",settings.radius+"px");
     root.style.setProperty("--border-speed",settings.speed+"s");
@@ -54,7 +54,7 @@
     $("#mascotToggle").checked=settings.mascot; $("#borderToggle").checked=settings.borders;
     $("#motionToggle").checked=settings.float; $("#revealToggle").checked=settings.reveal;
     $("#accentValue").value=$("#accentValue").textContent=settings.accent.toUpperCase();
-    $("#blurValue").value=$("#blurValue").textContent=settings.blur+"px";
+    $("#blurValue").value=$("#blurValue").textContent=(settings.blur*2)+"px";
     $("#opacityValue").value=$("#opacityValue").textContent=(settings.opacity/100).toFixed(2);
     $("#radiusValue").value=$("#radiusValue").textContent=settings.radius+"px";
     $("#speedValue").value=$("#speedValue").textContent=settings.speed+"s";
