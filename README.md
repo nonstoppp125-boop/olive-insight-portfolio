@@ -40,8 +40,12 @@ The prompt panel recognizes a limited set of visual instructions locally. It is 
 - A centered capsule rotates behind the page content, with an independent speed control.
 - Content surfaces use layered translucent Liquid Glass, restrained blur, specular highlights and subtle inset lighting.
 - Cards share a super-thin animated edge; off-screen edge animation pauses where IntersectionObserver is available.
-- The decorative companion can be dragged with mouse or touch. Its normalized screen position is saved in this browser.
+- The decorative companion can be dragged with mouse or touch. Pointer updates are coalesced to the latest animation frame to avoid dropping intermediate movement; its normalized screen position is saved in this browser.
 - Reduced-motion preferences are respected.
+
+## Accessibility
+
+Keyboard users can jump directly to the main content, visible focus outlines are provided for interactive controls, and the mobile navigation exposes and synchronizes its expanded state. The decorative companion remains hidden from assistive technology.
 
 ## Privacy and browser storage
 
