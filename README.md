@@ -19,9 +19,9 @@ The repository includes `.github/workflows/deploy.yml`. First-time setup require
 
 ## Design studio
 
-Use the floating **Design Studio** control to change the palette, accent color, glass blur and opacity, corner radius, typography, border animation speed, mascot visibility and motion/reveal toggles. Preferences are saved in the current browser using local storage.
+Use the floating **Design Studio** control to change the palette, accent color, glass blur and opacity, corner radius, typography, content density, text contrast, border animation speed, mascot visibility and motion/reveal toggles. Preferences are saved in the current browser using local storage.
 
-The prompt panel currently recognizes a focused set of visual instructions (palette, blur, radius, border speed and visibility). It is a local rule-based starter, not a connected generative AI service.
+The prompt panel currently recognizes a focused set of visual instructions (palette, blur, radius, spacing density, text contrast, typography, glass opacity, border speed and visibility). It is a local rule-based starter, not a connected generative AI service.
 
 ## Content integrity
 
