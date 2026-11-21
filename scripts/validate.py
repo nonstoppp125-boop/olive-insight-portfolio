@@ -12,6 +12,18 @@ def main():
     for path in (HTML, CSS, JS):
         if not path.is_file():
             errors.append(f"missing required file: {path.relative_to(ROOT)}")
+
+    if 'id="scrollStaircase"' not in html or 'id="staircaseBall"' not in html or 'id="staircaseOrbit"' not in html:
+        errors.append("scroll-driven staircase, rolling sphere and hidden orbit capsule must exist")
+    if "SCROLL-LOCKED 125deg staircase" not in css or "transform:rotate(var(--stair-angle))" not in css:
+        errors.append("the centered staircase must preserve its 125-degree diagonal geometry")
+    if "window.addEventListener(\"scroll\",onPageScroll,{passive:true})" not in js or "orbitAngle=(orbitAngle+delta*.24)%360" not in js:
+        errors.append("stair ball and capsule orbit must follow scroll direction in frame-synced updates")
+    if 'window.addEventListener("wheel"' not in js or 'window.scrollBy(0,event.deltaX*1.12)' not in js or 'touchAxis==="horizontal"' not in js:
+        errors.append("horizontal wheel and touch gestures must map onto the single vertical page axis")
+    if "overscroll-behavior-x:none" not in css or "overflow-x:hidden" not in css:
+        errors.append("portfolio must prevent horizontal page drift")
+
     if errors:
         print("\n".join("FAIL: " + item for item in errors))
         return 1

@@ -58,3 +58,9 @@ This is a learning-in-progress portfolio. It intentionally avoids fabricated wor
 ## Publish with GitHub Pages
 
 The repository deploys from the root directory through GitHub Actions whenever `main` changes. The quality workflow runs the static validator and `node --check` before changes are considered verified. Review the **Actions** tab for the latest quality and deployment results.
+
+## Scroll-driven staircase experience
+
+- A centered 125-degree diagonal staircase spans the portfolio background; a luminous sphere tracks total page progress and reverses immediately when scrolling upward.
+- A capsule travels around an elliptical orbit behind the stair structure. Its rotation direction is coupled to scroll direction, so downward movement turns clockwise and upward movement reverses it.
+- Dominant horizontal trackpad/wheel and deliberate horizontal touch gestures are mapped onto the vertical page axis to keep the experience linear. Motion updates are coalesced to animation frames and reduced-motion preferences remain respected.

@@ -287,4 +287,62 @@
   }catch(_){}
   apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
+
+  // Scroll is the single source of truth for the 125-degree stair, rolling sphere and orbit.
+  const stairStage=$("#scrollStaircase"),stairBall=$("#staircaseBall"),stairOrbit=$("#staircaseOrbit");
+  let scrollFrame=0,lastScrollY=window.scrollY,orbitAngle=0,ballRoll=0;
+  function paintScrollWorld(){
+    scrollFrame=0;
+    const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+    const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
+    const mobile=window.innerWidth<=680;
+    const startX=mobile?82:78,endX=mobile?18:22;
+    const startY=mobile?14:8,endY=mobile?86:92;
+    stairBall.style.left=(startX+(endX-startX)*progress)+"%";
+    stairBall.style.top=(startY+(endY-startY)*progress)+"%";
+    stairBall.style.setProperty("--ball-roll",ballRoll+"deg");
+    stairOrbit.style.setProperty("--orbit-angle",orbitAngle+"deg");
+  }
+  function onPageScroll(){
+    const current=window.scrollY,delta=current-lastScrollY;
+    if(Math.abs(delta)>.01){
+      orbitAngle=(orbitAngle+delta*.24)%360;
+      ballRoll=(ballRoll+delta*.9)%360;
+      lastScrollY=current;
+    }
+    if(!scrollFrame)scrollFrame=requestAnimationFrame(paintScrollWorld);
+  }
+  window.addEventListener("scroll",onPageScroll,{passive:true});
+  window.addEventListener("resize",()=>{if(!scrollFrame)scrollFrame=requestAnimationFrame(paintScrollWorld);},{passive:true});
+  paintScrollWorld();
+
+  // Convert dominant horizontal trackpad/wheel movement into the same vertical page axis.
+  window.addEventListener("wheel",event=>{
+    if(studio.classList.contains("open"))return;
+    if(Math.abs(event.deltaX)>Math.max(1,Math.abs(event.deltaY)*1.15)){
+      event.preventDefault();
+      window.scrollBy(0,event.deltaX*1.12);
+    }
+  },{passive:false});
+
+  // On touch screens, a deliberate horizontal swipe also travels the vertical page.
+  let touchStartX=0,touchStartY=0,touchAxis=null,touchLastX=0;
+  document.addEventListener("touchstart",event=>{
+    if(event.touches.length!==1||event.target.closest("button,input,select,textarea,[contenteditable=true],.studio")){touchAxis=null;return;}
+    touchStartX=touchLastX=event.touches[0].clientX;
+    touchStartY=event.touches[0].clientY;
+    touchAxis=null;
+  },{passive:true});
+  document.addEventListener("touchmove",event=>{
+    if(event.touches.length!==1||touchAxis==="vertical"||touchAxis==="blocked")return;
+    const touch=event.touches[0],dx=touch.clientX-touchStartX,dy=touch.clientY-touchStartY;
+    if(!touchAxis&&Math.max(Math.abs(dx),Math.abs(dy))>9)touchAxis=Math.abs(dx)>Math.abs(dy)*1.18?"horizontal":"vertical";
+    if(touchAxis==="horizontal"){
+      event.preventDefault();
+      const delta=touchLastX-touch.clientX;
+      if(Math.abs(delta)>0.1)window.scrollBy(0,delta*1.12);
+      touchLastX=touch.clientX;
+    }
+  },{passive:false});
+
 })();
