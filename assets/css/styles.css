@@ -30,7 +30,7 @@
 .companion:hover{transform:translateY(-5px) scale(1.025);filter:drop-shadow(0 18px 30px #0008)}
 .companion:focus-visible{outline:2px solid var(--accent-bright);outline-offset:4px;border-radius:24px}
 .companion-halo{position:absolute;inset:22px 8px 12px;border-radius:50%;background:radial-gradient(ellipse,rgba(var(--accent-rgb),.19),transparent 70%);filter:blur(12px);z-index:-1;transition:transform .4s,opacity .4s}
-.companion-mascot .visor i{transform:translate(calc(var(--look-x,0)*4px),calc(var(--look-y,0)*2px));transition:transform .18s ease}
+.companion-mascot .visor i{transform:translate(var(--look-x,0px),var(--look-y,0px));transition:transform .18s ease}
 .companion-mascot{position:absolute;left:-28px;bottom:-38px;transform:scale(.62);transform-origin:bottom center;animation:companion-idle 5.4s ease-in-out infinite;pointer-events:none}
 .companion-bubble{position:absolute;right:0;top:0;max-width:148px;padding:8px 11px;border:1px solid rgba(var(--accent-rgb),.48);border-radius:13px 13px 3px 13px;background:rgba(20,26,16,.92);backdrop-filter:blur(12px);color:var(--text);font:9px/1.45 var(--mono);text-align:center;box-shadow:0 8px 22px #0005;opacity:0;transform:translateY(7px) scale(.96);transition:opacity .25s,transform .25s;pointer-events:none}
 .companion:hover .companion-bubble,.companion:focus-visible .companion-bubble,.companion.is-reacting .companion-bubble{opacity:1;transform:none}
