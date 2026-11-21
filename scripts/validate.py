@@ -25,18 +25,18 @@ def main():
         size = path.stat().st_size
         if size > limit:
             errors.append(f"{path.relative_to(ROOT)} exceeds {limit} byte budget ({size})")
-    if not re.search(r'<html\\b[^>]*lang="en"', html, re.I):
+    if not re.search(r'<html\b[^>]*lang="en"', html, re.I):
         errors.append("document language must be declared")
-    if not re.search(r'<meta\\b[^>]*name="viewport"', html, re.I):
+    if not re.search(r'<meta\b[^>]*name="viewport"', html, re.I):
         errors.append("responsive viewport metadata is required")
-    if not re.search(r'<meta\\b[^>]*name="description"', html, re.I):
+    if not re.search(r'<meta\b[^>]*name="description"', html, re.I):
         errors.append("search description metadata is required")
-    if re.search(r'<(?:script|link)\\b[^>]*(?:src|href)="https?://', html, re.I):
+    if re.search(r'<(?:script|link)\b[^>]*(?:src|href)="https?://', html, re.I):
         errors.append("critical scripts and styles must remain local")
-    if re.search(r'<img\\b(?![^>]*\\balt=)[^>]*>', html, re.I):
+    if re.search(r'<img\b(?![^>]*\balt=)[^>]*>', html, re.I):
         errors.append("every image element must include alternative text")
-    for match in re.finditer(r'<a\\b([^>]*target="_blank"[^>]*)>', html, re.I):
-        if not re.search(r'\\brel="[^"]*noopener', match.group(1), re.I):
+    for match in re.finditer(r'<a\b([^>]*target="_blank"[^>]*)>', html, re.I):
+        if not re.search(r'\brel="[^"]*noopener', match.group(1), re.I):
             errors.append("new-tab links must include rel=noopener")
             break
 
