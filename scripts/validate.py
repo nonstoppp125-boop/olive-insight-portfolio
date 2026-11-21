@@ -13,24 +13,24 @@ def main():
         if not path.is_file():
             errors.append(f"missing required file: {path.relative_to(ROOT)}")
     if errors:
-        print("\\n".join("FAIL: " + item for item in errors))
+        print("\n".join("FAIL: " + item for item in errors))
         return 1
 
     html = HTML.read_text(encoding="utf-8")
     css = CSS.read_text(encoding="utf-8")
     js = JS.read_text(encoding="utf-8")
 
-    ids = re.findall(r'\\bid="([^"]+)"', html)
+    ids = re.findall(r'\bid="([^"]+)"', html)
     duplicates = sorted({item for item in ids if ids.count(item) > 1})
     if duplicates:
         errors.append("duplicate IDs: " + ", ".join(duplicates))
 
-    targets = re.findall(r'<a\\b[^>]*href="#([^"]+)"', html)
+    targets = re.findall(r'<a\b[^>]*href="#([^"]+)"', html)
     missing_targets = sorted(set(targets) - set(ids))
     if missing_targets:
         errors.append("missing in-page targets: " + ", ".join(missing_targets))
 
-    refs = re.findall(r'\\b(?:src|href)="([^"]+)"', html)
+    refs = re.findall(r'\b(?:src|href)="([^"]+)"', html)
     local_assets = [
         value.split("?", 1)[0] for value in refs
         if not value.startswith(("http://", "https://", "mailto:", "#", "data:"))
