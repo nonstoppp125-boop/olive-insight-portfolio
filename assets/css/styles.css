@@ -91,7 +91,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 [data-lucide="shield-check"]::before{content:"◇"}
 [data-lucide="hourglass"]::before{content:"⌛"}
 @media(max-width:680px){
- .bg-companion{left:-74px;bottom:-92px;opacity:.12;transform:translate3d(var(--bg-x,0px),var(--bg-y,0px),0) rotate(var(--bg-tilt,0deg)) scale(.68)}
+ .bg-companion{left:-34px;bottom:-55px;opacity:.13;transform:translate3d(var(--bg-x,0px),var(--bg-y,0px),0) rotate(var(--bg-tilt,0deg)) scale(.68)}
  .studio{padding:18px}
  .studio-tabs{gap:5px}
  .studio-tab{font-size:10px;min-height:40px}
