@@ -7,7 +7,7 @@
   const studio = $("#studio");
   const backdrop = $("#studioBackdrop");
   const toast = $("#toast");
-  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"Manrope",speed:12,borders:true,mascot:true,float:true,reveal:true};
+  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"Manrope",density:"balanced",contrast:"standard",speed:12,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
     earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
@@ -31,6 +31,9 @@
     root.style.setProperty("--radius",settings.radius+"px");
     root.style.setProperty("--border-speed",settings.speed+"s");
     root.style.setProperty("--font",settings.font==="system"?"system-ui, sans-serif":"'"+settings.font+"', sans-serif");
+    const density={compact:[40,56,22,11],balanced:[55,75,30,15],spacious:[68,90,38,20]}[settings.density]||[55,75,30,15];
+    root.style.setProperty("--section-space",density[0]+"px");root.style.setProperty("--section-bottom",density[1]+"px");root.style.setProperty("--card-padding",density[2]+"px");root.style.setProperty("--grid-gap",density[3]+"px");
+    root.style.setProperty("--muted",settings.contrast==="high"?"#d0d4c5":"#a6aa99");
     body.classList.toggle("no-border",!settings.borders);
     body.classList.toggle("no-mascot",!settings.mascot);
     body.classList.toggle("no-float",!settings.float);
@@ -46,7 +49,7 @@
   function syncControls(){
     $("#themeSelect").value=settings.theme; $("#accentPicker").value=settings.accent||palettes[settings.theme].accent;
     $("#blurControl").value=settings.blur; $("#opacityControl").value=settings.opacity; $("#radiusControl").value=settings.radius;
-    $("#fontSelect").value=settings.font; $("#speedControl").value=settings.speed;
+    $("#fontSelect").value=settings.font; $("#densitySelect").value=settings.density; $("#contrastSelect").value=settings.contrast; $("#speedControl").value=settings.speed;
     $("#mascotToggle").checked=settings.mascot; $("#borderToggle").checked=settings.borders;
     $("#motionToggle").checked=settings.float; $("#revealToggle").checked=settings.reveal;
     $("#accentValue").value=$("#accentValue").textContent=settings.accent.toUpperCase();
@@ -96,6 +99,8 @@
     $("#"+id).addEventListener("input",event=>{settings[key]=Number(event.target.value);apply();save();});
   });
   $("#fontSelect").addEventListener("change",event=>{settings.font=event.target.value;apply();save();});
+  $("#densitySelect").addEventListener("change",event=>{settings.density=event.target.value;apply();save();});
+  $("#contrastSelect").addEventListener("change",event=>{settings.contrast=event.target.value;apply();save();});
   [["mascotToggle","mascot"],["borderToggle","borders"],["motionToggle","float"],["revealToggle","reveal"]].forEach(([id,key])=>{
     $("#"+id).addEventListener("change",event=>{settings[key]=event.target.checked;apply();save();});
   });
@@ -115,6 +120,8 @@
       valid.accent=typeof incoming.accent==="string"&&/^#[0-9a-f]{6}$/i.test(incoming.accent)?incoming.accent:palettes[valid.theme].accent;
       for(const key of ["blur","opacity","radius","speed"])if(Number.isFinite(Number(incoming[key])))valid[key]=Math.max(({blur:4,opacity:20,radius:8,speed:5})[key],Math.min(({blur:32,opacity:85,radius:40,speed:30})[key],Number(incoming[key])));
       if(["Manrope","Inter","system"].includes(incoming.font))valid.font=incoming.font;
+      if(["compact","balanced","spacious"].includes(incoming.density))valid.density=incoming.density;
+      if(["standard","high"].includes(incoming.contrast))valid.contrast=incoming.contrast;
       for(const key of ["borders","mascot","float","reveal"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
       settings=valid;apply();save();notify("Design settings imported");
     }catch(_){notify("Invalid design settings file");}
@@ -135,8 +142,11 @@
     if(/slower border|slower animation|calm border/.test(prompt)){settings.speed=22;changed=true;}
     if(/more transparent|lighter glass|less opaque/.test(prompt)){settings.opacity=34;changed=true;}
     if(/less transparent|darker glass|more opaque/.test(prompt)){settings.opacity=76;changed=true;}
-    if(/compact|tighter spacing|less spacing/.test(prompt)){settings.radius=14;settings.blur=12;changed=true;}
-    if(/spacious|more spacing|airy layout/.test(prompt)){settings.radius=30;settings.blur=22;changed=true;}
+    if(/compact|tighter spacing|less spacing/.test(prompt)){settings.density="compact";settings.radius=14;settings.blur=12;changed=true;}
+    if(/spacious|more spacing|airy layout/.test(prompt)){settings.density="spacious";settings.radius=30;settings.blur=22;changed=true;}
+    if(/balanced spacing|normal density/.test(prompt)){settings.density="balanced";changed=true;}
+    if(/high contrast|stronger text/.test(prompt)){settings.contrast="high";changed=true;}
+    if(/standard contrast|softer text/.test(prompt)){settings.contrast="standard";changed=true;}
     if(/system font|system typography/.test(prompt)){settings.font="system";changed=true;}
     if(/inter font|use inter/.test(prompt)){settings.font="Inter";changed=true;}
     if(/manrope font|use manrope/.test(prompt)){settings.font="Manrope";changed=true;}
