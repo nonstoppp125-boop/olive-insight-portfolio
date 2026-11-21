@@ -336,13 +336,13 @@ body.no-motion .ambient,body.no-motion .ambient:after{animation:none!important;w
 body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!important}
 
 /* STEP 04 — ultra-light vertical scroll rail with draggable progress ball */
-.scroll-rail{--rail-progress:0px;--rail-ball-y:0px;position:fixed;z-index:40;left:clamp(8px,1.6vw,22px);top:10px;bottom:10px;width:28px;pointer-events:none;touch-action:none}
+.scroll-rail{--rail-progress:0px;--rail-ball-y:0px;position:fixed;z-index:40;left:clamp(8px,1.6vw,22px);top:26px;bottom:26px;width:30px;pointer-events:none;touch-action:none}
 .scroll-rail-line,.scroll-rail-progress{position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:transparent}
 .scroll-rail-progress{height:var(--rail-progress);bottom:auto;background:linear-gradient(to bottom,rgba(var(--accent-rgb),.82),rgba(var(--accent-rgb),.48));box-shadow:0 0 7px rgba(var(--accent-rgb),.24)}
-.scroll-rail-ball{position:absolute;left:50%;top:var(--rail-ball-y);width:18px;height:18px;padding:0;border:1px solid rgba(224,235,185,.82);border-radius:50%;transform:translate(-50%,0);background:radial-gradient(circle at 34% 28%,#fff 0,rgba(224,235,185,.92) 18%,rgba(var(--accent-rgb),.76) 54%,rgba(22,31,17,.94) 100%);box-shadow:0 0 0 4px rgba(var(--accent-rgb),.07),0 0 13px rgba(var(--accent-rgb),.28);cursor:grab;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;transition:box-shadow .12s ease,width .12s ease,height .12s ease}
+.scroll-rail-ball{position:absolute;left:50%;top:var(--rail-ball-y);width:23px;height:23px;padding:0;border:1px solid rgba(224,235,185,.82);border-radius:50%;transform:translate(-50%,0);background:radial-gradient(circle at 34% 28%,#fff 0,rgba(224,235,185,.92) 18%,rgba(var(--accent-rgb),.76) 54%,rgba(22,31,17,.94) 100%);box-shadow:0 0 0 4px rgba(var(--accent-rgb),.07),0 0 13px rgba(var(--accent-rgb),.28);cursor:grab;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;transition:box-shadow .12s ease,width .12s ease,height .12s ease}
 .scroll-rail-ball span{position:absolute;inset:4px;border-radius:50%;background:rgba(255,255,255,.56);filter:blur(.5px)}
 .scroll-rail-ball:active,.scroll-rail.is-dragging .scroll-rail-ball{width:19px;height:19px;cursor:grabbing;box-shadow:0 0 0 6px rgba(var(--accent-rgb),.12),0 0 18px rgba(var(--accent-rgb),.5)}
 .scroll-rail.is-dragging .scroll-rail-line{background:rgba(255,255,255,.035)}
 .scroll-rail-ball:focus-visible{outline:2px solid var(--accent-bright);outline-offset:5px}
-@media(max-width:680px){.scroll-rail{left:3px;top:8px;bottom:8px;width:26px}.scroll-rail-ball{width:17px;height:17px}}
+@media(max-width:680px){.scroll-rail{left:3px;top:22px;bottom:22px;width:28px}.scroll-rail-ball{width:22px;height:22px}}
 @media(prefers-reduced-motion:reduce){.scroll-rail-ball{transition:none}}
