@@ -47,17 +47,17 @@ def main():
         parser.errors.append("missing local assets: " + ", ".join(missing_assets))
     if css.count("{") != css.count("}"):
         parser.errors.append("unbalanced CSS braces")
-    for section in ("about", "education", "skills", "research", "projects", "progress", "future", "contact"):
+    for section in ("about", "education", "skills", "ai-workflow", "research", "projects", "progress", "future", "contact"):
         if f'id="{section}"' not in html:
             parser.errors.append(f"missing portfolio section: {section}")
-    for required in ("openStudio", "applyPrompt", "localStorage", "prefers-reduced-motion"):
+    for required in ("openStudio", "applyPrompt", "localStorage", "prefers-reduced-motion", "companion", "pointermove", "exportDesign", "importDesign", "aria-modal", "setPageInert"):
         if required not in (html + js + css):
             parser.errors.append(f"missing expected feature marker: {required}")
     if parser.errors:
         for error in parser.errors:
             print("FAIL:", error)
         return 1
-    print("PASS: HTML parsed; unique IDs; in-page links; local assets; CSS braces; portfolio sections; studio features.")
+    print("PASS: HTML parsed; unique IDs; in-page links; local assets; CSS braces; portfolio sections; persistent companion; touch interaction; studio accessibility and import/export.")
     print(f"Audited {len(parser.ids)} IDs, {len(parser.targets)} in-page links and {len(parser.assets)} local asset references.")
     return 0
 
