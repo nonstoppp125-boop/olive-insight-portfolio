@@ -288,40 +288,43 @@
   apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
 
-  // Scroll is the single source of truth for the 125-degree stair, rolling sphere and orbit.
+  // One scroll source drives a centered 125deg 3D stair, rolling sphere and rear capsule.
   const stairStage=$("#scrollStaircase"),stairBall=$("#staircaseBall"),stairOrbit=$("#staircaseOrbit");
-  let scrollFrame=0,lastScrollY=window.scrollY,orbitAngle=0,ballRoll=0;
+  let scrollFrame=0,lastScrollY=window.scrollY,orbitAngle=0,ballRoll=0,stairStartX=0,stairStartY=0,stairDX=0,stairDY=0;
+  function measureStaircase(){
+    const angle=125*Math.PI/180;
+    const length=Math.min(window.innerWidth*.66/Math.abs(Math.cos(angle)),window.innerHeight*.78/Math.sin(angle));
+    stairDX=Math.cos(angle)*length;stairDY=Math.sin(angle)*length;
+    stairStartX=window.innerWidth/2-stairDX/2;stairStartY=window.innerHeight/2-stairDY/2;
+    const treads=$(".stair-tread",stairStage);
+    treads.forEach((tread,index)=>{
+      const t=treads.length>1?index/(treads.length-1):0;
+      tread.style.left=(stairStartX+stairDX*t)+"px";
+      tread.style.top=(stairStartY+stairDY*t)+"px";
+    });
+    paintScrollWorld();
+  }
   function paintScrollWorld(){
     scrollFrame=0;
     const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
     const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
-    const angle=125*Math.PI/180;
-    const length=Math.min(window.innerWidth*.66/Math.abs(Math.cos(angle)),window.innerHeight*.78/Math.sin(angle));
-    const dx=Math.cos(angle)*length,dy=Math.sin(angle)*length;
-    const startX=window.innerWidth/2-dx/2,startY=window.innerHeight/2-dy/2;
-    const treads=$(".stair-tread",stairStage);
-    treads.forEach((tread,index)=>{
-      const t=treads.length>1?index/(treads.length-1):0;
-      tread.style.left=(startX+dx*t)+"px";
-      tread.style.top=(startY+dy*t)+"px";
-    });
-    stairBall.style.left=(startX+dx*progress)+"px";
-    stairBall.style.top=(startY+dy*progress)+"px";
+    stairBall.style.setProperty("--ball-x",(stairStartX+stairDX*progress)+"px");
+    stairBall.style.setProperty("--ball-y",(stairStartY+stairDY*progress)+"px");
     stairBall.style.setProperty("--ball-roll",ballRoll+"deg");
     stairOrbit.style.setProperty("--orbit-angle",orbitAngle+"deg");
   }
   function onPageScroll(){
     const current=window.scrollY,delta=current-lastScrollY;
     if(Math.abs(delta)>.01){
-      orbitAngle=(orbitAngle+delta*.24)%360;
+      orbitAngle=(orbitAngle+delta*.24+360)%360;
       ballRoll=(ballRoll+delta*.9)%360;
       lastScrollY=current;
     }
     if(!scrollFrame)scrollFrame=requestAnimationFrame(paintScrollWorld);
   }
   window.addEventListener("scroll",onPageScroll,{passive:true});
-  window.addEventListener("resize",()=>{if(!scrollFrame)scrollFrame=requestAnimationFrame(paintScrollWorld);},{passive:true});
-  paintScrollWorld();
+  window.addEventListener("resize",measureStaircase,{passive:true});
+  measureStaircase();
 
   // Convert dominant horizontal trackpad/wheel movement into the same vertical page axis.
   window.addEventListener("wheel",event=>{
