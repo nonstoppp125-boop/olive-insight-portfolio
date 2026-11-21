@@ -34,8 +34,8 @@ The interface includes mobile navigation, keyboard dismissal for the studio, vis
 
 ## Interactive experience
 
-- A low-contrast animated companion lives behind the page content across all sections; pointer movement subtly guides it and touch anywhere triggers a smooth reaction without covering links or controls.
+- A low-contrast animated companion lives behind the page content across all sections; mouse and touch movement subtly guide it, taps trigger a smooth reaction, and it never covers links or controls.
 - The Design Studio controls color palettes, accent, background softness, glass opacity, radius, local typography presets, border speed, mascot visibility and motion.
 - Design preferences persist locally in the browser and can be exported/imported as JSON.
 - Prompt controls interpret supported visual instructions locally; they do not call an AI model or send design data to a server.
-- The site avoids remote font/icon downloads and heavy glass blur on the critical render path. Reduced-motion preferences are respected. The studio supports keyboard focus management and Escape-to-close.
+- The site avoids remote font/icon downloads, large-area blur filters and off-screen card animations; sections use viewport-aware rendering. Reduced-motion preferences are respected. The studio supports keyboard focus management and Escape-to-close.
