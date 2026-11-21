@@ -7,7 +7,7 @@
   const studio = $("#studio");
   const backdrop = $("#studioBackdrop");
   const toast = $("#toast");
-  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"Manrope",density:"balanced",contrast:"standard",speed:12,borders:true,mascot:true,float:true,reveal:true};
+  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",speed:12,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
     earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
@@ -25,9 +25,10 @@
     const palette = palettes[settings.theme] || palettes.olive;
     const accent = settings.accent || palette.accent;
     root.style.setProperty("--accent",accent);
+    root.style.setProperty("--bg",palette.bg);
     root.style.setProperty("--accent-bright",palette.bright);
     root.style.setProperty("--accent-rgb",hexToRgb(accent));
-    root.style.setProperty("--blur",settings.blur+"px");root.style.setProperty("--ambient-blur",Math.max(18,settings.blur*2)+"px");
+    root.style.setProperty("--blur",settings.blur+"px");root.style.setProperty("--ambient-softness",Math.round(55+settings.blur*1.1)+"%");
     root.style.setProperty("--glass-alpha",String(settings.opacity/100));
     root.style.setProperty("--radius",settings.radius+"px");
     root.style.setProperty("--border-speed",settings.speed+"s");
@@ -206,7 +207,7 @@
   }
   try{
     const stored=localStorage.getItem("oliveInsightDesign");
-    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};}
+    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
   }catch(_){}
   apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
