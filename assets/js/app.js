@@ -295,11 +295,18 @@
     scrollFrame=0;
     const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
     const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
-    const mobile=window.innerWidth<=680;
-    const startX=mobile?82:78,endX=mobile?18:22;
-    const startY=mobile?14:8,endY=mobile?86:92;
-    stairBall.style.left=(startX+(endX-startX)*progress)+"%";
-    stairBall.style.top=(startY+(endY-startY)*progress)+"%";
+    const angle=125*Math.PI/180;
+    const length=Math.min(window.innerWidth*.66/Math.abs(Math.cos(angle)),window.innerHeight*.78/Math.sin(angle));
+    const dx=Math.cos(angle)*length,dy=Math.sin(angle)*length;
+    const startX=window.innerWidth/2-dx/2,startY=window.innerHeight/2-dy/2;
+    const treads=$(".stair-tread",stairStage);
+    treads.forEach((tread,index)=>{
+      const t=treads.length>1?index/(treads.length-1):0;
+      tread.style.left=(startX+dx*t)+"px";
+      tread.style.top=(startY+dy*t)+"px";
+    });
+    stairBall.style.left=(startX+dx*progress)+"px";
+    stairBall.style.top=(startY+dy*progress)+"px";
     stairBall.style.setProperty("--ball-roll",ballRoll+"deg");
     stairOrbit.style.setProperty("--orbit-angle",orbitAngle+"deg");
   }

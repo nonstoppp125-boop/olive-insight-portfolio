@@ -15,7 +15,7 @@ def main():
 
     if 'id="scrollStaircase"' not in html or 'id="staircaseBall"' not in html or 'id="staircaseOrbit"' not in html:
         errors.append("scroll-driven staircase, rolling sphere and hidden orbit capsule must exist")
-    if "SCROLL-LOCKED 125deg staircase" not in css or "transform:rotate(var(--stair-angle))" not in css:
+    if "SCROLL-LOCKED 125deg staircase" not in css or "const angle=125*Math.PI/180" not in js or "tread.style.left" not in js:
         errors.append("the centered staircase must preserve its 125-degree diagonal geometry")
     if "window.addEventListener(\"scroll\",onPageScroll,{passive:true})" not in js or "orbitAngle=(orbitAngle+delta*.24)%360" not in js:
         errors.append("stair ball and capsule orbit must follow scroll direction in frame-synced updates")
