@@ -1,0 +1,21 @@
+name: Portfolio quality checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Validate portfolio structure and local assets
+        run: python scripts/validate.py
+      - name: Check JavaScript syntax
+        run: node --check assets/js/app.js
