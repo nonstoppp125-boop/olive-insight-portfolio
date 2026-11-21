@@ -73,6 +73,12 @@ def main():
         errors.append("glass cards must retain animated border treatment")
     if "animation-play-state:var(--border-play,running)" not in css or "setupBorderMotion" not in js:
         errors.append("off-screen card borders must pause to reduce rendering work")
+    card_classes = ("card", "timeline-card", "feature-card", "future-item", "empty-state", "progress-panel", "contact-card", "float-note")
+    for class_value in re.findall(r'<(?:article|div)\\b[^>]*class="([^"]+)"[^>]*>', html):
+        class_set = set(class_value.split())
+        if class_set.intersection(card_classes) and "glass" not in class_set:
+            errors.append("every content card must use the shared animated glass surface")
+            break
     if 'class="glass float-note note-top"' not in html or 'class="glass float-note note-bottom"' not in html:
         errors.append("hero information panels must use the animated glass card system")
     if "filter:blur(36px)" in css or "filter:blur(90px)" in css:
