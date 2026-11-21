@@ -80,7 +80,7 @@ def main():
     for control in ("accentRed", "accentGreen", "accentBlue", "accentHex"):
         if f'id="{control}"' not in html or control not in js:
             errors.append(f"RGB/HEX color mixer is missing {control}")
-        card_classes = ("card", "timeline-card", "feature-card", "future-item", "empty-state", "progress-panel", "contact-card", "float-note")
+    card_classes = ("card", "timeline-card", "feature-card", "future-item", "empty-state", "progress-panel", "contact-card", "float-note")
     for class_value in re.findall(r'<(?:article|div)\b[^>]*class="([^"]+)"[^>]*>', html):
         class_set = set(class_value.split())
         if class_set.intersection(card_classes) and "glass" not in class_set:
