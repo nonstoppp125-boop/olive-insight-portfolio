@@ -34,7 +34,7 @@ The interface includes mobile navigation, keyboard dismissal for the studio, vis
 
 ## Interactive experience
 
-- A persistent floating companion remains available while browsing and responds to pointer movement and touch/click activation.
+- A persistent, fixed-position floating companion remains available across every page section, adapts to mobile screens, supports keyboard focus, and responds to pointer movement and touch/click activation.
 - The Design Studio controls color palettes, accent, glass blur/opacity, radius, typography, border speed, mascot visibility and motion.
 - Design preferences persist locally in the browser and can be exported/imported as JSON.
 - Prompt controls interpret supported visual instructions locally; they do not call an AI model or send design data to a server.
