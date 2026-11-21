@@ -193,24 +193,52 @@
     if(!changed){notify("No supported visual instruction found yet");return;}
     apply();save();notify("Supported design directions applied");
   });
-  // Scroll-linked center object: pure scroll progress makes reverse movement exact.
-  const scrollCore=$("#scrollCore");
-  if(scrollCore){
-    let scrollCoreFrame=0;
-    function updateScrollCore(){
-      scrollCoreFrame=0;
-      if(body.classList.contains("no-motion"))return;
-      const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
-      const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
-      scrollCore.style.setProperty("--scroll-x",(window.innerWidth*.14*progress).toFixed(2)+"px");
-      scrollCore.style.setProperty("--scroll-y",(window.innerHeight*.30*progress).toFixed(2)+"px");
-      scrollCore.style.setProperty("--scroll-angle",(progress*150).toFixed(2)+"deg");
-      scrollCore.style.setProperty("--scroll-progress",progress.toFixed(4));
+  // Minimal vertical scroll rail: the ball tracks page progress and can be dragged to scrub.
+  const scrollRail=$("#scrollRail");
+  const scrollRailBall=$("#scrollRailBall");
+  const scrollRailProgress=$("#scrollRailProgress");
+  if(scrollRail&&scrollRailBall&&scrollRailProgress){
+    let railFrame=0;
+    let railDragging=false;
+    function pageScrollLimit(){return Math.max(0,document.documentElement.scrollHeight-window.innerHeight);}
+    function paintScrollRail(){
+      railFrame=0;
+      const limit=pageScrollLimit();
+      const progress=limit?Math.max(0,Math.min(1,window.scrollY/limit)):0;
+      scrollRail.style.setProperty("--rail-progress",(progress*100).toFixed(3)+"%");
+      scrollRailBall.setAttribute("aria-valuenow",String(Math.round(progress*100)));
     }
-    function scheduleScrollCore(){if(!scrollCoreFrame)scrollCoreFrame=requestAnimationFrame(updateScrollCore);}
-    window.addEventListener("scroll",scheduleScrollCore,{passive:true});
-    window.addEventListener("resize",scheduleScrollCore,{passive:true});
-    scheduleScrollCore();
+    function scheduleRailPaint(){if(!railFrame)railFrame=requestAnimationFrame(paintScrollRail);}
+    function scrubRail(event){
+      const rect=scrollRail.getBoundingClientRect();
+      const progress=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
+      document.documentElement.scrollTop=progress*pageScrollLimit();
+      document.body.scrollTop=progress*pageScrollLimit();
+      paintScrollRail();
+    }
+    scrollRailBall.addEventListener("pointerdown",event=>{
+      railDragging=true;
+      scrollRail.classList.add("is-dragging");
+      try{scrollRailBall.setPointerCapture(event.pointerId);}catch(_){}
+      scrubRail(event);
+      event.preventDefault();
+    });
+    scrollRailBall.addEventListener("pointermove",event=>{if(railDragging)scrubRail(event);});
+    function stopRailDrag(){railDragging=false;scrollRail.classList.remove("is-dragging");}
+    scrollRailBall.addEventListener("pointerup",stopRailDrag);
+    scrollRailBall.addEventListener("pointercancel",stopRailDrag);
+    scrollRailBall.addEventListener("lostpointercapture",stopRailDrag);
+    scrollRailBall.addEventListener("keydown",event=>{
+      if(event.key==="ArrowDown"||event.key==="ArrowUp"){
+        event.preventDefault();
+        const delta=window.innerHeight*.18*(event.key==="ArrowDown"?1:-1);
+        document.documentElement.scrollTop=Math.max(0,Math.min(pageScrollLimit(),window.scrollY+delta));
+      }else if(event.key==="Home"){event.preventDefault();document.documentElement.scrollTop=0;}
+      else if(event.key==="End"){event.preventDefault();document.documentElement.scrollTop=pageScrollLimit();}
+    });
+    window.addEventListener("scroll",scheduleRailPaint,{passive:true});
+    window.addEventListener("resize",scheduleRailPaint,{passive:true});
+    scheduleRailPaint();
   }
   const bgCompanion=$("#bgCompanion");
   let mascotDragging=false,mascotMoved=false,mascotPointerId=null,mascotOffsetX=0,mascotOffsetY=0,mascotFrame=0;

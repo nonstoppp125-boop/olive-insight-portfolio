@@ -335,15 +335,14 @@ body.no-motion .ambient,body.no-motion .ambient:after{animation:none!important;w
 @media(prefers-reduced-motion:reduce){.brand-symbol,.brand-symbol:before{animation:none!important}}
 body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!important}
 
-/* STEP 04 — center object follows scroll progress and exactly retraces on reverse */
-.scroll-core{position:fixed;left:50%;top:50%;width:clamp(82px,10vw,132px);height:clamp(82px,10vw,132px);z-index:1;pointer-events:none;opacity:.17;contain:layout paint;transform:translate3d(calc(-50% + var(--scroll-x,0px)),calc(-50% + var(--scroll-y,0px)),0) rotate(var(--scroll-angle,0deg));transform-origin:center;will-change:transform}
-.scroll-core-orbit{position:absolute;inset:2%;border:1px solid rgba(var(--accent-rgb),.42);border-radius:34%;transform:rotate(28deg) scaleX(.78);box-shadow:0 0 24px rgba(var(--accent-rgb),.07),inset 0 0 18px rgba(var(--accent-rgb),.045)}
-.scroll-core-shell{position:absolute;inset:19%;display:block;border:1px solid rgba(224,235,185,.38);border-radius:38%;background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(var(--accent-rgb),.075) 42%,rgba(12,17,10,.2));box-shadow:inset 4px 4px 14px rgba(255,255,255,.09),inset -8px -8px 18px rgba(0,0,0,.22),0 0 26px rgba(var(--accent-rgb),.12)}
-.scroll-core-shell:before,.scroll-core-shell:after{content:"";position:absolute;inset:12%;border:1px solid rgba(255,255,255,.12);border-radius:34%;transform:rotate(45deg)}
-.scroll-core-shell:after{inset:26%;border-color:rgba(var(--accent-rgb),.26);transform:rotate(-22deg)}
-.scroll-core-glint{position:absolute;width:27%;height:27%;left:19%;top:17%;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.8),rgba(195,206,141,.28) 42%,transparent 75%)}
-.scroll-core-point{position:absolute;width:7px;height:7px;right:15%;bottom:17%;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 12px rgba(var(--accent-rgb),.8)}
-.scroll-core-halo{position:absolute;inset:-22%;border:1px solid rgba(var(--accent-rgb),.09);border-radius:50%;transform:scaleX(.72) rotate(-24deg)}
-body.no-motion .scroll-core{transform:translate3d(-50%,-50%,0);will-change:auto}
-@media(max-width:680px){.scroll-core{width:76px;height:76px;opacity:.13}}
-@media(prefers-reduced-motion:reduce){.scroll-core{transform:translate3d(-50%,-50%,0);will-change:auto}}
+/* STEP 04 — ultra-light vertical scroll rail with draggable progress ball */
+.scroll-rail{--rail-progress:0%;position:fixed;z-index:40;right:clamp(12px,2.1vw,28px);top:15vh;bottom:15vh;width:28px;pointer-events:none;touch-action:none}
+.scroll-rail-line,.scroll-rail-progress{position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:transparent}
+.scroll-rail-progress{height:var(--rail-progress);bottom:auto;background:linear-gradient(to bottom,rgba(var(--accent-rgb),.82),rgba(var(--accent-rgb),.48));box-shadow:0 0 7px rgba(var(--accent-rgb),.24)}
+.scroll-rail-ball{position:absolute;left:50%;top:var(--rail-progress);width:15px;height:15px;padding:0;border:1px solid rgba(224,235,185,.82);border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 34% 28%,#fff 0,rgba(224,235,185,.92) 18%,rgba(var(--accent-rgb),.76) 54%,rgba(22,31,17,.94) 100%);box-shadow:0 0 0 4px rgba(var(--accent-rgb),.07),0 0 13px rgba(var(--accent-rgb),.28);cursor:grab;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;transition:box-shadow .12s ease,width .12s ease,height .12s ease}
+.scroll-rail-ball span{position:absolute;inset:4px;border-radius:50%;background:rgba(255,255,255,.56);filter:blur(.5px)}
+.scroll-rail-ball:active,.scroll-rail.is-dragging .scroll-rail-ball{width:19px;height:19px;cursor:grabbing;box-shadow:0 0 0 6px rgba(var(--accent-rgb),.12),0 0 18px rgba(var(--accent-rgb),.5)}
+.scroll-rail.is-dragging .scroll-rail-line{background:rgba(255,255,255,.035)}
+.scroll-rail-ball:focus-visible{outline:2px solid var(--accent-bright);outline-offset:5px}
+@media(max-width:680px){.scroll-rail{right:5px;top:12vh;bottom:12vh;width:26px}.scroll-rail-ball{width:14px;height:14px}}
+@media(prefers-reduced-motion:reduce){.scroll-rail-ball{transition:none}}
