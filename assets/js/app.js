@@ -159,9 +159,7 @@
     clearTimeout(companionTimer);companionTimer=setTimeout(()=>{companion.classList.remove("is-reacting");companion.setAttribute("aria-pressed","false");},1500);
   }
   companion.addEventListener("click",reactToCompanion);
-  companion.addEventListener("pointerdown",event=>{
-    if(event.pointerType==="touch"){companion.style.setProperty("--touch-x",event.clientX+"px");reactToCompanion();}
-  });
+  companion.addEventListener("pointerleave",()=>{companion.style.setProperty("--look-x","0");companion.style.setProperty("--look-y","0");});
   companion.addEventListener("pointermove",event=>{
     if(event.pointerType==="mouse"&&event.buttons===0){
       const rect=companion.getBoundingClientRect();const x=(event.clientX-(rect.left+rect.width/2))/rect.width;
