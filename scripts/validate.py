@@ -63,7 +63,7 @@ def main():
         errors.append("background character must remain fixed across all sections")
     if 'window.addEventListener("pointerdown",reactBackgroundCompanion' not in js:
         errors.append("background character must react to touch and pointer input")
-    if 'window.addEventListener("pointermove",moveBackgroundCompanion' not in js:
+    if 'window.addEventListener("pointermove",moveBackgroundCompanion' not in js or 'event.pointerType==="touch"?8:18' not in js or 'window.addEventListener("pointerup",resetBackgroundCompanion' not in js:
         errors.append("background character must respond to pointer movement")
     if re.search(r'fonts\.googleapis|fonts\.gstatic|unpkg\.com', html + css):
         errors.append("avoid remote font/icon dependencies on the critical render path")
