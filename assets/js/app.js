@@ -182,7 +182,7 @@
   });
   const bgCompanion=$("#bgCompanion");
   let mascotDragging=false,mascotMoved=false,mascotPointerId=null,mascotOffsetX=0,mascotOffsetY=0,mascotFrame=0;
-  let mascotPosition=null;
+  let mascotNextX=0,mascotNextY=0,mascotPosition=null;
   function applyMascotPosition(x,y,persist=false){
     const maxX=Math.max(0,window.innerWidth-bgCompanion.offsetWidth);
     const maxY=Math.max(0,window.innerHeight-bgCompanion.offsetHeight);
@@ -212,14 +212,17 @@
   function dragMascot(event){
     if(!mascotDragging||event.pointerId!==mascotPointerId)return;
     mascotMoved=true;
-    const x=event.clientX-mascotOffsetX,y=event.clientY-mascotOffsetY;
-    if(!mascotFrame)mascotFrame=requestAnimationFrame(()=>{applyMascotPosition(x,y);mascotFrame=0;});
+    mascotNextX=event.clientX-mascotOffsetX;mascotNextY=event.clientY-mascotOffsetY;
+    if(!mascotFrame)mascotFrame=requestAnimationFrame(()=>{
+      applyMascotPosition(mascotNextX,mascotNextY);mascotFrame=0;
+    });
   }
   function finishMascotDrag(event){
     if(!mascotDragging||event.pointerId!==mascotPointerId)return;
     mascotDragging=false;mascotPointerId=null;bgCompanion.classList.remove("is-dragging");
     if(mascotFrame){cancelAnimationFrame(mascotFrame);mascotFrame=0;}
-    const rect=bgCompanion.getBoundingClientRect();applyMascotPosition(rect.left,rect.top,true);
+    if(mascotMoved)applyMascotPosition(mascotNextX,mascotNextY,true);
+    else{const rect=bgCompanion.getBoundingClientRect();applyMascotPosition(rect.left,rect.top,true);}
     if(!mascotMoved){
       bgCompanion.classList.remove("is-reacting");
       requestAnimationFrame(()=>bgCompanion.classList.add("is-reacting"));
