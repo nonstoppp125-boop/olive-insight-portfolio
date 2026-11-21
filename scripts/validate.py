@@ -77,8 +77,10 @@ def main():
         errors.append("hero information panels must use the animated glass card system")
     if "filter:blur(36px)" in css or "filter:blur(90px)" in css:
         errors.append("avoid expensive large-area ambient blur filters")
-    if "fontStacks={system:" not in js or 'value="editorial"' not in html or 'value="technical"' not in html:
+    if 'font:"system"' not in js or "fontStacks={system:" not in js or 'value="editorial"' not in html or 'value="technical"' not in html:
         errors.append("typography presets must use available local font stacks")
+    if 'root.style.setProperty("--bg",palette.bg)' not in js or '--ambient-softness' not in js:
+        errors.append("palette background and softness controls must apply to the rendered page")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
