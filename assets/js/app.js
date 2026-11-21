@@ -242,7 +242,10 @@
     const nav=$("#mainNav");const isOpen=nav.classList.toggle("open");
     $("#menuToggle").setAttribute("aria-expanded",String(isOpen));
   });
-  $$("#mainNav a").forEach(link=>link.addEventListener("click",()=>$("#mainNav").classList.remove("open")));
+  $("#mainNav a").forEach(link=>link.addEventListener("click",()=>{
+    $("#mainNav").classList.remove("open");
+    $("#menuToggle").setAttribute("aria-expanded","false");
+  }));
   function setupBorderMotion(){
     if(!("IntersectionObserver" in window))return;
     const observer=new IntersectionObserver(entries=>{
