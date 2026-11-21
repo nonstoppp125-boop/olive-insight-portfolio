@@ -233,8 +233,8 @@ body.no-border .glass:before{animation:none;opacity:0}
 @keyframes border-turn{to{--edge-angle:360deg}}
 @keyframes capsule-orbit{to{offset-distance:100%}}
 .ambient-capsule{position:fixed;inset:0;width:auto;height:auto;min-height:0;left:0;top:0;z-index:1;opacity:.22;pointer-events:none;overflow:visible;contain:layout paint;transform:none}
-.capsule-trail{position:absolute;left:50%;top:50%;width:88vw;height:82vh;inset:auto;border:.65px solid rgba(var(--accent-rgb),.055);border-radius:50%;transform:translate(-50%,-50%)}
-.capsule-shell{position:absolute;left:50%;top:50%;width:clamp(92px,13vw,172px);height:clamp(34px,4.4vw,58px);inset:auto;border:.8px solid rgba(var(--accent-rgb),.25);border-radius:999px;transform:translate(-50%,-50%);transform-origin:center;offset-path:ellipse(43vw 39vh at 50% 50%);offset-anchor:center;offset-distance:0%;offset-rotate:auto;animation:capsule-orbit var(--capsule-speed,36s) linear infinite;box-shadow:inset 0 0 18px rgba(var(--accent-rgb),.06),0 0 22px rgba(var(--accent-rgb),.08)}
+.capsule-trail{position:absolute;left:50%;top:50%;width:88vw;height:82vh;border:.65px solid rgba(var(--accent-rgb),.055);border-radius:50%;transform:translate(-50%,-50%)}
+.capsule-shell{position:absolute;left:50%;top:50%;width:clamp(92px,13vw,172px);height:clamp(34px,4.4vw,58px);border:.8px solid rgba(var(--accent-rgb),.25);border-radius:999px;transform:translate(-50%,-50%);transform-origin:center;offset-path:ellipse(43vw 39vh at 50% 50%);offset-anchor:center;offset-distance:0%;offset-rotate:auto;animation:capsule-orbit var(--capsule-speed,36s) linear infinite;box-shadow:inset 0 0 18px rgba(var(--accent-rgb),.06),0 0 22px rgba(var(--accent-rgb),.08)}
 .capsule-shell:before,.capsule-shell:after{inset:10% 5%;border:.6px solid rgba(var(--accent-rgb),.11);transform:rotate(14deg) scale(.94,.78)}
 .capsule-shell:after{inset:18% 12%;transform:rotate(-18deg) scale(.88,.64);border-color:rgba(255,255,255,.07)}
 .capsule-light{filter:none;background:radial-gradient(ellipse,rgba(255,255,255,.2),transparent 72%)}
