@@ -31,7 +31,8 @@
     root.style.setProperty("--glass-alpha",String(settings.opacity/100));
     root.style.setProperty("--radius",settings.radius+"px");
     root.style.setProperty("--border-speed",settings.speed+"s");
-    root.style.setProperty("--font",settings.font==="system"?"system-ui, sans-serif":"'"+settings.font+"', sans-serif");
+    const fontStacks={system:'ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',editorial:'ui-serif,Georgia,Cambria,"Times New Roman",serif',technical:'ui-monospace,SFMono-Regular,Consolas,monospace'};
+    root.style.setProperty("--font",fontStacks[settings.font]||fontStacks.system);
     const density={compact:[40,56,22,11],balanced:[55,75,30,15],spacious:[68,90,38,20]}[settings.density]||[55,75,30,15];
     root.style.setProperty("--section-space",density[0]+"px");root.style.setProperty("--section-bottom",density[1]+"px");root.style.setProperty("--card-padding",density[2]+"px");root.style.setProperty("--grid-gap",density[3]+"px");
     root.style.setProperty("--muted",settings.contrast==="high"?"#d0d4c5":"#a6aa99");
@@ -120,7 +121,7 @@
       valid.theme=Object.hasOwn(palettes,incoming.theme)?incoming.theme:defaults.theme;
       valid.accent=typeof incoming.accent==="string"&&/^#[0-9a-f]{6}$/i.test(incoming.accent)?incoming.accent:palettes[valid.theme].accent;
       for(const key of ["blur","opacity","radius","speed"])if(Number.isFinite(Number(incoming[key])))valid[key]=Math.max(({blur:4,opacity:20,radius:8,speed:5})[key],Math.min(({blur:32,opacity:85,radius:40,speed:30})[key],Number(incoming[key])));
-      if(["Manrope","Inter","system"].includes(incoming.font))valid.font=incoming.font;
+      if(["system","editorial","technical"].includes(incoming.font))valid.font=incoming.font;
       if(["compact","balanced","spacious"].includes(incoming.density))valid.density=incoming.density;
       if(["standard","high"].includes(incoming.contrast))valid.contrast=incoming.contrast;
       for(const key of ["borders","mascot","float","reveal"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
@@ -148,9 +149,9 @@
     if(/balanced spacing|normal density/.test(prompt)){settings.density="balanced";changed=true;}
     if(/high contrast|stronger text/.test(prompt)){settings.contrast="high";changed=true;}
     if(/standard contrast|softer text/.test(prompt)){settings.contrast="standard";changed=true;}
-    if(/system font|system typography/.test(prompt)){settings.font="system";changed=true;}
-    if(/inter font|use inter/.test(prompt)){settings.font="Inter";changed=true;}
-    if(/manrope font|use manrope/.test(prompt)){settings.font="Manrope";changed=true;}
+    if(/system font|system typography|clean typography/.test(prompt)){settings.font="system";changed=true;}
+    if(/editorial font|serif font|elegant typography/.test(prompt)){settings.font="editorial";changed=true;}
+    if(/technical font|mono font|monospace/.test(prompt)){settings.font="technical";changed=true;}
     if(/disable floating|stop floating|still mascot/.test(prompt)){settings.float=false;changed=true;}
     if(/enable floating|floating mascot/.test(prompt)){settings.float=true;changed=true;}
     if(/hide border|remove border|disable border|stop border/.test(prompt)){settings.borders=false;changed=true;}
@@ -175,8 +176,8 @@
   }
   function reactBackgroundCompanion(){
     if(!bgCompanion||body.classList.contains("no-mascot"))return;
-    bgCompanion.classList.remove("is-reacting");void bgCompanion.offsetWidth;
-    bgCompanion.classList.add("is-reacting");
+    bgCompanion.classList.remove("is-reacting");
+    requestAnimationFrame(()=>bgCompanion.classList.add("is-reacting"));
     clearTimeout(bgReactTimer);
     bgReactTimer=setTimeout(()=>bgCompanion.classList.remove("is-reacting"),1050);
   }
