@@ -193,19 +193,21 @@
     if(!changed){notify("No supported visual instruction found yet");return;}
     apply();save();notify("Supported design directions applied");
   });
-  // Minimal vertical scroll rail: the ball tracks page progress and can be dragged to scrub.
+  // Direct-manipulation scroll rail: pointer position maps to page progress without easing.
   const scrollRail=$("#scrollRail");
   const scrollRailBall=$("#scrollRailBall");
   const scrollRailProgress=$("#scrollRailProgress");
   if(scrollRail&&scrollRailBall&&scrollRailProgress){
     let railFrame=0;
     let railDragging=false;
+    let railPointerOffset=0;
+    let previousScrollBehavior={html:"",body:""};
     function pageScrollLimit(){return Math.max(0,document.documentElement.scrollHeight-window.innerHeight);}
     function paintScrollRail(){
       railFrame=0;
       const limit=pageScrollLimit();
       const progress=limit?Math.max(0,Math.min(1,window.scrollY/limit)):0;
-      const ballSize=scrollRailBall.offsetHeight||15;
+      const ballSize=scrollRailBall.offsetHeight||21;
       const ballY=progress*Math.max(0,scrollRail.clientHeight-ballSize);
       scrollRail.style.setProperty("--rail-progress",(ballY+ballSize/2).toFixed(2)+"px");
       scrollRail.style.setProperty("--rail-ball-y",ballY.toFixed(2)+"px");
@@ -214,18 +216,20 @@
     function scheduleRailPaint(){if(!railFrame)railFrame=requestAnimationFrame(paintScrollRail);}
     function scrubRail(event){
       const rect=scrollRail.getBoundingClientRect();
-      const ballSize=scrollRailBall.offsetHeight||15;
+      const ballSize=scrollRailBall.offsetHeight||21;
       const travel=Math.max(1,rect.height-ballSize);
-      const progress=Math.max(0,Math.min(1,(event.clientY-rect.top-ballSize/2)/travel));
+      const progress=Math.max(0,Math.min(1,(event.clientY-rect.top-railPointerOffset)/travel));
       const target=progress*pageScrollLimit();
-      document.documentElement.scrollTop=target;
-      document.body.scrollTop=target;
+      window.scrollTo({top:target,left:0,behavior:"instant"});
       paintScrollRail();
     }
     scrollRailBall.addEventListener("pointerdown",event=>{
       railDragging=true;
-      document.documentElement.dataset.railPreviousBehavior=document.documentElement.style.scrollBehavior;
+      const ballRect=scrollRailBall.getBoundingClientRect();
+      railPointerOffset=Math.max(0,Math.min(ballRect.height,event.clientY-ballRect.top));
+      previousScrollBehavior={html:document.documentElement.style.scrollBehavior,body:document.body.style.scrollBehavior};
       document.documentElement.style.scrollBehavior="auto";
+      document.body.style.scrollBehavior="auto";
       scrollRail.classList.add("is-dragging");
       try{scrollRailBall.setPointerCapture(event.pointerId);}catch(_){}
       scrubRail(event);
@@ -235,8 +239,8 @@
     function stopRailDrag(){
       if(!railDragging)return;
       railDragging=false;
-      document.documentElement.style.scrollBehavior=document.documentElement.dataset.railPreviousBehavior||"";
-      delete document.documentElement.dataset.railPreviousBehavior;
+      document.documentElement.style.scrollBehavior=previousScrollBehavior.html;
+      document.body.style.scrollBehavior=previousScrollBehavior.body;
       scrollRail.classList.remove("is-dragging");
     }
     scrollRailBall.addEventListener("pointerup",stopRailDrag);
@@ -246,9 +250,9 @@
       if(event.key==="ArrowDown"||event.key==="ArrowUp"){
         event.preventDefault();
         const delta=window.innerHeight*.18*(event.key==="ArrowDown"?1:-1);
-        document.documentElement.scrollTop=Math.max(0,Math.min(pageScrollLimit(),window.scrollY+delta));
-      }else if(event.key==="Home"){event.preventDefault();document.documentElement.scrollTop=0;}
-      else if(event.key==="End"){event.preventDefault();document.documentElement.scrollTop=pageScrollLimit();}
+        window.scrollTo({top:Math.max(0,Math.min(pageScrollLimit(),window.scrollY+delta)),behavior:"instant"});
+      }else if(event.key==="Home"){event.preventDefault();window.scrollTo({top:0,behavior:"instant"});}
+      else if(event.key==="End"){event.preventDefault();window.scrollTo({top:pageScrollLimit(),behavior:"instant"});}
     });
     window.addEventListener("scroll",scheduleRailPaint,{passive:true});
     window.addEventListener("resize",scheduleRailPaint,{passive:true});
