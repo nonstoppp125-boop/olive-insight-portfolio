@@ -95,7 +95,7 @@ def main():
             print("FAIL:", error)
         return 1
 
-    print("PASS: portfolio structure, unique IDs, anchor targets, local assets, CSS balance, site-wide ambient companion, performance-conscious rendering, accessible studio and settings import/export.")
+    print("PASS: portfolio structure, centered capsule orbit, draggable companion, RGB/HEX mixer, super-thin animated edges, Liquid Glass and settings import/export.")
     print(f"Audited {len(ids)} IDs, {len(targets)} in-page links and {len(local_assets)} local assets.")
     return 0
 
