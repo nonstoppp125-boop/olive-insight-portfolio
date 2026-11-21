@@ -55,20 +55,35 @@
     $("#radiusValue").value=$("#radiusValue").textContent=settings.radius+"px";
     $("#speedValue").value=$("#speedValue").textContent=settings.speed+"s";
   }
-  function openStudio(){
+  let studioTrigger=null;
+  function setPageInert(value){
+    ["#siteHeader","#mainContent","#siteFooter","#studioFab","#companion"].forEach(selector=>{const node=$(selector);if(node)node.inert=value;});
+  }
+  function openStudio(event){
+    studioTrigger=event?.currentTarget||document.activeElement;
     studio.classList.add("open");backdrop.classList.add("show");studio.setAttribute("aria-hidden","false");
-    $("#openStudio").setAttribute("aria-expanded","true");
+    $("#openStudio").setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setPageInert(true);
+    $("#closeStudio").focus();
   }
   function closeStudio(){
     studio.classList.remove("open");backdrop.classList.remove("show");studio.setAttribute("aria-hidden","true");
-    $("#openStudio").setAttribute("aria-expanded","false");
+    $("#openStudio").setAttribute("aria-expanded","false");document.body.style.overflow="";setPageInert(false);
+    if(studioTrigger&&typeof studioTrigger.focus==="function")studioTrigger.focus();
   }
   $("#openStudio").addEventListener("click",openStudio);
   $("#studioFab").addEventListener("click",openStudio);
   $("#closeStudio").addEventListener("click",closeStudio);
   $("#closeStudioBottom").addEventListener("click",closeStudio);
   backdrop.addEventListener("click",closeStudio);
-  document.addEventListener("keydown",event=>{if(event.key==="Escape")closeStudio();});
+  document.addEventListener("keydown",event=>{
+    if(event.key==="Escape"&&studio.classList.contains("open")){closeStudio();return;}
+    if(event.key==="Tab"&&studio.classList.contains("open")){
+      const items=$("button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[href]",studio).filter(el=>el.offsetParent!==null);
+      if(!items.length)return;const first=items[0],last=items[items.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+  });
   $$(".studio-tab").forEach(tab=>tab.addEventListener("click",()=>{
     $$(".studio-tab").forEach(item=>item.classList.toggle("active",item===tab));
     $$(".studio-panel").forEach(panel=>panel.hidden=panel.dataset.panel!==tab.dataset.tab);
@@ -85,6 +100,26 @@
     $("#"+id).addEventListener("change",event=>{settings[key]=event.target.checked;apply();save();});
   });
   $("#resetDesign").addEventListener("click",()=>{settings={...defaults};apply();save();notify("Design settings reset");});
+  $("#exportDesign").addEventListener("click",()=>{
+    const blob=new Blob([JSON.stringify({schema:"olive-insight-design-v1",settings},null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="olive-insight-design.json";link.click();URL.revokeObjectURL(url);notify("Design settings exported");
+  });
+  $("#importDesign").addEventListener("click",()=>$("#importDesignFile").click());
+  $("#importDesignFile").addEventListener("change",async event=>{
+    const file=event.target.files?.[0];if(!file)return;
+    try{
+      const data=JSON.parse(await file.text());const incoming=data.settings||data;
+      const valid={...defaults};
+      if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error("Invalid settings");
+      valid.theme=Object.hasOwn(palettes,incoming.theme)?incoming.theme:defaults.theme;
+      valid.accent=typeof incoming.accent==="string"&&/^#[0-9a-f]{6}$/i.test(incoming.accent)?incoming.accent:palettes[valid.theme].accent;
+      for(const key of ["blur","opacity","radius","speed"])if(Number.isFinite(Number(incoming[key])))valid[key]=Math.max(({blur:4,opacity:20,radius:8,speed:5})[key],Math.min(({blur:32,opacity:85,radius:40,speed:30})[key],Number(incoming[key])));
+      if(["Manrope","Inter","system"].includes(incoming.font))valid.font=incoming.font;
+      for(const key of ["borders","mascot","float","reveal"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
+      settings=valid;apply();save();notify("Design settings imported");
+    }catch(_){notify("Invalid design settings file");}
+    event.target.value="";
+  });
   $("#applyPrompt").addEventListener("click",()=>{
     const prompt=$("#designPrompt").value.trim().toLowerCase();
     if(!prompt){notify("Describe the visual direction first");return;}
@@ -96,14 +131,43 @@
     if(/less blur|sharper|crisp/.test(prompt)){settings.blur=8;changed=true;}
     if(/rounder|rounded|softer corners/.test(prompt)){settings.radius=32;changed=true;}
     if(/square|less rounded|sharper corners/.test(prompt)){settings.radius=12;changed=true;}
-    if(/faster border|faster animation/.test(prompt)){settings.speed=7;changed=true;}
-    if(/slower border|slower animation/.test(prompt)){settings.speed=22;changed=true;}
+    if(/faster border|faster animation|quick border/.test(prompt)){settings.speed=7;changed=true;}
+    if(/slower border|slower animation|calm border/.test(prompt)){settings.speed=22;changed=true;}
+    if(/more transparent|lighter glass|less opaque/.test(prompt)){settings.opacity=34;changed=true;}
+    if(/less transparent|darker glass|more opaque/.test(prompt)){settings.opacity=76;changed=true;}
+    if(/compact|tighter spacing|less spacing/.test(prompt)){settings.radius=14;settings.blur=12;changed=true;}
+    if(/spacious|more spacing|airy layout/.test(prompt)){settings.radius=30;settings.blur=22;changed=true;}
+    if(/system font|system typography/.test(prompt)){settings.font="system";changed=true;}
+    if(/inter font|use inter/.test(prompt)){settings.font="Inter";changed=true;}
+    if(/manrope font|use manrope/.test(prompt)){settings.font="Manrope";changed=true;}
+    if(/disable floating|stop floating|still mascot/.test(prompt)){settings.float=false;changed=true;}
+    if(/enable floating|floating mascot/.test(prompt)){settings.float=true;changed=true;}
+    if(/hide border|remove border|disable border|stop border/.test(prompt)){settings.borders=false;changed=true;}
+    if(/enable border|show border|animated border/.test(prompt)){settings.borders=true;changed=true;}
     if(/hide mascot|remove mascot/.test(prompt)){settings.mascot=false;changed=true;}
     if(/show mascot/.test(prompt)){settings.mascot=true;changed=true;}
-    if(/disable border|stop border/.test(prompt)){settings.borders=false;changed=true;}
     if(/enable border|animated border/.test(prompt)){settings.borders=true;changed=true;}
     if(!changed){notify("No supported visual instruction found yet");return;}
     apply();save();notify("Supported design directions applied");
+  });
+  const companion=$("#companion"),companionBubble=$("#companionBubble");
+  const companionLines=["Curiosity first. Evidence always.","A good question changes the analysis.","Let's turn another question into insight.","Tap again — I am still here."];
+  let companionCount=0,companionTimer;
+  function reactToCompanion(){
+    companionCount++;companion.classList.remove("is-reacting");void companion.offsetWidth;companion.classList.add("is-reacting");
+    companion.setAttribute("aria-pressed","true");companionBubble.textContent=companionLines[(companionCount-1)%companionLines.length];
+    clearTimeout(companionTimer);companionTimer=setTimeout(()=>{companion.classList.remove("is-reacting");companion.setAttribute("aria-pressed","false");},1500);
+  }
+  companion.addEventListener("click",reactToCompanion);
+  companion.addEventListener("pointerdown",event=>{
+    if(event.pointerType==="touch"){companion.style.setProperty("--touch-x",event.clientX+"px");reactToCompanion();}
+  });
+  companion.addEventListener("pointermove",event=>{
+    if(event.pointerType==="mouse"&&event.buttons===0){
+      const rect=companion.getBoundingClientRect();const x=(event.clientX-(rect.left+rect.width/2))/rect.width;
+      companion.style.setProperty("--look-x",String(Math.max(-1,Math.min(1,x))));
+      companion.style.setProperty("--look-y",String(Math.max(-1,Math.min(1,(event.clientY-(rect.top+rect.height/2))/rect.height))));
+    }
   });
   $("#menuToggle").addEventListener("click",()=>{
     const nav=$("#mainNav");const isOpen=nav.classList.toggle("open");
