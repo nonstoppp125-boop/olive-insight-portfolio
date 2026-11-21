@@ -61,7 +61,7 @@
   }
   let studioTrigger=null;
   function setPageInert(value){
-    ["#siteHeader","#home","#siteFooter","#studioFab","#companion"].forEach(selector=>{const node=$(selector);if(node)node.inert=value;});
+    ["#siteHeader","#home","#siteFooter","#studioFab"].forEach(selector=>{const node=$(selector);if(node)node.inert=value;});
   }
   function openStudio(event){
     studioTrigger=event?.currentTarget||document.activeElement;
@@ -161,23 +161,27 @@
     if(!changed){notify("No supported visual instruction found yet");return;}
     apply();save();notify("Supported design directions applied");
   });
-  const companion=$("#companion"),companionBubble=$("#companionBubble");
-  const companionLines=["Curiosity first. Evidence always.","A good question changes the analysis.","Let's turn another question into insight.","Tap again — I am still here."];
-  let companionCount=0,companionTimer;
-  function reactToCompanion(){
-    companionCount++;companion.classList.remove("is-reacting");void companion.offsetWidth;companion.classList.add("is-reacting");
-    companion.setAttribute("aria-pressed","true");companionBubble.textContent=companionLines[(companionCount-1)%companionLines.length];
-    clearTimeout(companionTimer);companionTimer=setTimeout(()=>{companion.classList.remove("is-reacting");companion.setAttribute("aria-pressed","false");},1500);
+  const bgCompanion=$("#bgCompanion");
+  let bgFrame=0,bgX=0,bgY=0,bgReactTimer;
+  function moveBackgroundCompanion(event){
+    if(!bgCompanion||event.pointerType==="touch")return;
+    bgX=(event.clientX/window.innerWidth-.5)*18;
+    bgY=(event.clientY/window.innerHeight-.5)*12;
+    if(!bgFrame)bgFrame=requestAnimationFrame(()=>{
+      bgCompanion.style.setProperty("--bg-x",bgX.toFixed(1)+"px");
+      bgCompanion.style.setProperty("--bg-y",bgY.toFixed(1)+"px");
+      bgFrame=0;
+    });
   }
-  companion.addEventListener("click",reactToCompanion);
-  companion.addEventListener("pointerleave",()=>{companion.style.setProperty("--look-x","0px");companion.style.setProperty("--look-y","0px");});
-  companion.addEventListener("pointermove",event=>{
-    if(event.pointerType==="mouse"&&event.buttons===0){
-      const rect=companion.getBoundingClientRect();const x=(event.clientX-(rect.left+rect.width/2))/rect.width;
-      companion.style.setProperty("--look-x",(Math.max(-1,Math.min(1,x))*4)+"px");
-      companion.style.setProperty("--look-y",(Math.max(-1,Math.min(1,(event.clientY-(rect.top+rect.height/2))/rect.height))*2)+"px");
-    }
-  });
+  function reactBackgroundCompanion(){
+    if(!bgCompanion||body.classList.contains("no-mascot"))return;
+    bgCompanion.classList.remove("is-reacting");void bgCompanion.offsetWidth;
+    bgCompanion.classList.add("is-reacting");
+    clearTimeout(bgReactTimer);
+    bgReactTimer=setTimeout(()=>bgCompanion.classList.remove("is-reacting"),1050);
+  }
+  window.addEventListener("pointermove",moveBackgroundCompanion,{passive:true});
+  window.addEventListener("pointerdown",reactBackgroundCompanion,{passive:true});
   $("#menuToggle").addEventListener("click",()=>{
     const nav=$("#mainNav");const isOpen=nav.classList.toggle("open");
     $("#menuToggle").setAttribute("aria-expanded",String(isOpen));
@@ -197,6 +201,5 @@
     if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};}
   }catch(_){}
   apply();setupReveal();
-  window.addEventListener("load",()=>{if(window.lucide)window.lucide.createIcons();});
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
 })();
