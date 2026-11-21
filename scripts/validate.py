@@ -71,6 +71,8 @@ def main():
         errors.append("glass surfaces must avoid expensive full-surface backdrop blur")
     if not re.search(r'\.glass:before\s*\{[^}]*animation:border-turn', css):
         errors.append("glass cards must retain animated border treatment")
+    if "animation-play-state:var(--border-play,running)" not in css or "setupBorderMotion" not in js:
+        errors.append("off-screen card borders must pause to reduce rendering work")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
