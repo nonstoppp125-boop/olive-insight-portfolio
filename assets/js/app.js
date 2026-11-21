@@ -187,6 +187,13 @@
     $("#menuToggle").setAttribute("aria-expanded",String(isOpen));
   });
   $$("#mainNav a").forEach(link=>link.addEventListener("click",()=>$("#mainNav").classList.remove("open")));
+  function setupBorderMotion(){
+    if(!("IntersectionObserver" in window))return;
+    const observer=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>entry.target.style.setProperty("--border-play",entry.isIntersecting?"running":"paused"));
+    },{rootMargin:"80px"});
+    $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
+  }
   function setupReveal(){
     const targets=$$(".section,.intro,.contact-card,.hero-copy,.hero-art");
     targets.forEach(element=>element.classList.add("reveal"));
@@ -200,6 +207,6 @@
     const stored=localStorage.getItem("oliveInsightDesign");
     if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};}
   }catch(_){}
-  apply();setupReveal();
+  apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
 })();
