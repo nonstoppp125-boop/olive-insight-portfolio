@@ -205,26 +205,40 @@
       railFrame=0;
       const limit=pageScrollLimit();
       const progress=limit?Math.max(0,Math.min(1,window.scrollY/limit)):0;
+      const ballSize=scrollRailBall.offsetHeight||15;
+      const ballY=progress*Math.max(0,scrollRail.clientHeight-ballSize);
       scrollRail.style.setProperty("--rail-progress",(progress*100).toFixed(3)+"%");
+      scrollRail.style.setProperty("--rail-ball-y",ballY.toFixed(2)+"px");
       scrollRailBall.setAttribute("aria-valuenow",String(Math.round(progress*100)));
     }
     function scheduleRailPaint(){if(!railFrame)railFrame=requestAnimationFrame(paintScrollRail);}
     function scrubRail(event){
       const rect=scrollRail.getBoundingClientRect();
-      const progress=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
-      document.documentElement.scrollTop=progress*pageScrollLimit();
-      document.body.scrollTop=progress*pageScrollLimit();
+      const ballSize=scrollRailBall.offsetHeight||15;
+      const travel=Math.max(1,rect.height-ballSize);
+      const progress=Math.max(0,Math.min(1,(event.clientY-rect.top-ballSize/2)/travel));
+      const target=progress*pageScrollLimit();
+      document.documentElement.scrollTop=target;
+      document.body.scrollTop=target;
       paintScrollRail();
     }
     scrollRailBall.addEventListener("pointerdown",event=>{
       railDragging=true;
+      document.documentElement.dataset.railPreviousBehavior=document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior="auto";
       scrollRail.classList.add("is-dragging");
       try{scrollRailBall.setPointerCapture(event.pointerId);}catch(_){}
       scrubRail(event);
       event.preventDefault();
     });
     scrollRailBall.addEventListener("pointermove",event=>{if(railDragging)scrubRail(event);});
-    function stopRailDrag(){railDragging=false;scrollRail.classList.remove("is-dragging");}
+    function stopRailDrag(){
+      if(!railDragging)return;
+      railDragging=false;
+      document.documentElement.style.scrollBehavior=document.documentElement.dataset.railPreviousBehavior||"";
+      delete document.documentElement.dataset.railPreviousBehavior;
+      scrollRail.classList.remove("is-dragging");
+    }
     scrollRailBall.addEventListener("pointerup",stopRailDrag);
     scrollRailBall.addEventListener("pointercancel",stopRailDrag);
     scrollRailBall.addEventListener("lostpointercapture",stopRailDrag);
