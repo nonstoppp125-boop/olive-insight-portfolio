@@ -34,8 +34,8 @@ The interface includes mobile navigation, keyboard dismissal for the studio, vis
 
 ## Interactive experience
 
-- A persistent, fixed-position floating companion remains available across every page section, adapts to mobile screens, supports keyboard focus, and responds to pointer movement and touch/click activation.
-- The Design Studio controls color palettes, accent, glass blur/opacity, radius, typography, border speed, mascot visibility and motion.
+- A low-contrast animated companion lives behind the page content across all sections; pointer movement subtly guides it and touch anywhere triggers a smooth reaction without covering links or controls.
+- The Design Studio controls color palettes, accent, background softness, glass opacity, radius, typography, border speed, mascot visibility and motion.
 - Design preferences persist locally in the browser and can be exported/imported as JSON.
 - Prompt controls interpret supported visual instructions locally; they do not call an AI model or send design data to a server.
-- Reduced-motion preferences are respected. The studio supports keyboard focus management and Escape-to-close.
+- The site avoids remote font/icon downloads and heavy glass blur on the critical render path. Reduced-motion preferences are respected. The studio supports keyboard focus management and Escape-to-close.
