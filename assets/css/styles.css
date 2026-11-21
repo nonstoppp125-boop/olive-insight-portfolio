@@ -48,7 +48,7 @@
 @keyframes bg-mascot-drift{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
 @keyframes bg-mascot-react{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-17px) rotate(-6deg)}70%{transform:translateY(-4px) rotate(5deg)}}
 body.no-mascot .bg-companion{display:none}
-body.no-float .bg-mascot{animation:none}
+body.no-float .bg-mascot,body.no-float .bg-companion.is-reacting .bg-mascot{animation:none!important}
 .site-header,main,.footer,.studio-fab,.studio,.toast{position:relative;z-index:2}
 .site-header{z-index:30}
 .studio,.studio-fab,.toast{position:fixed}
@@ -125,7 +125,7 @@ p{ text-wrap:pretty }
 }
 
 /* Ambient lighting without expensive full-layer blur */
-.ambient{filter:none!important;background:radial-gradient(circle,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),0) 72%)}
+.ambient{filter:none!important;background:radial-gradient(circle,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),0) var(--ambient-softness,72%))}
 .bg-mascot{filter:none!important}
 .float-note{border:1px solid rgba(var(--accent-rgb),.2);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.01)),rgba(25,30,20,.86)}
 /* Consistent micro-interactions for every interactive surface */
