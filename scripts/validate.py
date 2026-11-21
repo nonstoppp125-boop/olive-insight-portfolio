@@ -109,8 +109,11 @@ def main():
         errors.append("capsule must orbit around the full viewport like a clock hand")
     if "--edge-angle" not in css or "linear-gradient(transparent,transparent) padding-box,conic-gradient" not in css:
         errors.append("animated card edges must be drawn only on the outer perimeter")
-    if "mask-composite:exclude" in css[css.rfind("/* FINAL MOTION GEOMETRY"):]:
-        errors.append("final card-edge treatment must not depend on an inner fill mask")
+    final_motion_css = css[css.rfind("/* FINAL MOTION GEOMETRY"):]
+    if "mask-composite:exclude" not in final_motion_css or "-webkit-mask-composite:xor" not in final_motion_css:
+        errors.append("animated edge must use a perimeter-only mask for standard and WebKit browsers")
+    if "linear-gradient(transparent,transparent) padding-box,conic-gradient" in final_motion_css:
+        errors.append("animated edge gradient must not paint across the card face")
     if "borderSpeed" not in js or 'id="borderSpeedControl"' not in html or 'id="borderToggle"' not in html:
         errors.append("super-thin card edge animation controls must remain available")
     for control in ("accentRed", "accentGreen", "accentBlue", "accentHex"):
