@@ -166,3 +166,18 @@ p{ text-wrap:pretty }
  .card p,.timeline-card p,.research-grid p,.empty-state p,.progress-panel p,.contact-card p{font-size:12px}
  .studio-tabs{position:sticky;top:-18px;z-index:2}
 }
+
+/* Unified control geometry: button and card radii now share one design token */
+.button{min-height:44px;border-radius:clamp(10px,calc(var(--radius)*.58),18px)}
+.icon-button{width:42px;height:42px;flex:0 0 42px;border-radius:clamp(10px,calc(var(--radius)*.5),15px)}
+.float-note{border-radius:clamp(12px,calc(var(--radius)*.55),18px)}
+.studio-tab{border-radius:clamp(9px,calc(var(--radius)*.42),13px)}
+.studio .button{min-height:44px;border-radius:12px}
+.studio-io .button{min-height:48px}
+.header-actions{align-items:center}
+.header-actions .button{white-space:nowrap}
+@media(max-width:680px){
+ .button{min-height:44px;padding-inline:16px}
+ .icon-button{width:40px;height:40px;flex-basis:40px}
+ .studio .button{white-space:normal}
+}
