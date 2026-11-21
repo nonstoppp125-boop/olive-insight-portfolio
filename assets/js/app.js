@@ -159,12 +159,12 @@
     clearTimeout(companionTimer);companionTimer=setTimeout(()=>{companion.classList.remove("is-reacting");companion.setAttribute("aria-pressed","false");},1500);
   }
   companion.addEventListener("click",reactToCompanion);
-  companion.addEventListener("pointerleave",()=>{companion.style.setProperty("--look-x","0");companion.style.setProperty("--look-y","0");});
+  companion.addEventListener("pointerleave",()=>{companion.style.setProperty("--look-x","0px");companion.style.setProperty("--look-y","0px");});
   companion.addEventListener("pointermove",event=>{
     if(event.pointerType==="mouse"&&event.buttons===0){
       const rect=companion.getBoundingClientRect();const x=(event.clientX-(rect.left+rect.width/2))/rect.width;
-      companion.style.setProperty("--look-x",String(Math.max(-1,Math.min(1,x))));
-      companion.style.setProperty("--look-y",String(Math.max(-1,Math.min(1,(event.clientY-(rect.top+rect.height/2))/rect.height))));
+      companion.style.setProperty("--look-x",(Math.max(-1,Math.min(1,x))*4)+"px");
+      companion.style.setProperty("--look-y",(Math.max(-1,Math.min(1,(event.clientY-(rect.top+rect.height/2))/rect.height))*2)+"px");
     }
   });
   $("#menuToggle").addEventListener("click",()=>{
