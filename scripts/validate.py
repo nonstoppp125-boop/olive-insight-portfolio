@@ -1,4 +1,3 @@
-from html.parser import HTMLParser
 from pathlib import Path
 import re
 import sys
@@ -8,57 +7,60 @@ HTML = ROOT / "index.html"
 CSS = ROOT / "assets/css/styles.css"
 JS = ROOT / "assets/js/app.js"
 
-class AuditParser(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.ids = []
-        self.targets = []
-        self.assets = []
-        self.errors = []
-    def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        if "id" in attrs:
-            self.ids.append(attrs["id"])
-        if tag == "a" and attrs.get("href", "").startswith("#"):
-            self.targets.append(attrs["href"][1:])
-        for key in ("src", "href"):
-            value = attrs.get(key, "")
-            if value and not value.startswith(("http://", "https://", "mailto:", "#", "data:")):
-                if value.split("?", 1)[0].endswith((".css", ".js", ".svg")):
-                    self.assets.append(value.split("?", 1)[0])
-
 def main():
+    errors = []
     for path in (HTML, CSS, JS):
         if not path.is_file():
-            raise SystemExit(f"FAIL: missing {path.relative_to(ROOT)}")
+            errors.append(f"missing required file: {path.relative_to(ROOT)}")
+    if errors:
+        print("\\n".join("FAIL: " + item for item in errors))
+        return 1
+
     html = HTML.read_text(encoding="utf-8")
     css = CSS.read_text(encoding="utf-8")
     js = JS.read_text(encoding="utf-8")
-    parser = AuditParser()
-    parser.feed(html)
-    duplicates = sorted({x for x in parser.ids if parser.ids.count(x) > 1})
+
+    ids = re.findall(r'\\bid="([^"]+)"', html)
+    duplicates = sorted({item for item in ids if ids.count(item) > 1})
     if duplicates:
-        parser.errors.append("duplicate IDs: " + ", ".join(duplicates))
-    missing_targets = sorted(set(parser.targets) - set(parser.ids))
+        errors.append("duplicate IDs: " + ", ".join(duplicates))
+
+    targets = re.findall(r'<a\\b[^>]*href="#([^"]+)"', html)
+    missing_targets = sorted(set(targets) - set(ids))
     if missing_targets:
-        parser.errors.append("missing in-page targets: " + ", ".join(missing_targets))
-    missing_assets = [x for x in parser.assets if not (ROOT / x).is_file()]
+        errors.append("missing in-page targets: " + ", ".join(missing_targets))
+
+    refs = re.findall(r'\\b(?:src|href)="([^"]+)"', html)
+    local_assets = [
+        value.split("?", 1)[0] for value in refs
+        if not value.startswith(("http://", "https://", "mailto:", "#", "data:"))
+        and value.split("?", 1)[0].endswith((".css", ".js", ".svg"))
+    ]
+    missing_assets = sorted({value for value in local_assets if not (ROOT / value).is_file()})
     if missing_assets:
-        parser.errors.append("missing local assets: " + ", ".join(missing_assets))
+        errors.append("missing local assets: " + ", ".join(missing_assets))
+
     if css.count("{") != css.count("}"):
-        parser.errors.append("unbalanced CSS braces")
-    for section in ("about", "education", "skills", "ai-workflow", "research", "projects", "progress", "future", "contact"):
+        errors.append(f"unbalanced CSS braces: {css.count('{')} opening / {css.count('}')} closing")
+
+    sections = ("about", "education", "skills", "ai-workflow", "research", "projects", "progress", "future", "contact")
+    for section in sections:
         if f'id="{section}"' not in html:
-            parser.errors.append(f"missing portfolio section: {section}")
-    for required in ("openStudio", "applyPrompt", "localStorage", "prefers-reduced-motion", "companion", "pointermove", "exportDesign", "importDesign", "aria-modal", "setPageInert"):
-        if required not in (html + js + css):
-            parser.errors.append(f"missing expected feature marker: {required}")
-    if parser.errors:
-        for error in parser.errors:
+            errors.append(f"missing portfolio section: {section}")
+
+    markers = ("openStudio", "applyPrompt", "localStorage", "prefers-reduced-motion",
+               "companion", "pointermove", "exportDesign", "importDesign", "aria-modal", "setPageInert")
+    for marker in markers:
+        if marker not in html + js + css:
+            errors.append(f"missing expected feature marker: {marker}")
+
+    if errors:
+        for error in errors:
             print("FAIL:", error)
         return 1
-    print("PASS: HTML parsed; unique IDs; in-page links; local assets; CSS braces; portfolio sections; persistent companion; touch interaction; studio accessibility and import/export.")
-    print(f"Audited {len(parser.ids)} IDs, {len(parser.targets)} in-page links and {len(parser.assets)} local asset references.")
+
+    print("PASS: portfolio structure, unique IDs, anchor targets, local assets, CSS balance, persistent interactive companion, accessible studio and settings import/export.")
+    print(f"Audited {len(ids)} IDs, {len(targets)} in-page links and {len(local_assets)} local assets.")
     return 0
 
 if __name__ == "__main__":
