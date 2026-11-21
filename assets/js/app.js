@@ -207,7 +207,7 @@
       const progress=limit?Math.max(0,Math.min(1,window.scrollY/limit)):0;
       const ballSize=scrollRailBall.offsetHeight||15;
       const ballY=progress*Math.max(0,scrollRail.clientHeight-ballSize);
-      scrollRail.style.setProperty("--rail-progress",(progress*100).toFixed(3)+"%");
+      scrollRail.style.setProperty("--rail-progress",(ballY+ballSize/2).toFixed(2)+"px");
       scrollRail.style.setProperty("--rail-ball-y",ballY.toFixed(2)+"px");
       scrollRailBall.setAttribute("aria-valuenow",String(Math.round(progress*100)));
     }
