@@ -245,7 +245,7 @@ body.no-capsule .ambient-capsule{display:none}
  @keyframes capsule-fallback{to{transform:translate(-50%,-50%) rotate(360deg)}}
 }
 .glass{border:1px solid transparent;isolation:isolate}
-.glass:before{content:"";position:absolute;inset:0;border:1px solid transparent;padding:0;border-radius:inherit;background:linear-gradient(transparent,transparent) padding-box,conic-gradient(from var(--edge-angle,0deg),rgba(var(--accent-rgb),.10),rgba(255,255,255,.52),rgba(var(--accent-rgb),.30),rgba(255,255,255,.10),rgba(var(--accent-rgb),.10)) border-box;animation:border-turn var(--border-speed,24s) linear infinite;animation-play-state:var(--border-play,running);opacity:.46;z-index:2;pointer-events:none}
+.glass:before{content:"";position:absolute;inset:-.5px;border:0;padding:1px;border-radius:inherit;background:conic-gradient(from var(--edge-angle,0deg),rgba(var(--accent-rgb),.10),rgba(255,255,255,.52),rgba(var(--accent-rgb),.30),rgba(255,255,255,.10),rgba(var(--accent-rgb),.10));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;animation:border-turn var(--border-speed,24s) linear infinite;animation-play-state:var(--border-play,running);opacity:.46;z-index:2;pointer-events:none}
 .glass:after{z-index:0;pointer-events:none}
 .glass>*{position:relative;z-index:1}
 body.no-border .glass:before{animation:none;opacity:0}
@@ -277,6 +277,10 @@ body.no-border .glass:before{animation:none;opacity:0}
 
 /* Animated hairline perimeter also wraps Design Studio options and action controls */
 .studio-tab,.studio .control select,.studio .control input[type=color],.studio .hex-input,.studio .studio-panel textarea,.studio .button,.icon-button{position:relative;isolation:isolate}
-.studio-tab:before,.studio .control select:before,.studio .control input[type=color]:before,.studio .hex-input:before,.studio .studio-panel textarea:before,.studio .button:before,.icon-button:before{content:"";position:absolute;inset:0;border:1px solid transparent;border-radius:inherit;background:linear-gradient(transparent,transparent) padding-box,conic-gradient(from var(--edge-angle,0deg),rgba(var(--accent-rgb),.10),rgba(255,255,255,.48),rgba(var(--accent-rgb),.28),rgba(255,255,255,.08),rgba(var(--accent-rgb),.10)) border-box;animation:border-turn var(--border-speed,24s) linear infinite;animation-play-state:var(--border-play,running);opacity:.36;pointer-events:none;z-index:0}
+.studio-tab:before,.studio .button:before,.icon-button:before{content:"";position:absolute;inset:-.5px;border:0;padding:1px;border-radius:inherit;background:conic-gradient(from var(--edge-angle,0deg),rgba(var(--accent-rgb),.10),rgba(255,255,255,.48),rgba(var(--accent-rgb),.28),rgba(255,255,255,.08),rgba(var(--accent-rgb),.10));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;animation:border-turn var(--border-speed,24s) linear infinite;animation-play-state:var(--border-play,running);opacity:.36;pointer-events:none;z-index:2}
 .studio-tab>*,.studio .button>*,.icon-button>*{position:relative;z-index:1}
 body.no-border .studio-tab:before,body.no-border .studio .control select:before,body.no-border .studio .control input[type=color]:before,body.no-border .studio .hex-input:before,body.no-border .studio .studio-panel textarea:before,body.no-border .studio .button:before,.no-border .icon-button:before{animation:none;opacity:0}
+
+@supports not (mask-composite:exclude) and not (-webkit-mask-composite:xor){
+ .glass:before,.studio-tab:before,.studio .button:before,.icon-button:before{content:none}
+}
