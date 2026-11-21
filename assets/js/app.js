@@ -187,7 +187,8 @@
     const maxX=Math.max(0,window.innerWidth-bgCompanion.offsetWidth);
     const maxY=Math.max(0,window.innerHeight-bgCompanion.offsetHeight);
     const left=Math.max(0,Math.min(maxX,x)),top=Math.max(0,Math.min(maxY,y));
-    bgCompanion.style.left=left+"px";bgCompanion.style.top=top+"px";bgCompanion.style.bottom="auto";
+    bgCompanion.style.setProperty("--mascot-x",left+"px");
+    bgCompanion.style.setProperty("--mascot-y",top+"px");
     if(persist){
       mascotPosition={x:maxX?left/maxX:0,y:maxY?top/maxY:0};
       try{localStorage.setItem("oliveInsightMascotPosition",JSON.stringify(mascotPosition));}catch(_){}
@@ -204,7 +205,9 @@
   function startMascotDrag(event){
     if(body.classList.contains("no-mascot")||!event.target.closest(".mascot"))return;
     mascotDragging=true;mascotMoved=false;mascotPointerId=event.pointerId;
-    const rect=bgCompanion.getBoundingClientRect();mascotOffsetX=event.clientX-rect.left;mascotOffsetY=event.clientY-rect.top;
+    const rect=bgCompanion.getBoundingClientRect();
+    mascotOffsetX=event.clientX-rect.left;mascotOffsetY=event.clientY-rect.top;
+    mascotNextX=rect.left;mascotNextY=rect.top;
     bgCompanion.classList.add("is-dragging");
     try{bgCompanion.setPointerCapture(event.pointerId);}catch(_){}
     event.preventDefault();
@@ -216,18 +219,34 @@
     if(!mascotFrame)mascotFrame=requestAnimationFrame(()=>{
       applyMascotPosition(mascotNextX,mascotNextY);mascotFrame=0;
     });
+    event.preventDefault();
+  }
+  function snapMascotToNearestEdge(){
+    const maxX=Math.max(0,window.innerWidth-bgCompanion.offsetWidth);
+    const maxY=Math.max(0,window.innerHeight-bgCompanion.offsetHeight);
+    const x=Math.max(0,Math.min(maxX,mascotNextX));
+    const y=Math.max(0,Math.min(maxY,mascotNextY));
+    const edges=[{edge:"left",distance:x},{edge:"right",distance:maxX-x},{edge:"top",distance:y},{edge:"bottom",distance:maxY-y}];
+    edges.sort((a,b)=>a.distance-b.distance);
+    if(edges[0].edge==="left")mascotNextX=0;
+    else if(edges[0].edge==="right")mascotNextX=maxX;
+    else if(edges[0].edge==="top")mascotNextY=0;
+    else mascotNextY=maxY;
+    applyMascotPosition(mascotNextX,mascotNextY,true);
   }
   function finishMascotDrag(event){
     if(!mascotDragging||event.pointerId!==mascotPointerId)return;
-    mascotDragging=false;mascotPointerId=null;bgCompanion.classList.remove("is-dragging");
+    mascotDragging=false;mascotPointerId=null;
     if(mascotFrame){cancelAnimationFrame(mascotFrame);mascotFrame=0;}
-    if(mascotMoved)applyMascotPosition(mascotNextX,mascotNextY,true);
-    else{const rect=bgCompanion.getBoundingClientRect();applyMascotPosition(rect.left,rect.top,true);}
-    if(!mascotMoved){
+    if(mascotMoved)snapMascotToNearestEdge();
+    else{
+      const rect=bgCompanion.getBoundingClientRect();
+      applyMascotPosition(rect.left,rect.top,true);
       bgCompanion.classList.remove("is-reacting");
       requestAnimationFrame(()=>bgCompanion.classList.add("is-reacting"));
       setTimeout(()=>bgCompanion.classList.remove("is-reacting"),850);
     }
+    bgCompanion.classList.remove("is-dragging");
   }
   bgCompanion.addEventListener("pointerdown",startMascotDrag);
   window.addEventListener("pointermove",dragMascot,{passive:false});
