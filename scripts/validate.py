@@ -140,8 +140,10 @@ def main():
 
     if 'id="scrollRail"' not in html or 'id="scrollRailBall"' not in html or "scrubRail(event)" not in js:
         errors.append("draggable vertical scroll rail and progress ball are required")
-    if "left:clamp(8px,1.6vw,22px)" not in css or "top:26px;bottom:26px" not in css or "--rail-ball-y" not in css + js or "width:23px;height:23px" not in css or "ballY+ballSize/2" not in js:
+    if "left:clamp(8px,1.6vw,22px)" not in css or "top:26px;bottom:26px" not in css or "--rail-ball-y" not in css + js or "width:21px;height:21px" not in css or "width:20px;height:20px" not in css or "ballY+ballSize/2" not in js:
         errors.append("scroll rail must span the full viewport on the left with an edge-safe ball position")
+    if "scale(1.19)" not in css or "scale(1.2)" not in css or "transition:box-shadow .12s ease,transform .12s ease" not in css:
+        errors.append("scroll ball must grow smoothly while dragging without changing its layout geometry")
     if 'style.scrollBehavior="auto"' not in js or "railPreviousBehavior" not in js:
         errors.append("direct ball dragging must bypass smooth-scroll easing to prevent lag")
     if ".scroll-rail-progress" not in css or "touch-action:none" not in css:
