@@ -54,6 +54,22 @@ def main():
         if marker not in html + js + css:
             errors.append(f"missing expected feature marker: {marker}")
 
+    companion_match = re.search(r'<button\\b[^>]*\\bid="companion"[^>]*>', html)
+    if not companion_match:
+        errors.append("companion must be a native, accessible button")
+    elif html.find(companion_match.group(0)) < html.find("</main>"):
+        errors.append("companion must be outside main content so it persists site-wide")
+
+    companion_rule = re.search(r'\\.companion\\s*\\{([^}]*)\\}', css)
+    if not companion_rule or not re.search(r'position\\s*:\\s*fixed', companion_rule.group(1)):
+        errors.append("companion must use fixed positioning across page sections")
+    mobile_rule = re.search(r'@media\\s*\\(max-width\\s*:\\s*680px\\)\\s*\\{([^}]*)\\}', css)
+    if not mobile_rule or ".companion{" not in mobile_rule.group(1):
+        errors.append("companion must have a mobile-specific responsive rule")
+    for marker in ('companion.addEventListener("click"', 'companion.addEventListener("pointermove"'):
+        if marker not in js:
+            errors.append("companion interaction missing: " + marker)
+
     if errors:
         for error in errors:
             print("FAIL:", error)
