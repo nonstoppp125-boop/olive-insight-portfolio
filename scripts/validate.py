@@ -31,6 +31,12 @@ def main():
         errors.append("responsive viewport metadata is required")
     if not re.search(r'<meta\b[^>]*name="description"', html, re.I):
         errors.append("search description metadata is required")
+    if 'class="skip-link" href="#home"' not in html or ".skip-link:focus" not in css:
+        errors.append("keyboard users need a visible skip-to-content link")
+    if ':focus-visible' not in css or 'aria-label="Primary navigation"' not in html:
+        errors.append("keyboard focus and primary navigation semantics are required")
+    if 'aria-controls="mainNav" aria-expanded="false"' not in html or 'setAttribute("aria-expanded","false")' not in js:
+        errors.append("mobile navigation expanded state must stay synchronized")
     if re.search(r'<(?:script|link)\b[^>]*(?:src|href)="https?://', html, re.I):
         errors.append("critical scripts and styles must remain local")
     if re.search(r'<img\b(?![^>]*\balt=)[^>]*>', html, re.I):
