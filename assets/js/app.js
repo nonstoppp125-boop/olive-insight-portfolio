@@ -15,6 +15,7 @@
   };
   let settings = {...defaults};
   let toastTimer;
+  studio.inert=true;
   function notify(message){
     toast.textContent = message; toast.classList.add("show");
     clearTimeout(toastTimer); toastTimer = setTimeout(()=>toast.classList.remove("show"),2300);
@@ -64,12 +65,12 @@
   }
   function openStudio(event){
     studioTrigger=event?.currentTarget||document.activeElement;
-    studio.classList.add("open");backdrop.classList.add("show");studio.setAttribute("aria-hidden","false");
+    studio.inert=false;studio.classList.add("open");backdrop.classList.add("show");studio.setAttribute("aria-hidden","false");
     $("#openStudio").setAttribute("aria-expanded","true");document.body.style.overflow="hidden";setPageInert(true);
     $("#closeStudio").focus();
   }
   function closeStudio(){
-    studio.classList.remove("open");backdrop.classList.remove("show");studio.setAttribute("aria-hidden","true");
+    studio.classList.remove("open");backdrop.classList.remove("show");studio.setAttribute("aria-hidden","true");studio.inert=true;
     $("#openStudio").setAttribute("aria-expanded","false");document.body.style.overflow="";setPageInert(false);
     if(studioTrigger&&typeof studioTrigger.focus==="function")studioTrigger.focus();
   }
