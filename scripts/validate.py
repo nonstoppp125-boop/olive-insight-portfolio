@@ -89,8 +89,10 @@ def main():
         errors.append("background character must remain fixed across all sections")
     if 'bgCompanion.addEventListener("pointerdown",startMascotDrag)' not in js or "function dragMascot(event)" not in js or "oliveInsightMascotPosition" not in js:
         errors.append("background character must be draggable and retain its position")
-    if "mascotNextX=event.clientX-mascotOffsetX" not in js or "applyMascotPosition(mascotNextX,mascotNextY,true)" not in js:
-        errors.append("drag updates must coalesce to the latest pointer position without dropping the final frame")
+    if "mascotNextX=event.clientX-mascotOffsetX" not in js or "requestAnimationFrame" not in js or "snapMascotToNearestEdge" not in js:
+        errors.append("drag updates must be frame-coalesced and magnetically snap to the nearest screen edge")
+    if '"--mascot-x"' not in js or '"--mascot-y"' not in js or "translate3d(var(--mascot-x" not in css:
+        errors.append("mascot position must update through GPU-friendly transforms")
     if "touch-action:none" not in css or ".bg-companion.is-dragging" not in css:
         errors.append("background character drag must support smooth touch interaction")
     if re.search(r'fonts\.googleapis|fonts\.gstatic|unpkg\.com', html + css):
@@ -103,6 +105,12 @@ def main():
         errors.append("off-screen card borders must pause to reduce rendering work")
     if "capsule-clock" not in css or 'id="ambientCapsule"' not in html:
         errors.append("centered background capsule must rotate continuously")
+    if "offset-path:ellipse(43vw 39vh at 50% 50%)" not in css or "offset-distance:100%" not in css or "offset-rotate:auto" not in css:
+        errors.append("capsule must orbit around the full viewport like a clock hand")
+    if "--edge-angle" not in css or "linear-gradient(transparent,transparent) padding-box,conic-gradient" not in css:
+        errors.append("animated card edges must be drawn only on the outer perimeter")
+    if "mask-composite:exclude" in css[css.rfind("/* FINAL MOTION GEOMETRY"):]:
+        errors.append("final card-edge treatment must not depend on an inner fill mask")
     if "borderSpeed" not in js or 'id="borderSpeedControl"' not in html or 'id="borderToggle"' not in html:
         errors.append("super-thin card edge animation controls must remain available")
     for control in ("accentRed", "accentGreen", "accentBlue", "accentHex"):
