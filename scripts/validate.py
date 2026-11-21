@@ -63,8 +63,7 @@ def main():
     companion_rule = re.search(r'\.companion\s*\{([^}]*)\}', css)
     if not companion_rule or not re.search(r'position\s*:\s*fixed', companion_rule.group(1)):
         errors.append("companion must use fixed positioning across page sections")
-    mobile_rule = re.search(r'@media\s*\(max-width\s*:\s*680px\)\s*\{([^}]*)\}', css)
-    if not mobile_rule or ".companion{" not in mobile_rule.group(1):
+    if not re.search(r'@media\(max-width:680px\)\{\.companion\{[^}]*width:112px', css):
         errors.append("companion must have a mobile-specific responsive rule")
     for marker in ('companion.addEventListener("click"', 'companion.addEventListener("pointermove"'):
         if marker not in js:
