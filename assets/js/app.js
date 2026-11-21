@@ -316,7 +316,7 @@
   function onPageScroll(){
     const current=window.scrollY,delta=current-lastScrollY;
     if(Math.abs(delta)>.01){
-      orbitAngle=(orbitAngle+delta*.24+360)%360;
+      orbitAngle=(orbitAngle+delta*.24)%360;
       ballRoll=(ballRoll+delta*.9)%360;
       lastScrollY=current;
     }
