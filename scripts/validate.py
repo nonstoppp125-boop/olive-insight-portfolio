@@ -107,7 +107,7 @@ def main():
         errors.append("centered background capsule must rotate continuously")
     if "offset-path:ellipse(43vw 39vh at 50% 50%)" not in css or "offset-distance:100%" not in css or "offset-rotate:auto" not in css:
         errors.append("capsule must orbit around the full viewport like a clock hand")
-    if "--edge-angle" not in css or "linear-gradient(transparent,transparent) padding-box,conic-gradient" not in css:
+    if "--edge-angle" not in css or "mask-composite:exclude" not in css or "-webkit-mask-composite:xor" not in css:
         errors.append("animated card edges must be drawn only on the outer perimeter")
     final_motion_css = css[css.rfind("/* FINAL MOTION GEOMETRY"):]
     if "mask-composite:exclude" not in final_motion_css or "-webkit-mask-composite:xor" not in final_motion_css:
