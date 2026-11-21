@@ -30,3 +30,12 @@ Learning progress and project results are intentionally not fabricated. Replace 
 ## Accessibility and responsiveness
 
 The interface includes mobile navigation, keyboard dismissal for the studio, visible labels, semantic sections and reduced-motion preference handling.
+
+
+## Interactive experience
+
+- A persistent floating companion remains available while browsing and responds to pointer movement and touch/click activation.
+- The Design Studio controls color palettes, accent, glass blur/opacity, radius, typography, border speed, mascot visibility and motion.
+- Design preferences persist locally in the browser and can be exported/imported as JSON.
+- Prompt controls interpret supported visual instructions locally; they do not call an AI model or send design data to a server.
+- Reduced-motion preferences are respected. The studio supports keyboard focus management and Escape-to-close.
