@@ -61,19 +61,26 @@ def main():
         errors.append("background character must be outside main content")
     if not re.search(r'\.bg-companion\s*\{[^}]*position:\s*fixed', css):
         errors.append("background character must remain fixed across all sections")
-    if 'window.addEventListener("pointerdown",reactBackgroundCompanion' not in js:
-        errors.append("background character must react to touch and pointer input")
-    if 'window.addEventListener("pointermove",moveBackgroundCompanion' not in js or 'event.pointerType==="touch"?8:18' not in js or 'window.addEventListener("pointerup",resetBackgroundCompanion' not in js:
-        errors.append("background character must respond to pointer movement")
+    if 'bgCompanion.addEventListener("pointerdown",startMascotDrag)' not in js or "function dragMascot(event)" not in js or "oliveInsightMascotPosition" not in js:
+        errors.append("background character must be draggable and retain its position")
+    if "touch-action:none" not in css or ".bg-companion.is-dragging" not in css:
+        errors.append("background character drag must support smooth touch interaction")
     if re.search(r'fonts\.googleapis|fonts\.gstatic|unpkg\.com', html + css):
         errors.append("avoid remote font/icon dependencies on the critical render path")
-    if "backdrop-filter:blur(var(--blur))" in css:
-        errors.append("glass surfaces must avoid expensive full-surface backdrop blur")
+    if "backdrop-filter:blur(13px) saturate(145%)" not in css:
+        errors.append("Liquid Glass surfaces must use restrained optical blur")
     if not re.search(r'\.glass:before\s*\{[^}]*animation:border-turn', css):
-        errors.append("glass cards must retain animated border treatment")
+        errors.append("glass cards must retain super-thin animated edge treatment")
     if "animation-play-state:var(--border-play,running)" not in css or "setupBorderMotion" not in js:
         errors.append("off-screen card borders must pause to reduce rendering work")
-    card_classes = ("card", "timeline-card", "feature-card", "future-item", "empty-state", "progress-panel", "contact-card", "float-note")
+    if "capsule-clock" not in css or 'id="ambientCapsule"' not in html:
+        errors.append("centered background capsule must rotate continuously")
+    if "borderSpeed" not in js or 'id="borderSpeedControl"' not in html or 'id="borderToggle"' not in html:
+        errors.append("super-thin card edge animation controls must remain available")
+    for control in ("accentRed", "accentGreen", "accentBlue", "accentHex"):
+        if f'id="{control}"' not in html or control not in js:
+            errors.append(f"RGB/HEX color mixer is missing {control}")
+        card_classes = ("card", "timeline-card", "feature-card", "future-item", "empty-state", "progress-panel", "contact-card", "float-note")
     for class_value in re.findall(r'<(?:article|div)\b[^>]*class="([^"]+)"[^>]*>', html):
         class_set = set(class_value.split())
         if class_set.intersection(card_classes) and "glass" not in class_set:
