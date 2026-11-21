@@ -73,6 +73,12 @@ def main():
         errors.append("glass cards must retain animated border treatment")
     if "animation-play-state:var(--border-play,running)" not in css or "setupBorderMotion" not in js:
         errors.append("off-screen card borders must pause to reduce rendering work")
+    if 'class="glass float-note note-top"' not in html or 'class="glass float-note note-bottom"' not in html:
+        errors.append("hero information panels must use the animated glass card system")
+    if "filter:blur(36px)" in css or "filter:blur(90px)" in css:
+        errors.append("avoid expensive large-area ambient blur filters")
+    if "fontStacks={system:" not in js or 'value="editorial"' not in html or 'value="technical"' not in html:
+        errors.append("typography presets must use available local font stacks")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
