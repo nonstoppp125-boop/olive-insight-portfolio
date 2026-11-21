@@ -57,7 +57,7 @@
   }
   let studioTrigger=null;
   function setPageInert(value){
-    ["#siteHeader","#mainContent","#siteFooter","#studioFab","#companion"].forEach(selector=>{const node=$(selector);if(node)node.inert=value;});
+    ["#siteHeader","#home","#siteFooter","#studioFab","#companion"].forEach(selector=>{const node=$(selector);if(node)node.inert=value;});
   }
   function openStudio(event){
     studioTrigger=event?.currentTarget||document.activeElement;
