@@ -15,7 +15,7 @@ Open `index.html` in a modern browser. The page uses Google Fonts and Lucide ico
 
 ## Publish with GitHub Pages
 
-The repository includes `.github/workflows/deploy.yml`. It publishes the root directory to GitHub Pages whenever `main` changes and uses the Pages configuration action to enable the GitHub Actions deployment source. Check the **Actions** tab for the deployment result and the repository **Settings → Pages** page for the published URL.
+The repository includes `.github/workflows/deploy.yml`. First-time setup requires the repository owner to open **Settings → Pages** and choose **GitHub Actions** as the build and deployment source; the linked GitHub integration cannot create the initial Pages site. After that one-time setup, the workflow publishes the root directory whenever `main` changes. Check the **Actions** tab for the deployment result and **Settings → Pages** for the published URL.
 
 ## Design studio
 
