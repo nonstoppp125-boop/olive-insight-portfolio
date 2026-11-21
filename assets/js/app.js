@@ -7,6 +7,19 @@
   const studio = $("#studio");
   const backdrop = $("#studioBackdrop");
   const toast = $("#toast");
+  const pageLoader=$("#pageLoader");
+  if(pageLoader){
+    let loaderDismissed=false;
+    const dismissLoader=()=>{
+      if(loaderDismissed)return;
+      loaderDismissed=true;
+      pageLoader.classList.add("is-hidden");
+      window.setTimeout(()=>pageLoader.remove(),380);
+    };
+    if(document.readyState==="complete")requestAnimationFrame(dismissLoader);
+    else window.addEventListener("load",()=>requestAnimationFrame(dismissLoader),{once:true});
+    window.setTimeout(dismissLoader,1400);
+  }
   const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
@@ -287,72 +300,5 @@
   }catch(_){}
   apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
-
-  // One scroll source drives a centered 125deg 3D stair, rolling sphere and rear capsule.
-  const stairStage=$("#scrollStaircase"),stairBall=$("#staircaseBall"),stairOrbit=$("#staircaseOrbit");
-  let scrollFrame=0,lastScrollY=window.scrollY,orbitAngle=0,ballRoll=0,stairStartX=0,stairStartY=0,stairDX=0,stairDY=0;
-  function measureStaircase(){
-    const angle=125*Math.PI/180;
-    const length=Math.min(window.innerWidth*.66/Math.abs(Math.cos(angle)),window.innerHeight*.78/Math.sin(angle));
-    stairDX=Math.cos(angle)*length;stairDY=Math.sin(angle)*length;
-    stairStartX=window.innerWidth/2-stairDX/2;stairStartY=window.innerHeight/2-stairDY/2;
-    const treads=$(".stair-tread",stairStage);
-    treads.forEach((tread,index)=>{
-      const t=treads.length>1?index/(treads.length-1):0;
-      tread.style.left=(stairStartX+stairDX*t)+"px";
-      tread.style.top=(stairStartY+stairDY*t)+"px";
-    });
-    paintScrollWorld();
-  }
-  function paintScrollWorld(){
-    scrollFrame=0;
-    const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
-    const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
-    stairBall.style.setProperty("--ball-x",(stairStartX+stairDX*progress)+"px");
-    stairBall.style.setProperty("--ball-y",(stairStartY+stairDY*progress)+"px");
-    stairBall.style.setProperty("--ball-roll",ballRoll+"deg");
-    stairOrbit.style.setProperty("--orbit-angle",orbitAngle+"deg");
-  }
-  function onPageScroll(){
-    const current=window.scrollY,delta=current-lastScrollY;
-    if(Math.abs(delta)>.01){
-      orbitAngle=(orbitAngle+delta*.24)%360;
-      ballRoll=(ballRoll+delta*.9)%360;
-      lastScrollY=current;
-    }
-    if(!scrollFrame)scrollFrame=requestAnimationFrame(paintScrollWorld);
-  }
-  window.addEventListener("scroll",onPageScroll,{passive:true});
-  window.addEventListener("resize",measureStaircase,{passive:true});
-  measureStaircase();
-
-  // Convert dominant horizontal trackpad/wheel movement into the same vertical page axis.
-  window.addEventListener("wheel",event=>{
-    if(studio.classList.contains("open"))return;
-    if(Math.abs(event.deltaX)>Math.max(1,Math.abs(event.deltaY)*1.15)){
-      event.preventDefault();
-      window.scrollBy(0,event.deltaX*1.12);
-    }
-  },{passive:false});
-
-  // On touch screens, a deliberate horizontal swipe also travels the vertical page.
-  let touchStartX=0,touchStartY=0,touchAxis=null,touchLastX=0;
-  document.addEventListener("touchstart",event=>{
-    if(event.touches.length!==1||event.target.closest("button,input,select,textarea,[contenteditable=true],.studio")){touchAxis=null;return;}
-    touchStartX=touchLastX=event.touches[0].clientX;
-    touchStartY=event.touches[0].clientY;
-    touchAxis=null;
-  },{passive:true});
-  document.addEventListener("touchmove",event=>{
-    if(event.touches.length!==1||touchAxis==="vertical"||touchAxis==="blocked")return;
-    const touch=event.touches[0],dx=touch.clientX-touchStartX,dy=touch.clientY-touchStartY;
-    if(!touchAxis&&Math.max(Math.abs(dx),Math.abs(dy))>9)touchAxis=Math.abs(dx)>Math.abs(dy)*1.18?"horizontal":"vertical";
-    if(touchAxis==="horizontal"){
-      event.preventDefault();
-      const delta=touchLastX-touch.clientX;
-      if(Math.abs(delta)>0.1)window.scrollBy(0,delta*1.12);
-      touchLastX=touch.clientX;
-    }
-  },{passive:false});
 
 })();

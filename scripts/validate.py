@@ -138,16 +138,12 @@ def main():
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
-    if 'id="scrollStaircase"' not in html or 'id="staircaseBall"' not in html or 'id="staircaseOrbit"' not in html:
-        errors.append("scroll-driven staircase, rolling sphere and hidden orbit capsule must exist")
-    if "SCROLL-LOCKED 125deg staircase" not in css or "const angle=125*Math.PI/180" not in js or "tread.style.left" not in js:
-        errors.append("the centered staircase must preserve its 125-degree diagonal geometry")
-    if "window.addEventListener(\"scroll\",onPageScroll,{passive:true})" not in js or "orbitAngle=(orbitAngle+delta*.24)%360" not in js:
-        errors.append("stair ball and capsule orbit must follow scroll direction in frame-synced updates")
-    if 'window.addEventListener("wheel"' not in js or 'window.scrollBy(0,event.deltaX*1.12)' not in js or 'touchAxis==="horizontal"' not in js:
-        errors.append("horizontal wheel and touch gestures must map onto the single vertical page axis")
-    if "overscroll-behavior-x:none" not in css or "overflow-x:hidden" not in css:
-        errors.append("portfolio must prevent horizontal page drift")
+    if 'id="pageLoader"' not in html or ".page-loader" not in css or "dismissLoader" not in js:
+        errors.append("branded loading transition must exist and dismiss itself")
+    if 'id="scrollStaircase"' in html or "staircase" in css.lower() or "staircase" in js.lower():
+        errors.append("removed staircase markup, styling and scroll handlers must stay absent")
+    if "scroll-behavior:smooth" not in css or "overflow-x:hidden" not in css:
+        errors.append("native smooth vertical scrolling and horizontal overflow protection must remain")
 
     if errors:
         for error in errors:
