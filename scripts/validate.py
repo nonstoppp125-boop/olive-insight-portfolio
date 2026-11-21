@@ -54,27 +54,32 @@ def main():
         if marker not in html + js + css:
             errors.append(f"missing expected feature marker: {marker}")
 
-    companion_match = re.search(r'<button\b[^>]*\bid="companion"[^>]*>', html)
-    if not companion_match:
-        errors.append("companion must be a native, accessible button")
-    elif html.find(companion_match.group(0)) < html.find("</main>"):
-        errors.append("companion must be outside main content so it persists site-wide")
-
-    companion_rule = re.search(r'\.companion\s*\{([^}]*)\}', css)
-    if not companion_rule or not re.search(r'position\s*:\s*fixed', companion_rule.group(1)):
-        errors.append("companion must use fixed positioning across page sections")
-    if not re.search(r'@media\(max-width:680px\)\{\.companion\{[^}]*width:112px', css):
-        errors.append("companion must have a mobile-specific responsive rule")
-    for marker in ('companion.addEventListener("click"', 'companion.addEventListener("pointermove"'):
-        if marker not in js:
-            errors.append("companion interaction missing: " + marker)
+    background_character = re.search(r'<div\\b[^>]*id="bgCompanion"[^>]*>', html)
+    if not background_character or 'aria-hidden="true"' not in background_character.group(0):
+        errors.append("background character must be decorative and accessible")
+    if html.find(background_character.group(0)) < html.find("</main>"):
+        errors.append("background character must be outside main content")
+    if not re.search(r'\\.bg-companion\\s*\\{[^}]*position:\\s*fixed', css):
+        errors.append("background character must remain fixed across all sections")
+    if not re.search(r'window\\.addEventListener\\("pointerdown",reactBackgroundCompanion', js):
+        errors.append("background character must react to touch and pointer input")
+    if not re.search(r'window\\.addEventListener\\("pointermove",moveBackgroundCompanion', js):
+        errors.append("background character must respond to pointer movement")
+    if re.search(r'fonts\\.googleapis|fonts\\.gstatic|unpkg\\.com', html + css):
+        errors.append("avoid remote font/icon dependencies on the critical render path")
+    if "backdrop-filter:blur(var(--blur))" in css:
+        errors.append("glass surfaces must avoid expensive full-surface backdrop blur")
+    if not re.search(r'\\.glass:before\\s*\\{[^}]*animation:border-turn', css):
+        errors.append("glass cards must retain animated border treatment")
+    if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
+        errors.append("design studio tabs must use aligned equal-width columns")
 
     if errors:
         for error in errors:
             print("FAIL:", error)
         return 1
 
-    print("PASS: portfolio structure, unique IDs, anchor targets, local assets, CSS balance, persistent interactive companion, accessible studio and settings import/export.")
+    print("PASS: portfolio structure, unique IDs, anchor targets, local assets, CSS balance, site-wide ambient companion, performance-conscious rendering, accessible studio and settings import/export.")
     print(f"Audited {len(ids)} IDs, {len(targets)} in-page links and {len(local_assets)} local assets.")
     return 0
 
