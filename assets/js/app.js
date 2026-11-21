@@ -55,7 +55,7 @@
     $("#themeSelect").value=settings.theme; $("#accentPicker").value=settings.accent||palettes[settings.theme].accent;
     $("#blurControl").value=settings.blur; $("#opacityControl").value=settings.opacity; $("#radiusControl").value=settings.radius;
     $("#fontSelect").value=settings.font; $("#densitySelect").value=settings.density; $("#contrastSelect").value=settings.contrast; $("#speedControl").value=settings.capsuleSpeed; $("#borderSpeedControl").value=settings.borderSpeed;
-    $("#mascotToggle").checked=settings.mascot; $("#capsuleToggle").checked=settings.capsule;
+    $("#mascotToggle").checked=settings.mascot; $("#capsuleToggle").checked=settings.capsule; $("#borderToggle").checked=settings.borders;
     $("#motionToggle").checked=settings.float; $("#revealToggle").checked=settings.reveal;
     $("#accentValue").value=$("#accentValue").textContent=settings.accent.toUpperCase();
     const channels=hexToRgb(settings.accent).split(",").map(Number);
