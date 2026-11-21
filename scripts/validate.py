@@ -138,6 +138,9 @@ def main():
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
+    if ".wrap{width:min(1160px,calc(100% - 96px));margin-left:max(64px,calc((100% - 1160px)/2 + 24px));margin-right:auto}" not in css or ".wrap{width:calc(100% - 58px);margin-left:42px;margin-right:16px}" not in css:
+        errors.append("page content and text cards must stay clear of the fixed left scroll rail")
+
     if 'id="scrollRail"' not in html or 'id="scrollRailBall"' not in html or "scrubRail(event)" not in js:
         errors.append("draggable vertical scroll rail and progress ball are required")
     if "left:clamp(8px,1.6vw,22px)" not in css or "top:26px;bottom:26px" not in css or "width:32px" not in css or "--rail-ball-y" not in css + js or "width:21px;height:21px" not in css or "width:20px;height:20px" not in css or "ballY+ballSize/2" not in js:
