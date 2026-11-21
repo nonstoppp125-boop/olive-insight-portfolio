@@ -1,42 +1,56 @@
 # Olive Insight — Data & AI Portfolio
 
-A responsive personal portfolio for data analytics, business intelligence, AI-assisted analysis and data storytelling.
+A responsive, single-page personal portfolio documenting a developing interest in data analytics, business intelligence, AI-assisted research and data storytelling.
+
+## Live site
+
+https://nonstoppp125-boop.github.io/olive-insight-portfolio/
 
 ## Project structure
 
-- `index.html` — semantic page structure and portfolio sections
-- `assets/css/styles.css` — liquid-glass visual system, animated single-hue borders and responsive layouts
-- `assets/js/app.js` — interactive design studio, live theme controls, reduced-motion support and local preference persistence
-- `favicon.svg` — Olive Insight brand mark
+- `index.html` — semantic page structure and portfolio content
+- `assets/css/styles.css` — responsive layout, Liquid Glass surfaces, ambient motion and local design tokens
+- `assets/js/app.js` — Design Studio, theme controls, local preferences, mascot dragging and motion behavior
+- `scripts/validate.py` — static structure, accessibility-oriented and performance guardrails
+- `.github/workflows/quality.yml` — Python validation and JavaScript syntax checks
+- `.github/workflows/deploy.yml` — GitHub Pages deployment
 
 ## Run locally
 
-Open `index.html` in a modern browser. The page uses Google Fonts and Lucide icons from their public CDNs; the core layout and mascot illustration are authored locally.
+Open `index.html` in a modern browser. The core experience uses local HTML, CSS and JavaScript; it does not require a build step, remote font service, icon CDN or external API.
 
-## Publish with GitHub Pages
+## Design Studio
 
-The repository includes `.github/workflows/deploy.yml`. First-time setup requires the repository owner to open **Settings → Pages** and choose **GitHub Actions** as the build and deployment source; the linked GitHub integration cannot create the initial Pages site. After that one-time setup, the workflow publishes the root directory whenever `main` changes. Check the **Actions** tab for the deployment result and **Settings → Pages** for the published URL.
+The floating **Design Studio** provides:
 
-## Design studio
+- Olive, earth and forest palettes
+- Accent color picker, HEX input and independent RGB channels
+- Glass opacity, background softness and corner radius
+- Typography presets using local system font stacks
+- Compact, balanced and spacious content density
+- Standard and high text contrast
+- Independent ambient capsule and card-edge animation speeds
+- Motion, mascot visibility and scroll-reveal controls
+- JSON settings export/import and reset
 
-Use the floating **Design Studio** control to change the palette, accent color, glass blur and opacity, corner radius, typography, content density, text contrast, border animation speed, mascot visibility and motion/reveal toggles. Preferences are saved in the current browser using local storage.
+The prompt panel recognizes a limited set of visual instructions locally. It is a rule-based interface helper, not a connected generative AI service.
 
-The prompt panel currently recognizes a focused set of visual instructions (palette, blur, radius, spacing density, text contrast, typography, glass opacity, border speed and visibility). It is a local rule-based starter, not a connected generative AI service.
+## Ambient visual system
+
+- A centered capsule rotates behind the page content, with an independent speed control.
+- Content surfaces use layered translucent Liquid Glass, restrained blur, specular highlights and subtle inset lighting.
+- Cards share a super-thin animated edge; off-screen edge animation pauses where IntersectionObserver is available.
+- The decorative companion can be dragged with mouse or touch. Its normalized screen position is saved in this browser.
+- Reduced-motion preferences are respected.
+
+## Privacy and browser storage
+
+Design preferences and the companion position are stored in the current browser's local storage. They are not uploaded to a server by this static site. Exported settings are downloaded as a JSON file; importing settings reads a local file selected by the visitor.
 
 ## Content integrity
 
-Learning progress and project results are intentionally not fabricated. Replace profile/contact details and add completed project evidence as they become available. The current contact action links to the repository owner's GitHub profile.
+This is a learning-in-progress portfolio. It intentionally avoids fabricated work experience, completed projects, proficiency ratings and learning percentages. Add project case studies only when there is real work and reproducible evidence to show. Update profile and contact details before using the site as a public professional profile.
 
-## Accessibility and responsiveness
+## Publish with GitHub Pages
 
-The interface includes mobile navigation, keyboard dismissal for the studio, visible labels, semantic sections and reduced-motion preference handling.
-
-
-## Interactive experience
-
-- A low-contrast animated companion lives behind the page content across all sections; mouse and touch movement subtly guide it, taps trigger a smooth reaction, and it never covers links or controls.
-- The Design Studio controls color palettes, accent, background softness, glass opacity, radius, local typography presets, border speed, mascot visibility and motion.
-- Design preferences persist locally in the browser and can be exported/imported as JSON.
-- Prompt controls interpret supported visual instructions locally; they do not call an AI model or send design data to a server.
-- The site avoids remote font/icon downloads, large-area blur filters and off-screen card animations; sections use viewport-aware rendering. Reduced-motion preferences are respected. The studio supports keyboard focus management and Escape-to-close.
-\n\n## Ambient motion and Liquid Glass\n- The ambient capsule stays centered behind the page and rotates continuously; its rotation speed has an independent control.\n- Content cards retain a super-thin, low-contrast animated edge. Edge motion can be disabled or slowed separately.\n- The background companion can be dragged anywhere with mouse or touch; its position persists locally.\n- Cards use layered Liquid Glass with translucent depth, restrained blur, specular highlights and inset edge lighting.\n- Accent colors can be mixed with independent RGB sliders or entered as HEX.\n
+The repository deploys from the root directory through GitHub Actions whenever `main` changes. The quality workflow runs the static validator and `node --check` before changes are considered verified. Review the **Actions** tab for the latest quality and deployment results.
