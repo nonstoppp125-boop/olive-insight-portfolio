@@ -166,12 +166,21 @@
   const bgCompanion=$("#bgCompanion");
   let bgFrame=0,bgX=0,bgY=0,bgReactTimer;
   function moveBackgroundCompanion(event){
-    if(!bgCompanion||event.pointerType==="touch")return;
-    bgX=(event.clientX/window.innerWidth-.5)*18;
-    bgY=(event.clientY/window.innerHeight-.5)*12;
+    if(!bgCompanion)return;
+    const intensity=event.pointerType==="touch"?8:18;
+    bgX=(event.clientX/window.innerWidth-.5)*intensity;
+    bgY=(event.clientY/window.innerHeight-.5)*intensity*.66;
     if(!bgFrame)bgFrame=requestAnimationFrame(()=>{
       bgCompanion.style.setProperty("--bg-x",bgX.toFixed(1)+"px");
       bgCompanion.style.setProperty("--bg-y",bgY.toFixed(1)+"px");
+      bgFrame=0;
+    });
+  }
+  function resetBackgroundCompanion(){
+    bgX=0;bgY=0;
+    if(!bgFrame)bgFrame=requestAnimationFrame(()=>{
+      bgCompanion.style.setProperty("--bg-x","0px");
+      bgCompanion.style.setProperty("--bg-y","0px");
       bgFrame=0;
     });
   }
@@ -184,6 +193,8 @@
   }
   window.addEventListener("pointermove",moveBackgroundCompanion,{passive:true});
   window.addEventListener("pointerdown",reactBackgroundCompanion,{passive:true});
+  window.addEventListener("pointerup",resetBackgroundCompanion,{passive:true});
+  window.addEventListener("pointercancel",resetBackgroundCompanion,{passive:true});
   $("#menuToggle").addEventListener("click",()=>{
     const nav=$("#mainNav");const isOpen=nav.classList.toggle("open");
     $("#menuToggle").setAttribute("aria-expanded",String(isOpen));
