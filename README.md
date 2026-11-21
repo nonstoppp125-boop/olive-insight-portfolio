@@ -15,10 +15,7 @@ Open `index.html` in a modern browser. The page uses Google Fonts and Lucide ico
 
 ## Publish with GitHub Pages
 
-1. Open repository **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select branch **main** and folder **/(root)**, then save.
-4. Wait for the Pages deployment to finish. GitHub will show the published URL in the Pages settings.
+The repository includes `.github/workflows/deploy.yml`. It publishes the root directory to GitHub Pages whenever `main` changes and uses the Pages configuration action to enable the GitHub Actions deployment source. Check the **Actions** tab for the deployment result and the repository **Settings → Pages** page for the published URL.
 
 ## Design studio
 
