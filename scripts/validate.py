@@ -83,6 +83,8 @@ def main():
         errors.append("background character must remain fixed across all sections")
     if 'bgCompanion.addEventListener("pointerdown",startMascotDrag)' not in js or "function dragMascot(event)" not in js or "oliveInsightMascotPosition" not in js:
         errors.append("background character must be draggable and retain its position")
+    if "mascotNextX=event.clientX-mascotOffsetX" not in js or "applyMascotPosition(mascotNextX,mascotNextY,true)" not in js:
+        errors.append("drag updates must coalesce to the latest pointer position without dropping the final frame")
     if "touch-action:none" not in css or ".bg-companion.is-dragging" not in css:
         errors.append("background character drag must support smooth touch interaction")
     if re.search(r'fonts\.googleapis|fonts\.gstatic|unpkg\.com', html + css):
