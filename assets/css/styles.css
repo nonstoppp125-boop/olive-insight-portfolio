@@ -29,7 +29,7 @@
 /* Performance-first visual refinement */
 :root{--blur:0px;--font:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
 .glass{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),rgba(25,30,20,var(--glass-alpha,.82));box-shadow:0 10px 28px rgba(0,0,0,.16)}
-.glass:before{opacity:.72;will-change:transform;animation:border-turn var(--border-speed) linear infinite}
+.glass:before{opacity:.72;animation:border-turn var(--border-speed) linear infinite;animation-play-state:var(--border-play,running)}
 .glass:after{opacity:.55}
 .ambient{filter:blur(var(--ambient-blur,36px));opacity:.09}
 .float-note{background:rgba(23,29,17,.9)}
