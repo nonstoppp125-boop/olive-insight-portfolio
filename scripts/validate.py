@@ -49,7 +49,7 @@ def main():
             errors.append(f"missing portfolio section: {section}")
 
     markers = ("openStudio", "applyPrompt", "localStorage", "prefers-reduced-motion",
-               "companion", "pointermove", "exportDesign", "importDesign", "aria-modal", "setPageInert")
+               "companion", "pointermove", "exportDesign", "importDesign", "densitySelect", "contrastSelect", "aria-modal", "setPageInert")
     for marker in markers:
         if marker not in html + js + css:
             errors.append(f"missing expected feature marker: {marker}")
