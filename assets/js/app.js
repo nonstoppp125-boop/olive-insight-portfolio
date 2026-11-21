@@ -7,7 +7,7 @@
   const studio = $("#studio");
   const backdrop = $("#studioBackdrop");
   const toast = $("#toast");
-  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,capsule:true,mascot:true,float:true,reveal:true};
+  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
     earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
@@ -31,13 +31,14 @@
     root.style.setProperty("--blur",settings.blur+"px");root.style.setProperty("--ambient-softness",Math.round(55+settings.blur*1.1)+"%");
     root.style.setProperty("--glass-alpha",String(settings.opacity/100));
     root.style.setProperty("--radius",settings.radius+"px");
-    root.style.setProperty("--capsule-speed",settings.capsuleSpeed+"s");
+    root.style.setProperty("--capsule-speed",settings.capsuleSpeed+"s");root.style.setProperty("--border-speed",settings.borderSpeed+"s");
     const fontStacks={system:'ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',editorial:'ui-serif,Georgia,Cambria,"Times New Roman",serif',technical:'ui-monospace,SFMono-Regular,Consolas,monospace'};
     root.style.setProperty("--font",fontStacks[settings.font]||fontStacks.system);
     const density={compact:[40,56,22,11],balanced:[55,75,30,15],spacious:[68,90,38,20]}[settings.density]||[55,75,30,15];
     root.style.setProperty("--section-space",density[0]+"px");root.style.setProperty("--section-bottom",density[1]+"px");root.style.setProperty("--card-padding",density[2]+"px");root.style.setProperty("--grid-gap",density[3]+"px");
     root.style.setProperty("--muted",settings.contrast==="high"?"#d0d4c5":"#a6aa99");
     body.classList.toggle("no-border",!settings.borders);
+    body.classList.toggle("no-capsule",!settings.capsule);
     body.classList.toggle("no-mascot",!settings.mascot);
     body.classList.toggle("no-float",!settings.float);
     body.classList.toggle("no-reveal",!settings.reveal);
@@ -53,7 +54,7 @@
   function syncControls(){
     $("#themeSelect").value=settings.theme; $("#accentPicker").value=settings.accent||palettes[settings.theme].accent;
     $("#blurControl").value=settings.blur; $("#opacityControl").value=settings.opacity; $("#radiusControl").value=settings.radius;
-    $("#fontSelect").value=settings.font; $("#densitySelect").value=settings.density; $("#contrastSelect").value=settings.contrast; $("#speedControl").value=settings.capsuleSpeed;
+    $("#fontSelect").value=settings.font; $("#densitySelect").value=settings.density; $("#contrastSelect").value=settings.contrast; $("#speedControl").value=settings.capsuleSpeed; $("#borderSpeedControl").value=settings.borderSpeed;
     $("#mascotToggle").checked=settings.mascot; $("#capsuleToggle").checked=settings.capsule;
     $("#motionToggle").checked=settings.float; $("#revealToggle").checked=settings.reveal;
     $("#accentValue").value=$("#accentValue").textContent=settings.accent.toUpperCase();
@@ -63,7 +64,8 @@
     $("#blurValue").value=$("#blurValue").textContent=(settings.blur*2)+"px";
     $("#opacityValue").value=$("#opacityValue").textContent=(settings.opacity/100).toFixed(2);
     $("#radiusValue").value=$("#radiusValue").textContent=settings.radius+"px";
-    $("#speedValue").value=$("#speedValue").textContent=settings.speed+"s";
+    $("#speedValue").value=$("#speedValue").textContent=settings.capsuleSpeed+"s";
+    $("#borderSpeedValue").value=$("#borderSpeedValue").textContent=settings.borderSpeed+"s";
   }
   let studioTrigger=null;
   function setPageInert(value){
@@ -112,13 +114,13 @@
     settings.accent=rgbToHex(...values);apply();save();
   }
   ["accentRed","accentGreen","accentBlue"].forEach(id=>$("#"+id).addEventListener("input",updateRgbAccent));
-  [["blurControl","blur"],["opacityControl","opacity"],["radiusControl","radius"],["speedControl","capsuleSpeed"]].forEach(([id,key])=>{
+  [["blurControl","blur"],["opacityControl","opacity"],["radiusControl","radius"],["speedControl","capsuleSpeed"],["borderSpeedControl","borderSpeed"]].forEach(([id,key])=>{
     $("#"+id).addEventListener("input",event=>{settings[key]=Number(event.target.value);apply();save();});
   });
   $("#fontSelect").addEventListener("change",event=>{settings.font=event.target.value;apply();save();});
   $("#densitySelect").addEventListener("change",event=>{settings.density=event.target.value;apply();save();});
   $("#contrastSelect").addEventListener("change",event=>{settings.contrast=event.target.value;apply();save();});
-  [["mascotToggle","mascot"],["capsuleToggle","capsule"],["motionToggle","float"],["revealToggle","reveal"]].forEach(([id,key])=>{
+  [["mascotToggle","mascot"],["capsuleToggle","capsule"],["borderToggle","borders"],["motionToggle","float"],["revealToggle","reveal"]].forEach(([id,key])=>{
     $("#"+id).addEventListener("change",event=>{settings[key]=event.target.checked;apply();save();});
   });
   $("#resetDesign").addEventListener("click",()=>{settings={...defaults};apply();save();notify("Design settings reset");});
@@ -135,12 +137,12 @@
       if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error("Invalid settings");
       valid.theme=Object.hasOwn(palettes,incoming.theme)?incoming.theme:defaults.theme;
       valid.accent=typeof incoming.accent==="string"&&/^#[0-9a-f]{6}$/i.test(incoming.accent)?incoming.accent:palettes[valid.theme].accent;
-      for(const key of ["blur","opacity","radius","capsuleSpeed"])if(Number.isFinite(Number(incoming[key])))valid[key]=Math.max(({blur:4,opacity:20,radius:8,capsuleSpeed:12})[key],Math.min(({blur:32,opacity:85,radius:40,capsuleSpeed:90})[key],Number(incoming[key])));
+      for(const key of ["blur","opacity","radius","capsuleSpeed","borderSpeed"])if(Number.isFinite(Number(incoming[key])))valid[key]=Math.max(({blur:4,opacity:20,radius:8,capsuleSpeed:12,borderSpeed:12})[key],Math.min(({blur:32,opacity:85,radius:40,capsuleSpeed:90,borderSpeed:60})[key],Number(incoming[key])));
       if(Number.isFinite(Number(incoming.speed))&&!Number.isFinite(Number(incoming.capsuleSpeed)))valid.capsuleSpeed=Math.max(12,Math.min(90,Number(incoming.speed)));
       if(["system","editorial","technical"].includes(incoming.font))valid.font=incoming.font;
       if(["compact","balanced","spacious"].includes(incoming.density))valid.density=incoming.density;
       if(["standard","high"].includes(incoming.contrast))valid.contrast=incoming.contrast;
-      for(const key of ["capsule","mascot","float","reveal"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
+      for(const key of ["capsule","borders","mascot","float","reveal"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
       settings=valid;apply();save();notify("Design settings imported");
     }catch(_){notify("Invalid design settings file");}
     event.target.value="";
@@ -256,7 +258,7 @@
   }
   try{
     const stored=localStorage.getItem("oliveInsightDesign");
-    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed)));if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
+    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed))); if(typeof parsed.borders!=="boolean")settings.borders=true; if(Number.isFinite(Number(parsed.borderSpeed)))settings.borderSpeed=Math.max(12,Math.min(60,Number(parsed.borderSpeed)));if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
   }catch(_){}
   apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
