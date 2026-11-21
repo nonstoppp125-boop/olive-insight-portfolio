@@ -123,3 +123,24 @@ p{ text-wrap:pretty }
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .glass:not(.site-header):not(.studio):not(.studio-fab):not(.toast):hover{transform:translateY(-2px);border-color:rgba(var(--accent-rgb),.32);box-shadow:0 14px 34px rgba(0,0,0,.22)}
 }
+
+/* Ambient lighting without expensive full-layer blur */
+.ambient{filter:none!important;background:radial-gradient(circle,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),0) 72%)}
+.bg-mascot{filter:none!important}
+.float-note{border:1px solid rgba(var(--accent-rgb),.2);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.01)),rgba(25,30,20,.86)}
+/* Consistent micro-interactions for every interactive surface */
+.glass,.button,.icon-button,.studio-tab,.studio-io .button{transition:transform .28s cubic-bezier(.2,.75,.25,1),border-color .28s ease,background-color .28s ease,box-shadow .28s ease}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .button:hover,.icon-button:hover,.studio-tab:hover{transform:translateY(-2px)}
+ .studio-io .button:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(var(--accent-rgb),.15)}
+}
+.studio-panel[hidden]{display:none!important}
+.studio-panel .control:last-of-type{border-bottom:0}
+.studio .hint{max-width:48ch;line-height:1.65}
+.studio-heading h2{line-height:1.08;letter-spacing:-.045em}
+.studio-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid var(--line)}
+@media(max-width:680px){
+ .bg-companion{opacity:.1}
+ .float-note{max-width:44vw;padding:12px 14px}
+ .studio{right:10px;top:10px;bottom:10px;width:calc(100% - 20px);border-radius:20px}
+}
