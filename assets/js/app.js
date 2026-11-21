@@ -193,6 +193,25 @@
     if(!changed){notify("No supported visual instruction found yet");return;}
     apply();save();notify("Supported design directions applied");
   });
+  // Scroll-linked center object: pure scroll progress makes reverse movement exact.
+  const scrollCore=$("#scrollCore");
+  if(scrollCore){
+    let scrollCoreFrame=0;
+    function updateScrollCore(){
+      scrollCoreFrame=0;
+      if(body.classList.contains("no-motion"))return;
+      const maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+      const progress=Math.max(0,Math.min(1,window.scrollY/maxScroll));
+      scrollCore.style.setProperty("--scroll-x",(window.innerWidth*.14*progress).toFixed(2)+"px");
+      scrollCore.style.setProperty("--scroll-y",(window.innerHeight*.30*progress).toFixed(2)+"px");
+      scrollCore.style.setProperty("--scroll-angle",(progress*150).toFixed(2)+"deg");
+      scrollCore.style.setProperty("--scroll-progress",progress.toFixed(4));
+    }
+    function scheduleScrollCore(){if(!scrollCoreFrame)scrollCoreFrame=requestAnimationFrame(updateScrollCore);}
+    window.addEventListener("scroll",scheduleScrollCore,{passive:true});
+    window.addEventListener("resize",scheduleScrollCore,{passive:true});
+    scheduleScrollCore();
+  }
   const bgCompanion=$("#bgCompanion");
   let mascotDragging=false,mascotMoved=false,mascotPointerId=null,mascotOffsetX=0,mascotOffsetY=0,mascotFrame=0;
   let mascotNextX=0,mascotNextY=0,mascotPosition=null;

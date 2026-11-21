@@ -138,6 +138,10 @@ def main():
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
+    if "scrollCore" not in html or "scrollCore" not in js or "--scroll-y" not in js:
+        errors.append("center object must follow scroll progress and reverse along the same path")
+    if ".scroll-core" not in css or "prefers-reduced-motion:reduce" not in css:
+        errors.append("scroll core needs lightweight styling and reduced-motion support")
     if 'id="pageLoader"' not in html or ".page-loader" not in css or "dismissLoader" not in js:
         errors.append("branded loading transition must exist and dismiss itself")
     if 'id="scrollStaircase"' in html or "staircase" in css.lower() or "staircase" in js.lower():

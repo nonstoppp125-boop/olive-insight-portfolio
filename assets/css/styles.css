@@ -334,3 +334,16 @@ body.no-motion .ambient,body.no-motion .ambient:after{animation:none!important;w
 @keyframes brand-sheen{to{transform:translateX(130%)}}
 @media(prefers-reduced-motion:reduce){.brand-symbol,.brand-symbol:before{animation:none!important}}
 body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!important}
+
+/* STEP 04 — center object follows scroll progress and exactly retraces on reverse */
+.scroll-core{position:fixed;left:50%;top:50%;width:clamp(82px,10vw,132px);height:clamp(82px,10vw,132px);z-index:1;pointer-events:none;opacity:.17;contain:layout paint;transform:translate3d(calc(-50% + var(--scroll-x,0px)),calc(-50% + var(--scroll-y,0px)),0) rotate(var(--scroll-angle,0deg));transform-origin:center;will-change:transform}
+.scroll-core-orbit{position:absolute;inset:2%;border:1px solid rgba(var(--accent-rgb),.42);border-radius:34%;transform:rotate(28deg) scaleX(.78);box-shadow:0 0 24px rgba(var(--accent-rgb),.07),inset 0 0 18px rgba(var(--accent-rgb),.045)}
+.scroll-core-shell{position:absolute;inset:19%;display:block;border:1px solid rgba(224,235,185,.38);border-radius:38%;background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(var(--accent-rgb),.075) 42%,rgba(12,17,10,.2));box-shadow:inset 4px 4px 14px rgba(255,255,255,.09),inset -8px -8px 18px rgba(0,0,0,.22),0 0 26px rgba(var(--accent-rgb),.12)}
+.scroll-core-shell:before,.scroll-core-shell:after{content:"";position:absolute;inset:12%;border:1px solid rgba(255,255,255,.12);border-radius:34%;transform:rotate(45deg)}
+.scroll-core-shell:after{inset:26%;border-color:rgba(var(--accent-rgb),.26);transform:rotate(-22deg)}
+.scroll-core-glint{position:absolute;width:27%;height:27%;left:19%;top:17%;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.8),rgba(195,206,141,.28) 42%,transparent 75%)}
+.scroll-core-point{position:absolute;width:7px;height:7px;right:15%;bottom:17%;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 12px rgba(var(--accent-rgb),.8)}
+.scroll-core-halo{position:absolute;inset:-22%;border:1px solid rgba(var(--accent-rgb),.09);border-radius:50%;transform:scaleX(.72) rotate(-24deg)}
+body.no-motion .scroll-core{transform:translate3d(-50%,-50%,0);will-change:auto}
+@media(max-width:680px){.scroll-core{width:76px;height:76px;opacity:.13}}
+@media(prefers-reduced-motion:reduce){.scroll-core{transform:translate3d(-50%,-50%,0);will-change:auto}}
