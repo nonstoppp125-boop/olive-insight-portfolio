@@ -1,4 +1,4 @@
-# Olive Insight — Data & AI Portfolio
+# Insight — Data & Analytics Portfolio
 
 A responsive, single-page personal portfolio documenting a developing interest in data analytics, business intelligence, AI-assisted research and data storytelling.
 
@@ -23,7 +23,7 @@ Open `index.html` in a modern browser. The core experience uses local HTML, CSS 
 
 The floating **Design Studio** provides:
 
-- Olive, earth and forest palettes
+- Root-derived adaptive palettes (with manual accent override)
 - Accent color picker, HEX input and independent RGB channels
 - Glass opacity, background softness and corner radius
 - Typography presets using local system font stacks
