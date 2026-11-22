@@ -63,8 +63,8 @@
         float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
         liquid+=vec3(.86,1.0,.88)*boundaryGlow*(.32+.62*interfaceGlint);
-        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0030)*step(p.y,liquidLine);
-        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0024)*step(p.y,liquidLine);
+        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0040)*step(p.y,liquidLine);
+        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0032)*step(p.y,liquidLine);
         liquid+=vec3(.82,1.0,.88)*(bubbleA+bubbleB)*.52;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
         vec3 prism=mix(vec3(.10,.48,.28),vec3(.66,.88,.72),smoothstep(.08,.92,prismHue));
@@ -683,22 +683,24 @@
   function setupSectionFlow(sections){
     if(!sections.length||(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)||body.classList.contains("no-motion"))return;
     let frame=0;
+    const clamp=value=>Math.max(0,Math.min(1,value));
+    const smooth=value=>{const t=clamp(value);return t*t*(3-2*t);};
     const paint=()=>{
       frame=0;
-      const viewport=window.innerHeight||1;
-      const center=viewport*.5;
-      const range=Math.max(240,viewport*.72);
+      const vh=window.innerHeight||1;
+      const edge=vh*.62;
       sections.forEach(section=>{
         const rect=section.getBoundingClientRect();
-        const above=rect.bottom<center;
-        const below=rect.top>center;
-        const gap=above?center-rect.bottom:below?rect.top-center:0;
-        const raw=Math.min(1,gap/range);
-        const eased=raw*raw*(3-2*raw);
-        const direction=below?1:-1;
-        section.style.setProperty("--section-opacity",(1-.58*eased).toFixed(3));
-        section.style.setProperty("--section-y",(direction*26*eased).toFixed(2)+"px");
-        section.style.setProperty("--section-scale",(1-.018*eased).toFixed(4));
+        const entering=smooth((vh-rect.top)/edge);
+        const leaving=smooth((rect.bottom+edge)/edge);
+        const visibility=Math.min(entering,leaving);
+        const entryProgress=1-entering;
+        const exitProgress=1-leaving;
+        const translateY=(entryProgress*38)-(exitProgress*38);
+        const scale=.972+visibility*.028;
+        section.style.setProperty("--section-opacity",(0.24+visibility*.76).toFixed(3));
+        section.style.setProperty("--section-y",translateY.toFixed(2)+"px");
+        section.style.setProperty("--section-scale",scale.toFixed(4));
       });
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
