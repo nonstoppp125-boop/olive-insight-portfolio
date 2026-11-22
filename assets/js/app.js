@@ -16,7 +16,7 @@
     const seed=()=>{
       const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);dpr=Math.min(window.devicePixelRatio||1,1.5);
       canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
-      dots=[];const spacing=4.2;
+      dots=[];const spacing=2.3;
       for(let y=1.5;y<height;y+=spacing)for(let x=1.5;x<width;x+=spacing){
         const alpha=.025+Math.random()*.16;
         dots.push({x:x+(Math.random()-.5)*1.5,y:y+(Math.random()-.5)*1.5,a:alpha,target:alpha,wait:Math.random()*90,size:.48+Math.random()*.28});
