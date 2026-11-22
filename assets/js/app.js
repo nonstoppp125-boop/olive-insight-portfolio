@@ -59,7 +59,7 @@
         vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.42,depth));
         liquid=mix(liquid,liquidDeep,smoothstep(.48,1.0,depth));
         liquid+=u_accent*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
-        float boundaryGlow=exp(-pow((p.y-liquidLine)/.014,2.0))*step(.005,progress)*step(progress,.995);
+        float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
         liquid+=vec3(.9,.97,1.0)*boundaryGlow*(.48+.8*interfaceGlint);
         float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0014)*step(p.y,liquidLine);
@@ -71,7 +71,7 @@
         vec3 color=mix(glass,liquid,inLiquid*.94);
         color=mix(color,prism,iridescence*(.17+rim*.23));
         color+=vec3(.82,.93,.99)*pow(1.0-z/radius,5.5)*.7;
-        float outerRim=exp(-pow((r-radius+.012)/.012,2.0));
+        float rimDistance=(r-radius+.012)/.012;float outerRim=exp(-rimDistance*rimDistance);
         color+=mix(vec3(.92,.98,1.0),prism,.42)*outerRim*.92;
         float alpha=edge*clamp(.48+fresnel*.48+rim*.2,0.0,1.0);
         alpha=max(alpha,edge*inLiquid*.93);
