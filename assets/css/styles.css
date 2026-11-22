@@ -725,3 +725,19 @@ h3,.about-main h3{letter-spacing:-.025em}
 .hero-lede,.card p,.timeline-card p,.empty-state p,.progress-panel p,.contact-card p{font-size:clamp(12px,1.05vw,14px);line-height:1.95}
 .tag-list span,.detail-row,.timeline-card small{font-size:10px}
 @media(prefers-reduced-motion:reduce){.site-header>.main-nav,.site-header>.main-nav a{transition:none!important}}
+
+
+/* Hard clipping: navigation labels never paint outside the rounded header border. */
+.site-header{overflow:hidden!important;clip-path:inset(0 round 18px)}
+.site-header>.main-nav{overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;clip-path:inset(0 round 0 0 12px 12px);contain:paint}
+.site-header>.main-nav a{flex-shrink:0;max-width:100%;white-space:nowrap}
+@media(max-width:680px){.site-header{overflow:hidden!important}.site-header>.main-nav{overflow:hidden!important;overflow-x:hidden!important;touch-action:pan-y;justify-content:space-between!important;gap:clamp(3px,1.5vw,8px)!important;padding-inline:0}.site-header>.main-nav a{font-size:clamp(8px,2.5vw,10px);letter-spacing:-.015em}}
+/* Keep touch cursor compositing cheap and eliminate perceptible lag on direct manipulation. */
+@media(hover:none),(pointer:coarse){
+  .liquid-cursor{transition:opacity .12s linear,visibility .12s linear;will-change:transform;backdrop-filter:none}
+  .liquid-cursor-core,.liquid-cursor-ring{transition:none!important;backdrop-filter:none!important}
+  .liquid-lens-window{backdrop-filter:none;transition:opacity .1s linear,transform .1s linear}
+  .liquid-lens-content>.liquid-lens-clone{filter:none}
+  .liquid-hover-target{transition:transform .12s linear!important;filter:none!important}
+}
+@media(prefers-reduced-motion:reduce){.liquid-cursor,.liquid-cursor *{transition:none!important}}
