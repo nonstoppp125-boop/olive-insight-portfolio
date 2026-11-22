@@ -353,7 +353,14 @@
   $("#applyPrompt").addEventListener("click",()=>{
     const prompt=$("#designPrompt").value.trim().toLowerCase();
     if(!prompt){notify("Describe the visual direction first");return;}
+    const rootHex=prompt.match(/(?:root|background|base)(?:\s+(?:colour|color))?\s*(?:to|=|:)?\s*(#[0-9a-f]{6})/i);
+    const accentHex=prompt.match(/accent(?:\s+color)?\s*(?:to|=|:)?\s*(#[0-9a-f]{6})/i);
+    const namedRoot=prompt.match(/(?:background|root|base)(?:\s+(?:colour|color))?\s*(?:to|=|:)?\s+(black|white|red|blue|green|purple|orange|navy)/i);
+    const namedColors={black:"#101010",white:"#f5f5f2",red:"#7f1020",blue:"#102f72",green:"#123f2a",purple:"#38204f",orange:"#6b3210",navy:"#101b35"};
     let changed=false;
+    if(rootHex){settings.rootColor=rootHex[1].toLowerCase();settings.autoAccent=true;changed=true;}
+    else if(namedRoot){settings.rootColor=namedColors[namedRoot[1].toLowerCase()];settings.autoAccent=true;changed=true;}
+    if(accentHex){settings.accent=accentHex[1].toLowerCase();settings.autoAccent=false;changed=true;}
     if(/brown|earth|warm|copper|tan/.test(prompt)){settings.theme="earth";settings.rootColor=palettes.earth.bg;settings.autoAccent=true;changed=true;}
     else if(/forest|green|sage/.test(prompt)){settings.theme="forest";settings.rootColor=palettes.forest.bg;settings.autoAccent=true;changed=true;}
     else if(/olive/.test(prompt)){settings.theme="olive";settings.rootColor=palettes.olive.bg;settings.autoAccent=true;changed=true;}
@@ -527,9 +534,23 @@
       const action=event.target.closest("[data-shortcut]")?.dataset.shortcut;if(!action)return;
       closeAssistant();
       if(action==="studio")$("#openStudio").click();
+      else if(action==="appearance"||action==="motion"){$("#openStudio").click();document.querySelector('.studio-tab[data-tab="'+action+'"]').click();}
+      else if(action==="prompt"){$("#openStudio").click();document.querySelector('.studio-tab[data-tab="prompt"]').click();$("#designPrompt").focus();}
+      else if(action==="reset")$("#resetDesign").click();
+      else if(action==="export")$("#exportDesign").click();
       else if(action==="theme"){settings.theme=settings.theme==="olive"?"earth":settings.theme==="earth"?"forest":"olive";settings.rootColor=palettes[settings.theme].bg;settings.autoAccent=true;apply();save();notify("Theme changed");}
       else if(action==="particles")$("#ambientParticles")?.classList.toggle("particles-off");
       else{const target={home:"#home",about:"#about",projects:"#projects",contact:"#contact"}[action];if(target)$(target)?.scrollIntoView({behavior:"smooth",block:"start"});}
+    });
+    assistantMenu.addEventListener("submit",event=>{
+      if(event.target.id!=="assistantCommandForm")return;
+      event.preventDefault();
+      const command=$("#assistantCommandInput").value.trim();
+      if(!command)return;
+      $("#designPrompt").value=command;
+      closeAssistant();
+      $("#applyPrompt").click();
+      $("#assistantCommandInput").value="";
     });
     document.addEventListener("pointerdown",event=>{if(!assistantButton.contains(event.target)&&!assistantMenu.contains(event.target))closeAssistant();},{passive:true});
     document.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
