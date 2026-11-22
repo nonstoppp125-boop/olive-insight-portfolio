@@ -169,8 +169,8 @@
     });
   }
   function createAmbientParticles(){
-    if($("#ambientParticles"))return;
-    const field=$("#ambientParticles")||document.createElement("div");field.id="ambientParticles";field.className="ambient-particles";field.setAttribute("aria-hidden","true");
+    const field=$("#ambientParticles")||document.createElement("div");
+    if(field.children.length)return;field.id="ambientParticles";field.className="ambient-particles";field.setAttribute("aria-hidden","true");
     const fragment=document.createDocumentFragment();
     for(let i=0;i<108;i++){
       const dot=document.createElement("i");dot.className="ambient-particle";
@@ -205,7 +205,7 @@
     const accent=settings.autoAccent?derived.accent:(settings.accent||palette.accent);
     const accentBright=settings.autoAccent?derived.bright:palette.bright;
     settings.accent=accent;
-    root.style.setProperty("--bg",rootColor);
+    root.style.setProperty("--bg",rootColor);root.style.colorScheme=derived.dark?"dark":"light";
     root.style.setProperty("--root-rgb",hexToRgb(rootColor));
     root.style.setProperty("--bg-soft",derived.dark?"#"+rgbChannels(rootColor).map(v=>Math.max(0,Math.round(v*.78)).toString(16).padStart(2,"0")).join(""):"#"+rgbChannels(rootColor).map(v=>Math.min(255,Math.round(v+(255-v)*.13)).toString(16).padStart(2,"0")).join(""));
     root.style.setProperty("--text",derived.text);root.style.setProperty("--muted",settings.contrast==="high"?(derived.dark?"#e4e9e3":"#303a33"):derived.muted);
@@ -502,7 +502,7 @@
     if(!mascotDragging||event.pointerId!==mascotPointerId)return;
     mascotDragging=false;mascotPointerId=null;
     if(mascotFrame){cancelAnimationFrame(mascotFrame);mascotFrame=0;}
-    if(mascotMoved)snapMascotToNearestEdge();
+    if(mascotMoved){suppressMascotClick=true;snapMascotToNearestEdge();}
     else{
       const rect=bgCompanion.getBoundingClientRect();
       applyMascotPosition(rect.left,rect.top,true);
@@ -513,9 +513,10 @@
     bgCompanion.classList.remove("is-dragging");
   }
   const assistantButton=$("#bgCompanion"),assistantMenu=$("#assistantShortcuts");
+  let suppressMascotClick=false;
   if(assistantButton&&assistantMenu){
     const closeAssistant=()=>{assistantMenu.hidden=true;assistantButton.setAttribute("aria-expanded","false");};
-    assistantButton.addEventListener("click",()=>{const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));});
+    assistantButton.addEventListener("click",event=>{if(suppressMascotClick){suppressMascotClick=false;event.preventDefault();return;}const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));});
     assistantButton.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
     assistantMenu.addEventListener("click",event=>{
       const action=event.target.closest("[data-shortcut]")?.dataset.shortcut;if(!action)return;
