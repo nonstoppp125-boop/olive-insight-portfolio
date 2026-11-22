@@ -500,15 +500,15 @@
   });
   restoreMascotPosition();
 
-  // Persistent touch orb + desktop liquid magnifier.
+  // Low-latency liquid cursor. Touch movement is relative to the last visible orb position during its 1s afterglow.
   const liquidCursor=$("#liquidLensCursor");
   const liquidLensContent=$("#liquidLensContent");
   if(liquidCursor&&liquidLensContent&&(window.matchMedia("(hover: hover) and (pointer: fine)").matches||window.matchMedia("(pointer: coarse)").matches)){
     root.classList.add("has-liquid-cursor");
     const isCoarse=window.matchMedia("(pointer: coarse)").matches;
-    const lensTargets=".glass,.card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card,.button,.main-nav a,.tag-list span,.profile-orb";
-    let cursorX=-100,cursorY=-100,renderX=-100,renderY=-100,pointerX=0,pointerY=0,cursorRaf=0,currentTarget=null,cloneNode=null,hideTimer=0;
-    const cursorEase=.22;
+    const lensTargets=".card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card,.button,.main-nav a,.tag-list span,.profile-orb";
+    let cursorX=-100,cursorY=-100,renderX=-100,renderY=-100,pointerX=-100,pointerY=-100,cursorRaf=0,currentTarget=null,cloneNode=null,hideTimer=0,touchActive=false,touchStartX=0,touchStartY=0,touchAnchorX=0,touchAnchorY=0,cursorVisible=false;
+    const cursorEase=.48;
     function cleanClone(node){
       node.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));node.removeAttribute("id");node.classList.add("liquid-lens-clone");
       node.querySelectorAll("button,input,select,textarea").forEach(el=>{el.setAttribute("tabindex","-1");el.setAttribute("aria-hidden","true");});return node;
@@ -522,44 +522,62 @@
       const rect=target.getBoundingClientRect();cloneNode.style.width=rect.width+"px";cloneNode.style.height=rect.height+"px";
       liquidLensContent.appendChild(cloneNode);liquidCursor.classList.add("is-lens");
     }
-    function paintLiquidCursor(){
-      cursorRaf=0;renderX+=(cursorX-renderX)*cursorEase;renderY+=(cursorY-renderY)*cursorEase;
-      liquidCursor.style.transform="translate3d("+(renderX-36).toFixed(2)+"px,"+(renderY-36).toFixed(2)+"px,0)";
-      if(currentTarget&&cloneNode){
-        const rect=currentTarget.getBoundingClientRect(),localX=Math.max(0,Math.min(rect.width,pointerX-rect.left)),localY=Math.max(0,Math.min(rect.height,pointerY-rect.top));
-        cloneNode.style.left=(36-localX)+"px";cloneNode.style.top=(36-localY)+"px";
-        cloneNode.style.setProperty("--lens-origin-x",localX+"px");cloneNode.style.setProperty("--lens-origin-y",localY+"px");
-        const nx=(localX/Math.max(1,rect.width)-.5)*2,ny=(localY/Math.max(1,rect.height)-.5)*2;
-        currentTarget.style.setProperty("--liquid-shift-x",(nx*1.8).toFixed(2)+"px");currentTarget.style.setProperty("--liquid-shift-y",(ny*1.8).toFixed(2)+"px");
-      }
-      if(Math.abs(cursorX-renderX)>.12||Math.abs(cursorY-renderY)>.12)cursorRaf=requestAnimationFrame(paintLiquidCursor);
+    function syncLens(){
+      if(!currentTarget||!cloneNode||!currentTarget.isConnected)return;
+      const rect=currentTarget.getBoundingClientRect(),localX=Math.max(0,Math.min(rect.width,pointerX-rect.left)),localY=Math.max(0,Math.min(rect.height,pointerY-rect.top));
+      cloneNode.style.left=(36-localX)+"px";cloneNode.style.top=(36-localY)+"px";
+      cloneNode.style.setProperty("--lens-origin-x",localX+"px");cloneNode.style.setProperty("--lens-origin-y",localY+"px");
+      const nx=(localX/Math.max(1,rect.width)-.5)*2,ny=(localY/Math.max(1,rect.height)-.5)*2;
+      currentTarget.style.setProperty("--liquid-shift-x",(nx*1.25).toFixed(2)+"px");currentTarget.style.setProperty("--liquid-shift-y",(ny*1.25).toFixed(2)+"px");
     }
-    function updateCursor(event){
-      pointerX=event.clientX;pointerY=event.clientY;cursorX=pointerX;cursorY=pointerY;
-      const under=document.elementFromPoint(pointerX,pointerY);
-      const target=under&&under.closest?(under.closest(lensTargets)||under.closest("p,h1,h2,h3,h4,span,a,button,label,section,article,header,footer,main")||under):null;
-      setLensTarget(target&&target!==document.body&&target!==document.documentElement&&!target.closest(".liquid-cursor,.bg-companion")?target:null);
-      if(!cursorRaf)cursorRaf=requestAnimationFrame(paintLiquidCursor);
+    function paintLiquidCursor(){
+      cursorRaf=0;
+      if(isCoarse){renderX=cursorX;renderY=cursorY;}
+      else{renderX+=(cursorX-renderX)*cursorEase;renderY+=(cursorY-renderY)*cursorEase;}
+      liquidCursor.style.transform="translate3d("+(renderX-36).toFixed(1)+"px,"+(renderY-36).toFixed(1)+"px,0)";
+      if(!isCoarse&&(Math.abs(cursorX-renderX)>.2||Math.abs(cursorY-renderY)>.2))cursorRaf=requestAnimationFrame(paintLiquidCursor);
+    }
+    function moveCursorTo(x,y){
+      cursorX=x;cursorY=y;pointerX=x;pointerY=y;
+      const under=document.elementFromPoint(x,y);
+      const target=under&&under.closest?under.closest(lensTargets):null;
+      setLensTarget(target&&!target.closest(".liquid-cursor,.bg-companion")?target:null);
+      syncLens();
+      if(isCoarse){renderX=x;renderY=y;liquidCursor.style.transform="translate3d("+(x-36).toFixed(1)+"px,"+(y-36).toFixed(1)+"px,0)";}
+      else if(!cursorRaf)cursorRaf=requestAnimationFrame(paintLiquidCursor);
     }
     function showCursor(event){
       if(hideTimer){clearTimeout(hideTimer);hideTimer=0;}
-      liquidCursor.style.opacity="1";liquidCursor.style.visibility="visible";liquidCursor.classList.add("is-pressing");updateCursor(event);
+      if(isCoarse||event.pointerType==="touch"){
+        if(cursorVisible){touchAnchorX=cursorX;touchAnchorY=cursorY;}
+        else{touchAnchorX=event.clientX;touchAnchorY=event.clientY;cursorX=touchAnchorX;cursorY=touchAnchorY;renderX=cursorX;renderY=cursorY;}
+        touchStartX=event.clientX;touchStartY=event.clientY;touchActive=true;
+      }
+      cursorVisible=true;liquidCursor.style.opacity="1";liquidCursor.style.visibility="visible";liquidCursor.classList.add("is-pressing");
+      if(!isCoarse&&event.pointerType!=="touch")moveCursorTo(event.clientX,event.clientY);
+      else if(!cursorRaf)paintLiquidCursor();
     }
     function releaseCursor(event){
       liquidCursor.classList.remove("is-pressing");
       if(isCoarse||event.pointerType==="touch"){
+        touchActive=false;
         if(hideTimer)clearTimeout(hideTimer);
-        hideTimer=window.setTimeout(()=>{liquidCursor.style.opacity="0";setLensTarget(null);hideTimer=0;},1000);
+        hideTimer=window.setTimeout(()=>{liquidCursor.style.opacity="0";setLensTarget(null);hideTimer=0;cursorVisible=false;},1000);
       }
     }
     window.addEventListener("pointerdown",showCursor,{passive:true});
     window.addEventListener("pointermove",event=>{
-      if(event.pointerType==="touch"||!isCoarse){if(hideTimer){clearTimeout(hideTimer);hideTimer=0;}liquidCursor.style.opacity="1";updateCursor(event);}
+      if(event.pointerType==="touch"||isCoarse){
+        if(!touchActive)return;
+        if(hideTimer){clearTimeout(hideTimer);hideTimer=0;}
+        const x=touchAnchorX+(event.clientX-touchStartX),y=touchAnchorY+(event.clientY-touchStartY);
+        liquidCursor.style.opacity="1";moveCursorTo(x,y);
+      }else moveCursorTo(event.clientX,event.clientY);
     },{passive:true});
     window.addEventListener("pointerup",releaseCursor,{passive:true});
     window.addEventListener("pointercancel",releaseCursor,{passive:true});
     document.addEventListener("pointerleave",event=>{if(!isCoarse&&event.pointerType!=="touch"){setLensTarget(null);liquidCursor.style.opacity="0";}},{passive:true});
-    window.addEventListener("scroll",()=>{if(currentTarget&&!currentTarget.isConnected)setLensTarget(null);},{passive:true});
+    window.addEventListener("scroll",()=>{if(currentTarget&&!currentTarget.isConnected)setLensTarget(null);else syncLens();},{passive:true});
   }
 
   // Scroll-responsive horizontal navigation: evenly paced at rest, then fans outward and fades; scrolling up reverses it.
