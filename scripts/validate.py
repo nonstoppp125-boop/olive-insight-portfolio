@@ -139,8 +139,14 @@ def main():
         errors.append("typography presets must use available local font stacks")
     if 'root.style.setProperty("--bg",rootColor)' not in js or "deriveRootPalette(rootColor)" not in js or "autoAccentToggle" not in js:
         errors.append("root colour must derive adaptive semantic surfaces, contrast and optional automatic accent matching")
-    if 'id="assistantShortcuts"' not in html or 'id="assistantCommandForm"' not in html or 'data-shortcut="motion"' not in html or "assistantMenu.addEventListener" not in js:
-        errors.append("background assistant must expose working shortcuts and local command controls")
+    shortcut_menu=re.search(r'<div class="assistant-shortcuts" id="assistantShortcuts"[^>]*>(.*?)</div>', html, re.S)
+    shortcut_actions=re.findall(r'data-shortcut="([^"]+)"', shortcut_menu.group(1) if shortcut_menu else "")
+    if not shortcut_menu or shortcut_actions != ["studio","home","about","projects","contact"] or "assistantMenu.addEventListener" not in js:
+        errors.append("background assistant must keep one customization entry and only essential navigation shortcuts")
+    if "waitForImages" in js or "waitForLoad" in js or "document.fonts.ready" in js or "image.decode()" in js:
+        errors.append("loading screen must not block on off-screen images, fonts or the full window load event")
+    if "dot.next=performance.now()+Math.random()*1800" not in js or "dot.next=now+450+Math.random()*2400" not in js:
+        errors.append("loading pinpoints must twinkle on independent randomized schedules")
     if 'src="assets/insight-mark.svg"' not in html or "brand-mark" not in css:
         errors.append("dimensional portfolio identity mark must be integrated")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
