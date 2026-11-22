@@ -144,13 +144,13 @@
     let progress=0,targetProgress=7,frame=0,completed=false,dismissed=false;
     const paint=()=>{
       frame=0;
-      progress+=(targetProgress-progress)*.085;
-      if(Math.abs(targetProgress-progress)<.12)progress=targetProgress;
+      progress+=(targetProgress-progress)*.22;
+      if(Math.abs(targetProgress-progress)<.2)progress=targetProgress;
       const shown=Math.min(100,Math.floor(progress));
       pageLoader.style.setProperty("--loader-progress",shown+"%");
       if(percentNode)percentNode.textContent=shown+"%";
       if(trackNode)trackNode.style.width=shown+"%";
-      if(progress<targetProgress-.12)frame=requestAnimationFrame(paint);
+      if(progress<targetProgress-.2)frame=requestAnimationFrame(paint);
       else if(completed)dismissLoader();
     };
     const setProgress=(value,label)=>{
@@ -167,26 +167,11 @@
       pageLoader.classList.add("is-hidden");
       window.setTimeout(()=>pageLoader.remove(),520);
     };
-    const waitForLoad=()=>document.readyState==="complete"?Promise.resolve():new Promise(resolve=>window.addEventListener("load",resolve,{once:true}));
-    const waitForImages=async()=>{
-      const images=[...document.images].filter(image=>image.loading!=="lazy"||image.getBoundingClientRect().top<window.innerHeight);
-      await Promise.all(images.map(image=>{
-        if(image.complete&&image.naturalWidth>0)return Promise.resolve();
-        if(typeof image.decode==="function")return image.decode().catch(()=>{});
-        return new Promise(resolve=>{image.addEventListener("load",resolve,{once:true});image.addEventListener("error",resolve,{once:true});});
-      }));
-    };
     const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const prepareExperience=async()=>{
-      setProgress(22,"BUILDING THE PAGE");
-      await waitForLoad();
-      setProgress(58,"LOADING VISUAL RESOURCES");
-      await waitForImages();
-      const stylesheets=[...document.querySelectorAll('link[rel="stylesheet"]')];
-      await Promise.all(stylesheets.map(link=>link.sheet?Promise.resolve():new Promise(resolve=>{link.addEventListener("load",resolve,{once:true});link.addEventListener("error",resolve,{once:true});})));
-      setProgress(78,"PREPARING TYPOGRAPHY");
-      if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-      setProgress(93,"FINISHING THE DETAILS");
+      setProgress(42,"BUILDING THE PAGE");
+      await nextFrame();
+      setProgress(78,"FINISHING THE DETAILS");
       await nextFrame();
       setProgress(100,"YOUR EXPERIENCE IS READY");
       completed=true;
@@ -572,23 +557,7 @@
       const action=event.target.closest("[data-shortcut]")?.dataset.shortcut;if(!action)return;
       closeAssistant();
       if(action==="studio")$("#openStudio").click();
-      else if(action==="appearance"||action==="motion"){$("#openStudio").click();document.querySelector('.studio-tab[data-tab="'+action+'"]').click();}
-      else if(action==="prompt"){$("#openStudio").click();document.querySelector('.studio-tab[data-tab="prompt"]').click();$("#designPrompt").focus();}
-      else if(action==="reset")$("#resetDesign").click();
-      else if(action==="export")$("#exportDesign").click();
-      else if(action==="theme"){settings.theme=settings.theme==="olive"?"earth":settings.theme==="earth"?"forest":"olive";settings.rootColor=palettes[settings.theme].bg;settings.autoAccent=true;apply();save();notify("Theme changed");}
-      else if(action==="particles"){settings.particles=!settings.particles;apply();save();}
       else{const target={home:"#home",about:"#about",projects:"#projects",contact:"#contact"}[action];if(target)$(target)?.scrollIntoView({behavior:"smooth",block:"start"});}
-    });
-    assistantMenu.addEventListener("submit",event=>{
-      if(event.target.id!=="assistantCommandForm")return;
-      event.preventDefault();
-      const command=$("#assistantCommandInput").value.trim();
-      if(!command)return;
-      $("#designPrompt").value=command;
-      closeAssistant();
-      $("#applyPrompt").click();
-      $("#assistantCommandInput").value="";
     });
     document.addEventListener("pointerdown",event=>{if(!assistantButton.contains(event.target)&&!assistantMenu.contains(event.target))closeAssistant();},{passive:true});
     document.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
