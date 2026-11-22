@@ -11,8 +11,9 @@
   function createLoaderOrb(){
     const canvas=$("#loaderOrbCanvas");
     if(!canvas)return;
+    const fallback=()=>{canvas.classList.add("orb-unavailable");canvas.closest(".loader-vessel")?.classList.add("orb-fallback");};
     const gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:false,powerPreference:"low-power"});
-    if(!gl){canvas.classList.add("orb-unavailable");return;}
+    if(!gl){fallback();return;}
     const vertex=`
       attribute vec2 a_position;
       varying vec2 v_uv;
@@ -81,7 +82,7 @@
     const compile=(type,source)=>{const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){gl.deleteShader(shader);throw new Error(gl.getShaderInfoLog(shader)||"Orb shader compile failed");}return shader;};
     let program;
     try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)||"Orb shader link failed");}
-    catch(error){canvas.classList.add("orb-unavailable");canvas.dataset.orbError=String(error.message||error);console.warn("Liquid orb shader unavailable; CSS glass fallback enabled.",error);return;}
+    catch(error){fallback();canvas.dataset.orbError=String(error.message||error);console.warn("Liquid orb shader unavailable; CSS glass fallback enabled.",error);return;}
     gl.useProgram(program);
     const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
     const position=gl.getAttribLocation(program,"a_position");gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
