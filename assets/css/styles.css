@@ -578,3 +578,30 @@ body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!
 @media(max-width:680px){
   #bgCompanion .bg-mascot{zoom:.33!important}
 }
+
+
+/* Actual companion fix: make the mascot a block box before scaling.
+   The previous inline span ignored the intended layout dimensions on mobile. */
+#bgCompanion .bg-mascot{
+  display:block!important;
+  position:relative!important;
+  width:210px!important;
+  height:300px!important;
+  zoom:1!important;
+  transform:scale(.33)!important;
+  transform-origin:top left!important;
+  animation:none!important;
+}
+#bgCompanion .mascot-arm{
+  top:190px!important;
+  width:18px!important;
+  height:43px!important;
+  z-index:1!important;
+  transform-origin:50% 8px!important;
+}
+#bgCompanion .arm-left{left:43px!important;right:auto!important;transform:rotate(18deg)!important}
+#bgCompanion .arm-right{left:auto!important;right:43px!important;transform:rotate(-18deg)!important}
+#bgCompanion .mascot-body{z-index:2!important}
+@media(max-width:680px){
+  #bgCompanion .bg-mascot{transform:scale(.33)!important}
+}
