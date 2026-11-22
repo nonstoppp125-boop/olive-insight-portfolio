@@ -9,16 +9,68 @@
   const toast = $("#toast");
   const pageLoader=$("#pageLoader");
   if(pageLoader){
-    let loaderDismissed=false;
-    const dismissLoader=()=>{
-      if(loaderDismissed)return;
-      loaderDismissed=true;
-      pageLoader.classList.add("is-hidden");
-      window.setTimeout(()=>pageLoader.remove(),380);
+    const percentNode=$("#loaderPercent");
+    const statusNode=$("#loaderStatus");
+    const trackNode=$("#loaderTrackFill");
+    let progress=0,targetProgress=7,frame=0,completed=false;
+    const paint=()=>{
+      frame=0;
+      progress+=(targetProgress-progress)*.085;
+      if(Math.abs(targetProgress-progress)<.12)progress=targetProgress;
+      const shown=Math.min(100,Math.floor(progress));
+      pageLoader.style.setProperty("--loader-progress",shown+"%");
+      if(percentNode)percentNode.textContent=shown+"%";
+      if(trackNode)trackNode.style.width=shown+"%";
+      if(progress<targetProgress-.12||targetProgress<100)frame=requestAnimationFrame(paint);
+      else if(completed)finishLoader();
     };
-    if(document.readyState==="complete")requestAnimationFrame(dismissLoader);
-    else window.addEventListener("load",()=>requestAnimationFrame(dismissLoader),{once:true});
-    window.setTimeout(dismissLoader,1400);
+    const setProgress=(value,label)=>{
+      targetProgress=Math.max(targetProgress,Math.min(100,value));
+      if(label&&statusNode)statusNode.textContent=label;
+      if(!frame)frame=requestAnimationFrame(paint);
+    };
+    const finishLoader=()=>{
+      if(!completed||progress<99.8)return;
+      if(percentNode)percentNode.textContent="100%";
+      pageLoader.style.setProperty("--loader-progress","100%");
+      if(trackNode)trackNode.style.width="100%";
+      pageLoader.classList.add("is-hidden");
+      window.setTimeout(()=>pageLoader.remove(),520);
+    };
+    const waitForLoad=()=>document.readyState==="complete"?Promise.resolve():new Promise(resolve=>window.addEventListener("load",resolve,{once:true}));
+    const waitForImages=async()=>{
+      const images=[...document.images].filter(image=>image.loading!=="lazy"||image.getBoundingClientRect().top<window.innerHeight);
+      await Promise.all(images.map(image=>{
+        if(image.complete&&image.naturalWidth>0)return Promise.resolve();
+        if(typeof image.decode==="function")return image.decode().catch(()=>{});
+        return new Promise(resolve=>{image.addEventListener("load",resolve,{once:true});image.addEventListener("error",resolve,{once:true});});
+      }));
+    };
+    const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const prepareExperience=async()=>{
+      setProgress(22,"BUILDING THE PAGE");
+      await waitForLoad();
+      setProgress(58,"LOADING VISUAL RESOURCES");
+      await waitForImages();
+      const stylesheets=[...document.querySelectorAll('link[rel="stylesheet"]')];
+      await Promise.all(stylesheets.map(link=>link.sheet?Promise.resolve():new Promise(resolve=>{link.addEventListener("load",resolve,{once:true});link.addEventListener("error",resolve,{once:true});})));
+      setProgress(78,"PREPARING TYPOGRAPHY");
+      if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+      setProgress(93,"FINISHING THE DETAILS");
+      await nextFrame();
+      setProgress(100,"YOUR EXPERIENCE IS READY");
+      completed=true;
+      if(!frame)frame=requestAnimationFrame(paint);
+      const waitUntilFull=()=>{if(progress>=99.8){finishLoader();return;}requestAnimationFrame(waitUntilFull);};
+      requestAnimationFrame(waitUntilFull);
+    };
+    frame=requestAnimationFrame(paint);
+    prepareExperience().catch(()=>{
+      setProgress(100,"YOUR EXPERIENCE IS READY");
+      completed=true;
+      const revealWhenPainted=()=>{if(progress>=99.8){finishLoader();return;}requestAnimationFrame(revealWhenPainted);};
+      requestAnimationFrame(revealWhenPainted);
+    });
   }
   const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {

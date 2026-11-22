@@ -296,23 +296,24 @@ body.no-border .studio-tab:before,body.no-border .studio .control select:before,
 
 
 
-/* Lightweight branded entry transition */
-.page-loader{position:fixed;inset:0;z-index:9999;display:grid;place-content:center;justify-items:center;gap:19px;background:radial-gradient(ellipse at 50% 44%,rgba(var(--accent-rgb),.13),transparent 48%),#10130e;opacity:1;visibility:visible;transition:opacity .32s ease,visibility .32s ease}
+/* Liquid welcome loader — progress is driven by actual page readiness */
+.page-loader{--loader-progress:0%;position:fixed;inset:0;z-index:9999;display:grid;align-content:center;justify-items:center;gap:17px;padding:24px;background:radial-gradient(ellipse at 50% 42%,rgba(var(--accent-rgb),.16),transparent 46%),#10130e;opacity:1;visibility:visible;transition:opacity .48s cubic-bezier(.2,.7,.2,1),visibility .48s ease}
 .page-loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
-.loader-mark{position:relative;width:72px;height:72px;display:grid;place-items:center;border:1px solid rgba(var(--accent-rgb),.52);border-radius:22px;box-shadow:inset 0 0 24px rgba(var(--accent-rgb),.13),0 0 38px rgba(var(--accent-rgb),.12);animation:loader-breathe 1.2s ease-in-out infinite}
-.loader-mark>span{font-size:27px;font-weight:800;letter-spacing:-.12em;color:var(--accent-bright)}
-.loader-mark>span span{color:var(--text)}
-.loader-orbit{position:absolute;inset:-9px;border:1px dashed rgba(195,206,141,.52);border-radius:50%;animation:loader-spin 1.6s linear infinite}
-.loader-copy{display:grid;justify-items:center;gap:4px}
-.loader-copy strong{font:800 10px var(--font);letter-spacing:.24em;color:var(--text)}
-.loader-copy>span{font:8px var(--mono);letter-spacing:.16em;color:var(--muted)}
-.loader-track{width:148px;height:2px;overflow:hidden;background:rgba(255,255,255,.1);border-radius:9px}
-.loader-track i{display:block;width:38%;height:100%;border-radius:inherit;background:linear-gradient(90deg,transparent,var(--accent-bright),transparent);animation:loader-progress 1.05s ease-in-out infinite}
-@keyframes loader-spin{to{transform:rotate(360deg)}}
-@keyframes loader-breathe{50%{transform:translateY(-3px);box-shadow:inset 0 0 28px rgba(var(--accent-rgb),.2),0 0 46px rgba(var(--accent-rgb),.18)}}
-@keyframes loader-progress{0%{transform:translateX(-110%)}100%{transform:translateX(270%)}}
-@media(prefers-reduced-motion:reduce){.page-loader,.loader-mark,.loader-orbit,.loader-track i{animation:none;transition-duration:.01ms}}
-
+.loader-vessel{position:relative;width:142px;height:142px;display:grid;place-items:center;isolation:isolate;overflow:hidden;border:1px solid rgba(213,230,174,.58);border-radius:39% 61% 55% 45% / 47% 43% 57% 53%;background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.018));box-shadow:inset 0 0 28px rgba(var(--accent-rgb),.12),0 0 44px rgba(var(--accent-rgb),.16),0 0 0 8px rgba(var(--accent-rgb),.035);animation:loader-shape 7s ease-in-out infinite}
+.loader-liquid{position:absolute;z-index:-1;left:-8%;right:-8%;bottom:-2px;height:var(--loader-progress);border-radius:48% 52% 0 0 / 12% 14% 0 0;background:linear-gradient(180deg,rgba(195,206,141,.92),rgba(105,128,66,.96) 48%,rgba(55,75,39,.98));box-shadow:0 -5px 24px rgba(195,206,141,.24),inset 0 8px 16px rgba(255,255,255,.2);transition:height .2s linear}
+.loader-liquid:before{content:"";position:absolute;left:-8%;top:-9px;width:116%;height:18px;border-radius:44% 56% 48% 52%;background:rgba(204,220,153,.92);filter:drop-shadow(0 0 7px rgba(195,206,141,.32));animation:loader-wave 2.8s ease-in-out infinite alternate}
+.loader-vessel-shine{position:absolute;inset:9px;border:1px solid rgba(255,255,255,.13);border-radius:inherit;pointer-events:none}
+.loader-percent{font:800 31px var(--font);letter-spacing:-.06em;color:#f2f4e8;text-shadow:0 2px 14px rgba(0,0,0,.36);font-variant-numeric:tabular-nums}
+.loader-copy{display:grid;justify-items:center;gap:6px;margin-top:5px}
+.loader-copy strong{font:800 10px var(--font);letter-spacing:.25em;color:var(--text)}
+.loader-copy>span{font:8px var(--mono);letter-spacing:.17em;color:var(--muted)}
+.loader-track{width:164px;height:2px;overflow:hidden;background:rgba(255,255,255,.12);border-radius:9px}
+.loader-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-bright));box-shadow:0 0 12px rgba(var(--accent-rgb),.5);transition:width .18s linear}
+.loader-caption{font:7px var(--mono);letter-spacing:.12em;color:rgba(220,226,203,.48);text-align:center}
+@keyframes loader-wave{from{transform:translateX(-3%) rotate(-2deg)}to{transform:translateX(3%) rotate(2deg)}}
+@keyframes loader-shape{0%,100%{border-radius:39% 61% 55% 45% / 47% 43% 57% 53%}50%{border-radius:52% 48% 43% 57% / 40% 56% 44% 60%}}
+@media(max-width:480px){.loader-vessel{width:128px;height:128px}.loader-percent{font-size:28px}.loader-caption{font-size:6px;letter-spacing:.09em}}
+@media(prefers-reduced-motion:reduce){.page-loader,.loader-vessel,.loader-liquid:before{animation:none;transition-duration:.01ms}}
 
 /* STEP 02 — ambient background atmosphere (compositor-friendly motion) */
 .ambient{opacity:.22;will-change:transform;contain:paint}
