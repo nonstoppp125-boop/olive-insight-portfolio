@@ -1,4 +1,4 @@
-name: Deploy Olive Insight to GitHub Pages
+name: Deploy Insight Portfolio to GitHub Pages
 on:
   push:
     branches: [main]
