@@ -209,8 +209,8 @@
     root.style.setProperty("--bg",rootColor);root.style.colorScheme=derived.dark?"dark":"light";
     root.style.setProperty("--root-rgb",hexToRgb(rootColor));
     root.style.setProperty("--bg-soft",derived.dark?"#"+rgbChannels(rootColor).map(v=>Math.max(0,Math.round(v*.78)).toString(16).padStart(2,"0")).join(""):"#"+rgbChannels(rootColor).map(v=>Math.min(255,Math.round(v+(255-v)*.13)).toString(16).padStart(2,"0")).join(""));
-    root.style.setProperty("--text",derived.text);root.style.setProperty("--muted",settings.contrast==="high"?(derived.dark?"#e4e9e3":"#303a33"):derived.muted);
-    root.style.setProperty("--surface-rgb",derived.surface);root.style.setProperty("--line",derived.line);root.style.setProperty("--panel",derived.panel);
+    root.style.setProperty("--text",derived.text);root.style.setProperty("--muted",settings.contrast==="high"?(derived.dark?"#e4e9e3":relativeLuminance(rootColor)>.72?"#303a33":"#171b18"):derived.muted);
+    root.style.setProperty("--brand-hue",derived.brandHue+"deg");root.style.setProperty("--surface-rgb",derived.surface);root.style.setProperty("--line",derived.line);root.style.setProperty("--panel",derived.panel);
     root.style.setProperty("--accent",accent);root.style.setProperty("--accent-bright",accentBright);root.style.setProperty("--accent-deep",derived.accentDeep);root.style.setProperty("--accent-contrast",derived.accentText);
     root.style.setProperty("--accent-rgb",hexToRgb(accent));
     root.style.setProperty("--blur",settings.blur+"px");root.style.setProperty("--ambient-softness",Math.round(55+settings.blur*1.1)+"%");
@@ -230,7 +230,7 @@
   function fromHsl(h,s,l){h=((h%360)+360)%360;s=Math.max(0,Math.min(1,s));l=Math.max(0,Math.min(1,l));const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;let v=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return rgbToHex(...v.map(n=>Math.round((n+m)*255)));}
   function relativeLuminance(hex){return rgbChannels(hex).map(v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);}
   function deriveRootPalette(hex){
-    const channels=rgbChannels(hex),[h,s,l]=toHsl(channels),dark=relativeLuminance(hex)<.179;
+    const channels=rgbChannels(hex),[h,s,l]=toHsl(channels),rootLuminance=relativeLuminance(hex),dark=rootLuminance<.179;
     const hue=s>.16?h:92;
     const accent=fromHsl(hue,dark?Math.max(.34,Math.min(.68,s+.12)):.54,dark?.62:.32);
     const bright=fromHsl(hue,dark?Math.max(.48,Math.min(.78,.78-s*.08)):.27);
@@ -238,7 +238,7 @@
     const panelChannels=dark?channels.map(v=>Math.round(v*.86)):channels.map(v=>Math.round(v+(255-v)*.48));
     const panel="rgba("+panelChannels.join(",")+",.84)";
     const accentLuminance=relativeLuminance(accent);
-    return {dark,accent,bright,deep,text:dark?"#f4f6f2":"#171b18",muted:dark?"#b8c1b8":"#4b554e",surface:dark?"255,255,255":"0,0,0",line:dark?"rgba(255,255,255,.17)":"rgba(0,0,0,.16)",panel,accentText:accentLuminance>.179?"#101510":"#ffffff",accentDeep:deep};
+    return {dark,accent,bright,deep,text:dark?"#f4f6f2":"#171b18",muted:dark?"#b8c1b8":rootLuminance>.72?"#4b554e":"#171b18",brandHue:(((h-145+540)%360)-180),surface:dark?"255,255,255":"0,0,0",line:dark?"rgba(255,255,255,.17)":"rgba(0,0,0,.16)",panel,accentText:accentLuminance>.179?"#101510":"#ffffff",accentDeep:deep};
   }
   function hexToRgb(hex){
     const value=hex.replace("#","");
