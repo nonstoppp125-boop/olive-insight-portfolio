@@ -168,7 +168,7 @@
       requestAnimationFrame(revealWhenPainted);
     });
   }
-  const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
+  const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",blur:18,opacity:58,radius:24,font:"fancy",typographyV2:true,density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
     earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
@@ -196,8 +196,10 @@
     root.style.setProperty("--glass-alpha",String(settings.opacity/100));
     root.style.setProperty("--radius",settings.radius+"px");
     root.style.setProperty("--capsule-speed",settings.capsuleSpeed+"s");root.style.setProperty("--border-speed",settings.borderSpeed+"s");
-    const fontStacks={system:'ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',editorial:'ui-serif,Georgia,Cambria,"Times New Roman",serif',technical:'ui-monospace,SFMono-Regular,Consolas,monospace'};
-    root.style.setProperty("--font",fontStacks[settings.font]||fontStacks.system);
+    const fontStacks={fancy:'"Manrope",ui-sans-serif,system-ui,sans-serif',system:'ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',editorial:'ui-serif,Georgia,Cambria,"Times New Roman",serif',technical:'ui-monospace,SFMono-Regular,Consolas,monospace'};
+    const displayStacks={fancy:'"Space Grotesk","Manrope",ui-sans-serif,system-ui,sans-serif',system:fontStacks.system,editorial:fontStacks.editorial,technical:fontStacks.technical};
+    root.style.setProperty("--font",fontStacks[settings.font]||fontStacks.fancy);
+    root.style.setProperty("--display-font",displayStacks[settings.font]||displayStacks.fancy);
     const density={compact:[40,56,22,11],balanced:[55,75,30,15],spacious:[68,90,38,20]}[settings.density]||[55,75,30,15];
     root.style.setProperty("--section-space",density[0]+"px");root.style.setProperty("--section-bottom",density[1]+"px");root.style.setProperty("--card-padding",density[2]+"px");root.style.setProperty("--grid-gap",density[3]+"px");
     root.style.setProperty("--muted",settings.contrast==="high"?"#d0d4c5":"#a6aa99");
@@ -566,24 +568,33 @@
     if(!nav)return;
     const links=Array.from(nav.querySelectorAll("a"));
     links.forEach((link,index)=>link.style.setProperty("--nav-index",String(index)));
-    let previousY=window.scrollY,lastDirection=1,raf=0;
+    let previousY=window.scrollY,lastDirection=0,raf=0;
     const paint=()=>{
       raf=0;
       const y=Math.max(0,window.scrollY);
       const delta=y-previousY;
-      if(Math.abs(delta)>0.25)lastDirection=delta>0?1:-1;
+      if(Math.abs(delta)>.25)lastDirection=delta>0?1:-1;
       previousY=y;
-      const travel=Math.min(1,y/900);
-      const spread=3+Math.sin(y/190)*6+travel*2;
-      const drift=lastDirection*(1.4+Math.min(3,Math.abs(delta)*.12));
-      nav.style.setProperty("--nav-drift",(lastDirection*3.5)+"px");
-      nav.style.gap=(20+((Math.sin(y/230)+1)*4))+"px";
+      if(window.matchMedia("(max-width:760px)").matches){
+        nav.style.removeProperty("--nav-drift");
+        nav.style.removeProperty("gap");
+        links.forEach(link=>link.style.setProperty("--nav-x","0px"));
+        nav.dataset.scrollDirection="static";
+        return;
+      }
+      const phase=(Math.sin(y/230)+1)/2;
+      const gap=14+(phase*10);
+      const fan=(phase-.5)*5;
+      const directionFlow=lastDirection===0?0:(lastDirection>0?-1:1);
+      nav.style.setProperty("--nav-drift",(directionFlow*3.5).toFixed(2)+"px");
+      nav.style.gap=gap.toFixed(2)+"px";
       links.forEach((link,index)=>{
         const center=index-(links.length-1)/2;
-        const offset=center*spread+index*drift;
+        const serial=directionFlow*index*1.45;
+        const offset=center*fan+serial;
         link.style.setProperty("--nav-x",offset.toFixed(2)+"px");
       });
-      nav.dataset.scrollDirection=lastDirection>0?"down":"up";
+      nav.dataset.scrollDirection=lastDirection>0?"down":lastDirection<0?"up":"static";
     };
     const schedule=()=>{if(!raf)raf=requestAnimationFrame(paint);};
     window.addEventListener("scroll",schedule,{passive:true});
@@ -618,7 +629,7 @@
   }
   try{
     const stored=localStorage.getItem("oliveInsightDesign");
-    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed))); if(typeof parsed.borders!=="boolean")settings.borders=true; if(Number.isFinite(Number(parsed.borderSpeed)))settings.borderSpeed=Math.max(12,Math.min(60,Number(parsed.borderSpeed)));if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
+    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed))); if(typeof parsed.borders!=="boolean")settings.borders=true; if(Number.isFinite(Number(parsed.borderSpeed)))settings.borderSpeed=Math.max(12,Math.min(60,Number(parsed.borderSpeed)));if(!parsed.typographyV2){settings.font="fancy";settings.typographyV2=true;}if(!["fancy","system","editorial","technical"].includes(settings.font))settings.font="fancy";}
   }catch(_){}
   apply();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
