@@ -563,7 +563,7 @@
   function setupScrollNav(){
     const nav=$("#mainNav");
     if(!nav)return;
-    const links=$("a",nav);
+    const links=Array.from(nav.querySelectorAll("a"));
     links.forEach((link,index)=>link.style.setProperty("--nav-index",String(index)));
     let previousY=window.scrollY,lastDirection=1,raf=0;
     const paint=()=>{
