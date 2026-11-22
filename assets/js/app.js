@@ -40,9 +40,9 @@
         vec3 reflected=reflect(-viewDir,n),refracted=refract(-viewDir,n,1.0/1.46);
         vec3 refractedR=refract(-viewDir,n,1.0/1.455),refractedB=refract(-viewDir,n,1.0/1.475);
         float envA=softLight(reflected.xy,vec2(-.52,.48),.27,.12),envB=softLight(reflected.xy,vec2(.58,.25),.18,.32),envC=softLight(reflected.xy,vec2(-.18,-.68),.45,.09);
-        vec3 reflectionEnv=u_root*.18+vec3(.44,.88,.35)*envA+vec3(.25,.68,.39)*envB+vec3(.78,.96,.56)*envC;
+        vec3 reflectionEnv=u_root*.10+vec3(.30,.68,.43)*envA+vec3(.18,.48,.31)*envB+vec3(.76,.94,.82)*envC;
         float transA=softLight(refracted.xy,vec2(-.4,.34),.34,.16),transB=softLight(refracted.xy,vec2(.46,-.18),.24,.3),transC=softLight(refracted.xy,vec2(.05,-.62),.4,.1);
-        vec3 transmissionEnv=u_root*.22+vec3(.26,.86,.34)*transA+vec3(.13,.43,.24)*transB+vec3(.58,.82,.36)*transC;
+        vec3 transmissionEnv=u_root*.10+vec3(.30,.72,.43)*transA+vec3(.14,.42,.25)*transB+vec3(.72,.91,.78)*transC;
         float dispersion=length(refractedR-refractedB)*2.8;
         vec3 environment=mix(transmissionEnv,reflectionEnv,fresnel);
         float spec1=pow(max(dot(reflect(normalize(vec3(-.45,.72,.85)),n),viewDir),0.0),42.0);
@@ -55,11 +55,11 @@
         float wave=.026*sin(p.x*7.2+u_time*1.45)+.012*sin(p.x*15.0-u_time*1.1)+.006*sin(p.x*24.0+u_time*.72);
         float liquidLine=mix(-radius-.04,radius+.025,progress)+wave;
         float inLiquid=step(p.y,liquidLine)*step(r,radius),depth=clamp((liquidLine-p.y)/(radius*2.0),0.0,1.0);
-        vec3 liquidTop=vec3(.84,1.0,.69),liquidMid=vec3(.25,.91,.37),liquidDeep=vec3(.025,.31,.13);
+        vec3 liquidTop=vec3(.78,.94,.82),liquidMid=vec3(.20,.58,.36),liquidDeep=vec3(.035,.22,.12);
         float caustic=sin(p.x*17.0+u_time*1.2+sin(p.y*9.0))*sin(p.y*13.0-u_time*.8);
         vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.42,depth));
         liquid=mix(liquid,liquidDeep,smoothstep(.48,1.0,depth));
-        liquid+=vec3(.16,.78,.29)*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
+        liquid+=vec3(.28,.66,.42)*(.025+caustic*.018)*softLight(p,vec2(-.25,.12),.6,.55);
         float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
         liquid+=vec3(.86,1.0,.88)*boundaryGlow*(.32+.62*interfaceGlint);
@@ -67,7 +67,7 @@
         float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0011)*step(p.y,liquidLine);
         liquid+=vec3(.82,1.0,.88)*(bubbleA+bubbleB)*.52;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
-        vec3 prism=mix(vec3(.08,.72,.31),vec3(.78,1.0,.34),smoothstep(.08,.92,prismHue));
+        vec3 prism=mix(vec3(.10,.48,.28),vec3(.66,.88,.72),smoothstep(.08,.92,prismHue));
         float iridescence=clamp(fresnel*.72+dispersion*.7+boundaryGlow*.22,0.0,.72);
         vec3 color=mix(glass,liquid,inLiquid*.94);
         color=mix(color,prism,iridescence*(.08+rim*.12));
@@ -75,7 +75,7 @@
         float rimDistance=(r-radius+.012)/.012;float outerRim=exp(-rimDistance*rimDistance);
         color+=mix(vec3(.94,1.0,.96),prism,.24)*outerRim*.78;
         float alpha=edge*clamp(.48+fresnel*.48+rim*.2,0.0,1.0);
-        alpha=max(alpha,edge*inLiquid*.93);
+        alpha=max(alpha,edge*inLiquid*.72);
         gl_FragColor=vec4(color,alpha);
       }
     `;
@@ -168,6 +168,22 @@
       requestAnimationFrame(revealWhenPainted);
     });
   }
+  function createAmbientParticles(){
+    if($("#ambientParticles"))return;
+    const field=document.createElement("div");field.id="ambientParticles";field.className="ambient-particles";field.setAttribute("aria-hidden","true");
+    const fragment=document.createDocumentFragment();
+    for(let i=0;i<108;i++){
+      const dot=document.createElement("i");dot.className="ambient-particle";
+      dot.style.left=(Math.random()*100).toFixed(3)+"%";dot.style.top=(Math.random()*100).toFixed(3)+"%";
+      dot.style.setProperty("--twinkle-duration",(1.8+Math.random()*6.2).toFixed(2)+"s");
+      dot.style.setProperty("--twinkle-delay",(-Math.random()*8).toFixed(2)+"s");
+      dot.style.setProperty("--twinkle-min",(0.08+Math.random()*.12).toFixed(2));
+      dot.style.setProperty("--twinkle-max",(0.48+Math.random()*.5).toFixed(2));
+      fragment.appendChild(dot);
+    }
+    field.appendChild(fragment);body.prepend(field);
+  }
+  createAmbientParticles();
   const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",autoAccent:true,blur:18,opacity:58,radius:24,font:"system",typographyV2:true,density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
