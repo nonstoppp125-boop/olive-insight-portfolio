@@ -355,3 +355,117 @@ body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!
 .scroll-rail-ball:focus-visible{outline:2px solid var(--accent-bright);outline-offset:5px}
 @media(max-width:680px){.scroll-rail{left:3px;top:22px;bottom:22px;width:30px}.scroll-rail-ball{width:20px;height:20px}.scroll-rail-ball:active,.scroll-rail.is-dragging .scroll-rail-ball{transform:translate3d(-50%,0,0) scale(1.2)}}
 @media(prefers-reduced-motion:reduce){.scroll-rail-ball{transition:none}}
+
+
+/* BG COMPANION — compact rounded character, tiny hands and soft magnetic snap */
+.bg-companion{
+  width:82px;height:116px;
+  opacity:.62;
+  transform:translate3d(var(--mascot-x,0px),var(--mascot-y,0px),0) rotate(var(--bg-tilt,0deg));
+  transition:transform .58s cubic-bezier(.2,1.38,.32,1),opacity .2s ease;
+  filter:saturate(.9);
+}
+.bg-companion:after{
+  inset:7% -18%;
+  background:radial-gradient(ellipse,rgba(var(--accent-rgb),.24),rgba(var(--accent-rgb),.07) 42%,transparent 72%);
+  filter:blur(5px);
+}
+.bg-companion .bg-mascot{
+  width:210px;height:300px;
+  transform:scale(.38);
+  transform-origin:top left;
+  animation:bg-mascot-drift 8s ease-in-out infinite;
+  filter:drop-shadow(0 9px 13px rgba(0,0,0,.24));
+}
+.bg-companion .mascot-head{
+  top:43px;left:18px;width:174px;height:145px;
+  border-radius:47% 47% 45% 45%;
+  background:radial-gradient(ellipse at 32% 18%,#f2f2df 0,#b4c091 12%,#586646 35%,#26321f 68%,#141b12 100%);
+  box-shadow:inset 9px 8px 18px #fff8,inset -12px -14px 22px #050805,0 5px 22px rgba(var(--accent-rgb),.26);
+}
+.bg-companion .mascot-head:after{inset:7px;border-radius:inherit}
+.bg-companion .visor{
+  left:25px;right:25px;top:54px;height:35px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#11190f,#25321e);
+  gap:29px;
+  box-shadow:inset 0 2px 9px #000,0 0 13px rgba(191,220,139,.13);
+}
+.bg-companion .visor i{
+  width:8px;height:15px;border-radius:999px;
+  background:#e2f5b4;
+  box-shadow:0 0 9px #d5ef9a,0 0 18px #a8d36c;
+}
+.bg-companion .antenna{
+  top:24px;left:103px;width:3px;height:22px;
+  border-radius:4px;background:linear-gradient(var(--accent-bright),transparent);
+}
+.bg-companion .antenna:before{
+  top:-5px;left:-3px;width:9px;height:9px;
+  background:#e3efb7;box-shadow:0 0 12px var(--accent-bright);
+}
+.bg-companion .mascot-neck{top:180px;left:94px;width:22px;height:16px;border-radius:8px}
+.bg-companion .mascot-body{
+  top:190px;left:52px;width:106px;height:86px;
+  border-radius:38px 38px 34px 34px;
+  background:radial-gradient(ellipse at 30% 12%,#dfe8c5 0,#8c9b69 15%,#3c4a2c 46%,#192116 100%);
+  border:1px solid rgba(218,233,180,.8);
+  box-shadow:inset 7px 5px 14px #fff6,inset -10px -11px 17px #0009,0 5px 15px #0004;
+}
+.bg-companion .mascot-body span{
+  top:27px;left:41px;width:22px;height:22px;
+  border-color:#d5e99d;
+  background:radial-gradient(circle,#d9f4a0 0 13%,rgba(var(--accent-rgb),.28) 38%,transparent 70%);
+  box-shadow:0 0 14px rgba(var(--accent-rgb),.72);
+}
+.bg-companion .mascot-arm{
+  top:198px;width:19px;height:48px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#27331f,#aab987 48%,#35442a);
+  border:1px solid rgba(215,231,178,.85);
+  box-shadow:inset 3px 2px 5px #fff6,0 3px 7px #0004;
+}
+.bg-companion .arm-left{left:38px;transform:rotate(24deg)}
+.bg-companion .arm-right{right:38px;transform:rotate(-24deg)}
+.bg-companion .mascot-arm:after{
+  content:"";position:absolute;bottom:-5px;left:50%;
+  width:19px;height:18px;border-radius:48% 48% 55% 55%;
+  transform:translateX(-50%);
+  background:radial-gradient(circle at 35% 25%,#e4edc9,#91a474 48%,#39472d 100%);
+  border:1px solid rgba(222,236,187,.8);
+  box-shadow:0 2px 6px #0005;
+}
+.bg-companion .mascot-foot{
+  width:34px;height:20px;border-radius:14px 14px 10px 10px;
+  background:linear-gradient(#a0b27b,#35432a);
+  border-color:rgba(214,230,174,.8);
+}
+.bg-companion .foot-left{left:58px}
+.bg-companion .foot-right{right:58px}
+.bg-companion.is-dragging{
+  opacity:1;cursor:grabbing;
+  transition:none;
+}
+.bg-companion.is-dragging .bg-mascot{
+  animation:none;
+  scale:1.035;
+}
+.bg-companion.is-snapping{
+  transition:transform .68s cubic-bezier(.18,1.48,.28,1),opacity .2s ease;
+}
+.bg-companion.is-snapping .bg-mascot{animation:bg-mascot-land .68s cubic-bezier(.2,.8,.25,1)}
+.bg-companion.is-reacting .bg-mascot{animation:bg-mascot-react .9s cubic-bezier(.2,.8,.2,1)}
+@keyframes bg-mascot-land{
+  0%{scale:1.04;translate:0 -4px}
+  48%{scale:.94;translate:0 2px}
+  72%{scale:1.015;translate:0 -1px}
+  100%{scale:1;translate:0 0}
+}
+@media(max-width:680px){
+  .bg-companion{width:76px;height:108px;opacity:.58}
+  .bg-companion.is-dragging{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .bg-companion,.bg-companion.is-snapping{transition:none!important}
+  .bg-companion .bg-mascot{animation:none!important}
+}
