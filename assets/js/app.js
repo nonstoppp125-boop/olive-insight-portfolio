@@ -456,7 +456,7 @@
     if(!mascotFrame)mascotFrame=requestAnimationFrame(()=>{
       applyMascotPosition(mascotNextX,mascotNextY);mascotFrame=0;
     });
-    event.preventDefault();
+    // The mascot itself has touch-action:none; no global event cancellation is needed.
   }
   function snapMascotToNearestEdge(){
     const maxX=Math.max(0,window.innerWidth-bgCompanion.offsetWidth);
@@ -491,7 +491,8 @@
     if(event.propertyName==="transform")bgCompanion.classList.remove("is-snapping");
   });
   bgCompanion.addEventListener("pointerdown",startMascotDrag);
-  window.addEventListener("pointermove",dragMascot,{passive:false});
+  // Passive global pointer tracking avoids blocking native touch scrolling on the main thread.
+  window.addEventListener("pointermove",dragMascot,{passive:true});
   window.addEventListener("pointerup",finishMascotDrag);
   window.addEventListener("pointercancel",finishMascotDrag);
   window.addEventListener("resize",()=>{
