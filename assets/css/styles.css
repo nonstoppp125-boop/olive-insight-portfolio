@@ -800,3 +800,21 @@ p,.muted,.hero-lede,.intro p,.card p,.timeline-card p,.contact-card p,.detail-ro
 .ambient-particle{position:absolute;width:1.15px;height:1.15px;border-radius:50%;background:rgba(255,255,255,.96);opacity:var(--twinkle-min,.1);box-shadow:0 0 2px rgba(255,255,255,.7),0 0 5px rgba(255,255,255,.22);animation:independent-twinkle var(--twinkle-duration,4s) ease-in-out var(--twinkle-delay,0s) infinite alternate;will-change:opacity,filter}
 @keyframes independent-twinkle{0%{opacity:var(--twinkle-min,.1);filter:brightness(.75)}43%{opacity:var(--twinkle-max,.7);filter:brightness(1.2)}68%{opacity:var(--twinkle-min,.1);filter:brightness(.8)}100%{opacity:var(--twinkle-max,.7);filter:brightness(1.3)}}
 @media(prefers-reduced-motion:reduce){.ambient-particle{animation:none;opacity:.28;will-change:auto}}
+
+
+/* Four-dimensional-inspired glass hypercube identity mark and assistant shortcut dock. */
+.brand-mark-frame{width:42px;height:42px;display:grid;place-items:center;perspective:600px;flex:0 0 auto}
+.brand-mark{width:40px;height:40px;display:block;transform-style:preserve-3d;filter:drop-shadow(0 4px 10px rgba(var(--accent-rgb),.24));animation:mark-dimension 12s ease-in-out infinite}
+.brand:hover .brand-mark{animation-duration:3.8s;filter:drop-shadow(0 0 12px rgba(var(--accent-rgb),.58))}
+@keyframes mark-dimension{0%,100%{transform:rotateX(-8deg) rotateY(-16deg) rotateZ(0)}50%{transform:rotateX(12deg) rotateY(18deg) rotateZ(8deg)}}
+.brand-name{font-size:12px;letter-spacing:.2em}
+.brand-name small{letter-spacing:.17em}
+.bg-companion{appearance:none;-webkit-appearance:none;padding:0;border:0;background:transparent;color:inherit;text-align:initial}
+.bg-companion:focus-visible{outline:2px solid var(--accent-bright);outline-offset:5px;border-radius:28px}
+.assistant-shortcuts{position:fixed;z-index:55;left:calc(var(--mascot-x,24px) + 88px);top:var(--mascot-y,24px);width:min(210px,calc(100vw - 120px));display:grid;gap:5px;padding:10px;border:1px solid var(--line);border-radius:17px;background:var(--panel);backdrop-filter:blur(18px);box-shadow:0 14px 42px rgba(0,0,0,.28)}
+.assistant-shortcuts[hidden]{display:none}
+.assistant-shortcuts button{width:100%;min-height:36px;padding:8px 10px;text-align:left;border:1px solid transparent;border-radius:10px;background:rgba(var(--surface-rgb),.045);color:var(--text);font-size:11px;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.assistant-shortcuts button:hover{background:rgba(var(--accent-rgb),.18);border-color:var(--line);transform:translateX(2px)}
+.ambient-particles.particles-off{display:none}
+@media(max-width:520px){.assistant-shortcuts{left:12px;top:auto;bottom:calc(18px + env(safe-area-inset-bottom));width:190px}.brand-mark-frame{width:36px;height:36px}.brand-mark{width:35px;height:35px}}
+@media(prefers-reduced-motion:reduce){.brand-mark{animation:none!important}}
