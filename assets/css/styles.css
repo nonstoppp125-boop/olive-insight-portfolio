@@ -741,3 +741,10 @@ h3,.about-main h3{letter-spacing:-.025em}
   .liquid-hover-target{transition:transform .12s linear!important;filter:none!important}
 }
 @media(prefers-reduced-motion:reduce){.liquid-cursor,.liquid-cursor *{transition:none!important}}
+
+/* Mobile interaction budget: keep the visual system, but avoid expensive blur and long hover transitions during touch. */
+@media(hover:none),(pointer:coarse){
+  .glass:not(.site-header),.card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card{transition:transform .14s ease,border-color .14s ease!important}
+  .glass:before{animation-duration:var(--border-speed,28s)}
+  .ambient{contain:strict}
+}
