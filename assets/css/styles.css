@@ -44,7 +44,7 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}body{margin:0;background:ra
 .glass:hover{border-color:rgba(var(--accent-rgb),.25)}
 .feature-card:hover,.research-grid article:hover,.timeline-card:hover,.future-item:hover,.empty-state:hover,.progress-panel:hover,.contact-card:hover{transform:translateY(-3px)}
 /* Site-wide background character: compact, draggable and edge-magnetic */
-.bg-companion{position:fixed;z-index:4;left:0;top:0;bottom:auto;width:104px;height:148px;pointer-events:auto;opacity:.9;touch-action:none;cursor:grab;transform:translate3d(var(--mascot-x,0px),var(--mascot-y,0px),0) rotate(var(--bg-tilt,0deg));transform-origin:top left;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .22s;will-change:transform;filter:saturate(.82)}
+.bg-companion{position:fixed;z-index:4;left:0;top:0;bottom:auto;width:104px;height:148px;pointer-events:auto;opacity:.9;touch-action:none;cursor:grab;transform:translate3d(var(--mascot-x,0px),var(--mascot-y,0px),0) rotate(var(--bg-tilt,0deg));transform-origin:top left;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .22s;will-change:transform;filter:saturate(.82) hue-rotate(var(--brand-hue,0deg))}
 .bg-companion:after{content:"";position:absolute;inset:8% -12%;border-radius:48%;background:radial-gradient(ellipse,rgba(var(--accent-rgb),.2),transparent 70%);z-index:-1;pointer-events:none}
 .bg-mascot{transform:scale(.48);transform-origin:top left;animation:bg-mascot-drift 11s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(0,0,0,.18))}
 .bg-companion.is-dragging{transition:none;cursor:grabbing;opacity:1}
@@ -804,7 +804,7 @@ p,.muted,.hero-lede,.intro p,.card p,.timeline-card p,.contact-card p,.detail-ro
 
 /* Four-dimensional-inspired glass hypercube identity mark and assistant shortcut dock. */
 .brand-mark-frame{width:42px;height:42px;display:grid;place-items:center;perspective:600px;flex:0 0 auto}
-.brand-mark{width:40px;height:40px;display:block;transform-style:preserve-3d;filter:drop-shadow(0 4px 10px rgba(var(--accent-rgb),.24));animation:mark-dimension 12s ease-in-out infinite}
+.brand-mark{width:40px;height:40px;display:block;transform-style:preserve-3d;filter:hue-rotate(var(--brand-hue,0deg)) drop-shadow(0 4px 10px rgba(var(--accent-rgb),.24));animation:mark-dimension 12s ease-in-out infinite}
 .brand:hover .brand-mark{animation-duration:3.8s;filter:drop-shadow(0 0 12px rgba(var(--accent-rgb),.58))}
 @keyframes mark-dimension{0%,100%{transform:rotateX(-8deg) rotateY(-16deg) rotateZ(0)}50%{transform:rotateX(12deg) rotateY(18deg) rotateZ(8deg)}}
 .brand-name{font-size:12px;letter-spacing:.2em}
