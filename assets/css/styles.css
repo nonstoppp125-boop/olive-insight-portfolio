@@ -534,3 +534,21 @@ body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!
   .bg-companion,.bg-companion.is-snapping{transition:none!important}
   .bg-companion .bg-mascot{animation:none!important}
 }
+
+
+/* Companion arm placement correction: hands must join the torso, not float beside it. */
+#bgCompanion .mascot-body{z-index:2!important}
+#bgCompanion .mascot-arm{
+  z-index:1!important;
+  top:195px!important;
+  width:18px!important;
+  height:43px!important;
+  transform-origin:50% 8px!important;
+}
+#bgCompanion .arm-left{left:45px!important;transform:rotate(18deg)!important}
+#bgCompanion .arm-right{right:45px!important;transform:rotate(-18deg)!important}
+#bgCompanion .mascot-arm:after{
+  bottom:-3px!important;
+  width:14px!important;
+  height:14px!important;
+}
