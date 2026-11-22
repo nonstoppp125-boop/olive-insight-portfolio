@@ -172,9 +172,10 @@
     const field=$("#ambientParticles")||document.createElement("div");
     if(field.children.length)return;field.id="ambientParticles";field.className="ambient-particles";field.setAttribute("aria-hidden","true");
     const fragment=document.createDocumentFragment();
-    for(let i=0;i<108;i++){
+    const particleCount=Math.max(22,Math.min(220,Math.round(window.innerWidth*window.innerHeight/10000)));
+    for(let i=0;i<particleCount;i++){
       const dot=document.createElement("i");dot.className="ambient-particle";
-      dot.style.left=(Math.random()*100).toFixed(3)+"%";dot.style.top=(Math.random()*100).toFixed(3)+"%";
+      dot.style.left=(Math.random()*100).toFixed(3)+"%";dot.style.top=(Math.random()*100).toFixed(3)+"%";dot.style.width="1px";dot.style.height="1px";
       dot.style.setProperty("--twinkle-duration",(1.8+Math.random()*6.2).toFixed(2)+"s");
       dot.style.setProperty("--twinkle-delay",(-Math.random()*8).toFixed(2)+"s");
       dot.style.setProperty("--twinkle-min",(0.08+Math.random()*.12).toFixed(2));
@@ -516,7 +517,7 @@
   let suppressMascotClick=false;
   if(assistantButton&&assistantMenu){
     const closeAssistant=()=>{assistantMenu.hidden=true;assistantButton.setAttribute("aria-expanded","false");};
-    assistantButton.addEventListener("click",event=>{if(suppressMascotClick){suppressMascotClick=false;event.preventDefault();return;}const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));});
+    assistantButton.addEventListener("click",event=>{if(suppressMascotClick){suppressMascotClick=false;event.preventDefault();return;}const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));if(open){const rect=assistantButton.getBoundingClientRect(),menuWidth=Math.min(210,window.innerWidth-24);assistantMenu.style.left=Math.max(12,Math.min(window.innerWidth-menuWidth,rect.right+12))+"px";assistantMenu.style.top=Math.max(12,Math.min(window.innerHeight-320,rect.top))+"px";}});
     assistantButton.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
     assistantMenu.addEventListener("click",event=>{
       const action=event.target.closest("[data-shortcut]")?.dataset.shortcut;if(!action)return;
