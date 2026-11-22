@@ -145,7 +145,7 @@ def main():
         errors.append("background assistant must keep one customization entry and only essential navigation shortcuts")
     if "waitForImages" in js or "waitForLoad" in js or "document.fonts.ready" in js or "image.decode()" in js:
         errors.append("loading screen must not block on off-screen images, fonts or the full window load event")
-    if "dot.next=performance.now()+Math.random()*1800" not in js or "dot.next=now+450+Math.random()*2400" not in js:
+    if "next:performance.now()+Math.random()*1800" not in js or "dot.next=now+450+Math.random()*2400" not in js:
         errors.append("loading pinpoints must twinkle on independent randomized schedules")
     if 'src="assets/insight-mark.svg"' not in html or "brand-mark" not in css:
         errors.append("dimensional portfolio identity mark must be integrated")
