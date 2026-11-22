@@ -842,3 +842,23 @@ input::placeholder,textarea::placeholder{color:var(--muted)}
 .assistant-command{display:grid;gap:6px;padding:8px 2px 2px;border-top:1px solid var(--line);margin-top:5px}.assistant-command label{font:italic 11px Georgia,serif;color:var(--muted)}.assistant-command input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:rgba(var(--surface-rgb),.06);color:var(--text);font-size:11px}.assistant-command button{padding:8px 10px;border:1px solid rgba(var(--accent-rgb),.45);border-radius:9px;background:var(--accent);color:var(--accent-contrast);font-size:11px;font-weight:700;cursor:pointer}
 
 body.no-particles #ambientParticles{display:none}.assistant-shortcuts{max-height:calc(100vh - 24px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+
+
+/* Reversible, scroll-linked section handoff: subtle depth, fade and straight vertical travel. */
+.section-flow{transform-origin:50% 50%;backface-visibility:hidden}
+@supports (animation-timeline:view()) and (animation-range:entry 0% exit 100%){
+  .section-flow{
+    animation:section-depth-handoff linear both;
+    animation-timeline:view(block);
+    animation-range:entry 0% exit 100%;
+    will-change:transform,opacity;
+  }
+  @keyframes section-depth-handoff{
+    0%{opacity:.38;transform:translate3d(0,34px,0) scale(.986)}
+    17%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+    78%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+    100%{opacity:.38;transform:translate3d(0,-30px,0) scale(.986)}
+  }
+}
+body.no-motion .section-flow{animation:none!important;opacity:1!important;transform:none!important;will-change:auto}
+@media(prefers-reduced-motion:reduce){.section-flow{animation:none!important;opacity:1!important;transform:none!important;will-change:auto}}
