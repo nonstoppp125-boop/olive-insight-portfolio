@@ -296,24 +296,19 @@ body.no-border .studio-tab:before,body.no-border .studio .control select:before,
 
 
 
-/* Precision 3D glass-orb liquid loader */
-.page-loader{--loader-progress:0%;position:fixed;inset:0;z-index:9999;display:grid;align-content:center;justify-items:center;gap:19px;padding:24px;background:radial-gradient(ellipse at 50% 43%,rgba(var(--accent-rgb),.17),transparent 42%),radial-gradient(ellipse at 50% 58%,rgba(0,0,0,.18),transparent 58%),#10130e;opacity:1;visibility:visible;transition:opacity .48s cubic-bezier(.2,.7,.2,1),visibility .48s ease}
+/* Real-time refractive glass-orb loader */
+@font-face{font-family:"Bodoni Moda Loader";src:url("../fonts/BodoniModa-Italic.ttf") format("truetype");font-style:italic;font-weight:400 900;font-display:swap}
+.page-loader{--loader-progress:0%;position:fixed;inset:0;z-index:9999;display:grid;align-content:center;justify-items:center;gap:17px;padding:24px;background:radial-gradient(ellipse at 50% 45%,rgba(var(--accent-rgb),.2),transparent 38%),radial-gradient(ellipse at 50% 62%,rgba(0,0,0,.32),transparent 56%),#10130e;opacity:1;visibility:visible;transition:opacity .48s cubic-bezier(.2,.7,.2,1),visibility .48s ease}
 .page-loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
-.loader-vessel{position:relative;width:164px;height:164px;display:grid;place-items:center;isolation:isolate;overflow:hidden;border:1px solid rgba(239,246,222,.68);border-radius:50%;background:radial-gradient(ellipse at 29% 17%,rgba(255,255,255,.32) 0,rgba(255,255,255,.11) 8%,transparent 27%),radial-gradient(ellipse at 72% 82%,rgba(0,0,0,.42),transparent 49%),radial-gradient(circle at 50% 48%,rgba(171,190,128,.12),rgba(255,255,255,.035) 58%,rgba(0,0,0,.22) 100%),linear-gradient(145deg,rgba(255,255,255,.19),rgba(255,255,255,.018) 48%,rgba(255,255,255,.075));box-shadow:inset 0 2px 4px rgba(255,255,255,.48),inset 0 -18px 30px rgba(0,0,0,.42),inset 13px 0 25px rgba(255,255,255,.075),inset -10px 0 24px rgba(0,0,0,.18),0 20px 48px rgba(0,0,0,.48),0 0 36px rgba(var(--accent-rgb),.2),0 0 0 1px rgba(255,255,255,.055)}
-.loader-vessel:before{content:"";position:absolute;z-index:3;inset:2px;border:1px solid rgba(255,255,255,.2);border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at 27% 12%,rgba(255,255,255,.42),transparent 17%),radial-gradient(ellipse at 79% 78%,rgba(255,255,255,.055),transparent 35%),linear-gradient(112deg,rgba(255,255,255,.18),transparent 21%,transparent 69%,rgba(255,255,255,.1));box-shadow:inset 0 0 0 1px rgba(255,255,255,.075),inset 0 0 22px rgba(255,255,255,.055)}
-.loader-vessel:after{content:"";position:absolute;z-index:4;left:15%;top:8%;width:29%;height:8%;border-radius:50%;background:rgba(255,255,255,.48);filter:blur(6px);transform:rotate(-39deg);pointer-events:none;box-shadow:25px 5px 15px rgba(255,255,255,.12)}
-.loader-liquid{position:absolute;z-index:1;left:-4%;right:-4%;bottom:-2px;height:var(--loader-progress);border-radius:48% 52% 0 0 / 9% 11% 0 0;background:radial-gradient(ellipse at 34% 0%,rgba(237,247,199,.38),transparent 38%),linear-gradient(180deg,#dce9b0 0%,#b8cc83 12%,#8fa45b 35%,#61783f 70%,#344627 100%);box-shadow:0 -6px 21px rgba(211,229,158,.34),inset 0 9px 16px rgba(255,255,255,.27),inset 0 -13px 22px rgba(0,0,0,.32);transition:height .2s linear}
-.loader-liquid:before{content:"";position:absolute;left:-8%;top:-8px;width:116%;height:16px;border-radius:48% 52% 50% 50%;background:linear-gradient(180deg,rgba(244,250,218,.98),rgba(190,211,137,.92) 55%,rgba(137,161,88,.84));filter:drop-shadow(0 0 7px rgba(220,237,173,.42));animation:loader-wave 3.4s ease-in-out infinite alternate}
-.loader-liquid:after{content:"";position:absolute;left:13%;top:12px;width:34%;height:48%;border-radius:50%;background:linear-gradient(110deg,rgba(255,255,255,.2),transparent 72%);filter:blur(9px);pointer-events:none}
-.loader-vessel-shine{position:absolute;z-index:4;inset:7px;border:1px solid rgba(255,255,255,.22);border-radius:50%;box-shadow:inset 0 0 18px rgba(255,255,255,.075),0 0 9px rgba(255,255,255,.035);pointer-events:none}
-.loader-percent{position:relative;z-index:5;font-family:"Bodoni 72","Didot","Iowan Old Style","Noto Serif",Georgia,"Times New Roman",serif;font-size:39px;font-weight:500;font-style:italic;letter-spacing:-.065em;color:#fbfced;text-shadow:0 2px 12px rgba(0,0,0,.48),0 0 20px rgba(255,255,255,.2);font-variant-numeric:tabular-nums}
-.loader-label{font-family:"Bodoni 72","Didot","Iowan Old Style","Noto Serif",Georgia,"Times New Roman",serif;font-size:14px;font-weight:600;font-style:italic;letter-spacing:.2em;color:rgba(244,247,229,.94);text-shadow:0 1px 12px rgba(0,0,0,.42)}
-.loader-track{width:164px;height:2px;overflow:hidden;background:rgba(255,255,255,.13);border-radius:9px;box-shadow:0 1px 5px rgba(0,0,0,.22)}
-.loader-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#839654,#d5e6a0);box-shadow:0 0 13px rgba(var(--accent-rgb),.62);transition:width .18s linear}
-@keyframes loader-wave{from{transform:translateX(-3%) rotate(-2deg)}to{transform:translateX(3%) rotate(2deg)}}
-@media(max-width:480px){.loader-vessel{width:148px;height:148px}.loader-percent{font-size:35px}.loader-label{font-size:13px}}
-@media(prefers-reduced-motion:reduce){.page-loader,.loader-liquid:before{animation:none;transition-duration:.01ms}}
-
+.loader-vessel{position:relative;width:190px;height:190px;display:grid;place-items:center;isolation:isolate;overflow:visible}
+.loader-orb-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;filter:drop-shadow(0 16px 22px rgba(0,0,0,.34))}
+.loader-vessel-shine{position:absolute;z-index:3;inset:7px;border:1px solid rgba(255,255,255,.16);border-radius:50%;box-shadow:inset 0 0 22px rgba(255,255,255,.045),0 0 15px rgba(255,255,255,.025);pointer-events:none}
+.loader-percent{position:relative;z-index:5;font-family:"Bodoni Moda Loader","Bodoni 72","Didot",serif;font-size:43px;font-weight:500;font-style:italic;letter-spacing:-.055em;color:#fffef4;text-shadow:0 2px 12px rgba(0,0,0,.58),0 0 24px rgba(255,255,255,.22);font-variant-numeric:tabular-nums}
+.loader-label{font-family:"Bodoni Moda Loader","Bodoni 72","Didot",serif;font-size:16px;font-weight:600;font-style:italic;letter-spacing:.19em;color:rgba(250,250,238,.97);text-shadow:0 2px 14px rgba(0,0,0,.52)}
+.loader-track{width:172px;height:2px;overflow:hidden;background:rgba(255,255,255,.14);border-radius:9px;box-shadow:0 1px 5px rgba(0,0,0,.22)}
+.loader-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#839654,#e2edb7);box-shadow:0 0 13px rgba(var(--accent-rgb),.7);transition:width .18s linear}
+@media(max-width:480px){.loader-vessel{width:174px;height:174px}.loader-percent{font-size:39px}.loader-label{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.page-loader{transition-duration:.01ms}}
 /* STEP 02 — ambient background atmosphere (compositor-friendly motion) */
 .ambient{opacity:.22;will-change:transform;contain:paint}
 .ambient-one{background:radial-gradient(circle at 42% 44%,rgba(var(--accent-rgb),.42),rgba(var(--accent-rgb),.12) 38%,transparent 72%);animation:ambient-drift-a 24s ease-in-out infinite alternate}

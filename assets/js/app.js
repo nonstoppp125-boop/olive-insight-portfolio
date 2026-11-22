@@ -8,6 +8,98 @@
   const backdrop = $("#studioBackdrop");
   const toast = $("#toast");
   const pageLoader=$("#pageLoader");
+  function createLoaderOrb(){
+    const canvas=$("#loaderOrbCanvas");
+    if(!canvas)return;
+    const gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:false,powerPreference:"low-power"});
+    if(!gl){canvas.classList.add("orb-unavailable");return;}
+    const vertex=`
+      attribute vec2 a_position;
+      varying vec2 v_uv;
+      void main(){v_uv=a_position*.5+.5;gl_Position=vec4(a_position,0.0,1.0);}
+    `;
+    const fragment=`
+      precision highp float;
+      varying vec2 v_uv;
+      uniform vec2 u_resolution;
+      uniform float u_time;
+      uniform float u_progress;
+      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
+      float softLight(vec2 p,vec2 c,float sx,float sy){vec2 d=(p-c)/vec2(sx,sy);return exp(-dot(d,d));}
+      void main(){
+        vec2 p=(v_uv-.5)*2.0;
+        p.x*=u_resolution.x/u_resolution.y;
+        float r=length(p);
+        float radius=.84;
+        float edge=1.0-smoothstep(radius-.008,radius+.008,r);
+        if(edge<=0.001){gl_FragColor=vec4(0.0);return;}
+        float z=sqrt(max(0.0,radius*radius-dot(p,p)));
+        vec3 n=normalize(vec3(p,z));
+        vec3 viewDir=vec3(0.0,0.0,1.0);
+        float fresnel=pow(1.0-max(dot(n,viewDir),0.0),5.0);
+        float rim=pow(1.0-z/radius,2.4);
+        vec3 reflected=reflect(-viewDir,n);
+        float envA=softLight(reflected.xy,vec2(-.52,.48),.27,.12);
+        float envB=softLight(reflected.xy,vec2(.58,.25),.18,.32);
+        float envC=softLight(reflected.xy,vec2(-.18,-.68),.45,.09);
+        vec3 environment=vec3(.035,.047,.033)+vec3(.62,.72,.48)*envA+vec3(.48,.62,.74)*envB+vec3(.75,.82,.59)*envC;
+        float spec1=pow(max(dot(reflect(normalize(vec3(-.45,.72,.85)),n),viewDir),0.0),42.0);
+        float spec2=pow(max(dot(reflect(normalize(vec3(.72,-.5,.8)),n),viewDir),0.0),72.0);
+        float sheen=softLight(p,vec2(-.36,.53),.22,.075)+.48*softLight(p,vec2(.47,-.42),.12,.22);
+        vec3 glass=mix(vec3(.12,.17,.105),environment,.2+fresnel*.82);
+        glass+=vec3(.62,.75,.48)*rim*.48;
+        glass+=vec3(1.0)*spec1*.72+vec3(.76,.88,1.0)*spec2*.42+vec3(1.0)*sheen*.13;
+        float progress=clamp(u_progress,0.0,1.0);
+        float wave=.025*sin(p.x*7.2+u_time*1.45)+.012*sin(p.x*15.0-u_time*1.1);
+        float liquidLine=mix(-radius-.04,radius+.025,progress)+wave;
+        float inLiquid=step(p.y,liquidLine)*step(r,radius);
+        float depth=clamp((liquidLine-p.y)/(radius*2.0),0.0,1.0);
+        vec3 liquidTop=vec3(.78,.87,.55);
+        vec3 liquidMid=vec3(.43,.56,.27);
+        vec3 liquidDeep=vec3(.12,.20,.09);
+        vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.38,depth));
+        liquid=mix(liquid,liquidDeep,smoothstep(.45,1.0,depth));
+        float liquidLight=softLight(p,vec2(-.25,.22),.32,.38)*.22;
+        liquid+=vec3(.55,.7,.32)*liquidLight;
+        float interface=exp(-pow((p.y-liquidLine)/.018,2.0))*step(.005,progress)*step(progress,.995);
+        float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
+        liquid+=vec3(.82,.94,.62)*interface*(.3+.7*interfaceGlint);
+        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0014)*step(p.y,liquidLine);
+        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0011)*step(p.y,liquidLine);
+        liquid+=vec3(.8,.91,.64)*(bubbleA+bubbleB)*.55;
+        vec3 color=mix(glass,liquid,inLiquid*.94);
+        float edgeReflection=pow(1.0-z/radius,5.5);
+        color+=vec3(.82,.93,.66)*edgeReflection*.72;
+        float outerRim=exp(-pow((r-radius+.012)/.012,2.0));
+        color+=vec3(.93,1.0,.79)*outerRim*.75;
+        float alpha=edge*clamp(.52+fresnel*.44+rim*.18,0.0,1.0);
+        alpha=max(alpha,edge*inLiquid*.91);
+        gl_FragColor=vec4(color,alpha);
+      }
+    `;
+    const compile=(type,source)=>{const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){gl.deleteShader(shader);throw new Error(gl.getShaderInfoLog(shader)||"Orb shader compile failed");}return shader;};
+    let program;
+    try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)||"Orb shader link failed");}
+    catch(error){canvas.classList.add("orb-unavailable");return;}
+    gl.useProgram(program);
+    const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+    const position=gl.getAttribLocation(program,"a_position");gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
+    const resolution=gl.getUniformLocation(program,"u_resolution"),time=gl.getUniformLocation(program,"u_time"),progress=gl.getUniformLocation(program,"u_progress");
+    let raf=0,start=performance.now(),lastWidth=0,lastHeight=0;
+    const draw=now=>{
+      if(!canvas.isConnected){cancelAnimationFrame(raf);gl.deleteBuffer(buffer);gl.deleteProgram(program);return;}
+      const rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,1.65),w=Math.max(1,Math.round(rect.width*dpr)),h=Math.max(1,Math.round(rect.height*dpr));
+      if(w!==lastWidth||h!==lastHeight){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);lastWidth=w;lastHeight=h;}
+      const raw=getComputedStyle(pageLoader).getPropertyValue("--loader-progress").trim();
+      const amount=Math.max(0,Math.min(1,(parseFloat(raw)||0)/100));
+      gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform2f(resolution,w,h);gl.uniform1f(time,(now-start)/1000);gl.uniform1f(progress,amount);gl.drawArrays(gl.TRIANGLES,0,6);
+      raf=requestAnimationFrame(draw);
+    };
+    raf=requestAnimationFrame(draw);
+    canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();cancelAnimationFrame(raf);},{once:true});
+  }
+  createLoaderOrb();
   if(pageLoader){
     const percentNode=$("#loaderPercent");
     const statusNode=$("#loaderStatus");
