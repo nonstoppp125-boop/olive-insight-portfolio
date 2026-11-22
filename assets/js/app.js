@@ -22,14 +22,14 @@
       if(percentNode)percentNode.textContent=shown+"%";
       if(trackNode)trackNode.style.width=shown+"%";
       if(progress<targetProgress-.12)frame=requestAnimationFrame(paint);
-      else if(completed)finishLoader();
+      else if(completed)dismissLoader();
     };
     const setProgress=(value,label)=>{
       targetProgress=Math.max(targetProgress,Math.min(100,value));
       if(label&&statusNode)statusNode.textContent=label;
       if(!frame)frame=requestAnimationFrame(paint);
     };
-    const finishLoader=()=>{
+    const dismissLoader=()=>{
       if(dismissed||!completed||progress<99.8)return;
       dismissed=true;
       if(percentNode)percentNode.textContent="100%";
@@ -62,14 +62,14 @@
       setProgress(100,"YOUR EXPERIENCE IS READY");
       completed=true;
       if(!frame)frame=requestAnimationFrame(paint);
-      const waitUntilFull=()=>{if(progress>=99.8){finishLoader();return;}requestAnimationFrame(waitUntilFull);};
+      const waitUntilFull=()=>{if(progress>=99.8){dismissLoader();return;}requestAnimationFrame(waitUntilFull);};
       requestAnimationFrame(waitUntilFull);
     };
     frame=requestAnimationFrame(paint);
     prepareExperience().catch(()=>{
       setProgress(100,"YOUR EXPERIENCE IS READY");
       completed=true;
-      const revealWhenPainted=()=>{if(progress>=99.8){finishLoader();return;}requestAnimationFrame(revealWhenPainted);};
+      const revealWhenPainted=()=>{if(progress>=99.8){dismissLoader();return;}requestAnimationFrame(revealWhenPainted);};
       requestAnimationFrame(revealWhenPainted);
     });
   }
