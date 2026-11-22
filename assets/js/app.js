@@ -501,15 +501,18 @@
   });
   restoreMascotPosition();
 
-  // Low-latency liquid cursor. Touch movement is relative to the last visible orb position during its 1s afterglow.
+  // Direct-touch liquid cursor: the orb tracks the finger's actual screen position.
+  // Velocity only deforms the glass body; it never offsets or delays the touch position.
   const liquidCursor=$("#liquidLensCursor");
   const liquidLensContent=$("#liquidLensContent");
   if(liquidCursor&&liquidLensContent&&(window.matchMedia("(hover: hover) and (pointer: fine)").matches||window.matchMedia("(pointer: coarse)").matches)){
     root.classList.add("has-liquid-cursor");
-    const isCoarse=window.matchMedia("(pointer: coarse)").matches;
+    const coarseQuery=window.matchMedia("(pointer: coarse)");
+    const isCoarse=coarseQuery.matches;
     const lensTargets=".card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card,.button,.main-nav a,.tag-list span,.profile-orb";
-    let cursorX=-100,cursorY=-100,renderX=-100,renderY=-100,pointerX=-100,pointerY=-100,cursorRaf=0,currentTarget=null,cloneNode=null,hideTimer=0,touchActive=false,touchStartX=0,touchStartY=0,touchAnchorX=0,touchAnchorY=0,cursorVisible=false;
-    const cursorEase=.48;
+    let cursorX=-100,cursorY=-100,pointerX=-100,pointerY=-100,cursorRaf=0,currentTarget=null,cloneNode=null,hideTimer=0;
+    let activePointerId=null,lastX=0,lastY=0,lastTime=0,velocityX=0,velocityY=0,stretch=1;
+    const ease=.48;
     function cleanClone(node){
       node.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));node.removeAttribute("id");node.classList.add("liquid-lens-clone");
       node.querySelectorAll("button,input,select,textarea").forEach(el=>{el.setAttribute("tabindex","-1");el.setAttribute("aria-hidden","true");});return node;
@@ -531,50 +534,64 @@
       const nx=(localX/Math.max(1,rect.width)-.5)*2,ny=(localY/Math.max(1,rect.height)-.5)*2;
       currentTarget.style.setProperty("--liquid-shift-x",(nx*1.25).toFixed(2)+"px");currentTarget.style.setProperty("--liquid-shift-y",(ny*1.25).toFixed(2)+"px");
     }
-    function paintLiquidCursor(){
+    function paintCursor(){
       cursorRaf=0;
-      if(isCoarse){renderX=cursorX;renderY=cursorY;}
-      else{renderX+=(cursorX-renderX)*cursorEase;renderY+=(cursorY-renderY)*cursorEase;}
-      liquidCursor.style.transform="translate3d("+(renderX-36).toFixed(1)+"px,"+(renderY-36).toFixed(1)+"px,0)";
-      if(!isCoarse&&(Math.abs(cursorX-renderX)>.2||Math.abs(cursorY-renderY)>.2))cursorRaf=requestAnimationFrame(paintLiquidCursor);
+      const fine=!isCoarse;
+      if(fine){
+        const dx=cursorX-parseFloat(liquidCursor.dataset.renderX||cursorX),dy=cursorY-parseFloat(liquidCursor.dataset.renderY||cursorY);
+        const rx=parseFloat(liquidCursor.dataset.renderX||cursorX)+dx*ease,ry=parseFloat(liquidCursor.dataset.renderY||cursorY)+dy*ease;
+        liquidCursor.dataset.renderX=String(rx);liquidCursor.dataset.renderY=String(ry);
+        liquidCursor.style.transform="translate3d("+(rx-36).toFixed(2)+"px,"+(ry-36).toFixed(2)+"px,0)";
+        if(Math.abs(cursorX-rx)>.2||Math.abs(cursorY-ry)>.2)cursorRaf=requestAnimationFrame(paintCursor);
+      }else liquidCursor.style.transform="translate3d("+(cursorX-36).toFixed(2)+"px,"+(cursorY-36).toFixed(2)+"px,0)";
     }
-    function moveCursorTo(x,y){
-      cursorX=x;cursorY=y;pointerX=x;pointerY=y;
-      const under=document.elementFromPoint(x,y);
-      const target=under&&under.closest?under.closest(lensTargets):null;
-      setLensTarget(target&&!target.closest(".liquid-cursor,.bg-companion")?target:null);
-      syncLens();
-      if(isCoarse){renderX=x;renderY=y;liquidCursor.style.transform="translate3d("+(x-36).toFixed(1)+"px,"+(y-36).toFixed(1)+"px,0)";}
-      else if(!cursorRaf)cursorRaf=requestAnimationFrame(paintLiquidCursor);
+    function setPosition(x,y,now){
+      const dt=Math.max(8,Math.min(48,now-lastTime||16));
+      velocityX=(x-lastX)/dt;velocityY=(y-lastY)/dt;
+      const speed=Math.min(1,Math.hypot(velocityX,velocityY)/1.35);
+      const angle=Math.atan2(velocityY,velocityX)*180/Math.PI;
+      stretch=1+speed*.24;
+      liquidCursor.style.setProperty("--cursor-stretch-x",stretch.toFixed(3));
+      liquidCursor.style.setProperty("--cursor-stretch-y",(1-speed*.19).toFixed(3));
+      liquidCursor.style.setProperty("--cursor-angle",angle.toFixed(2)+"deg");
+      lastX=x;lastY=y;lastTime=now;cursorX=x;cursorY=y;pointerX=x;pointerY=y;
+      const under=document.elementFromPoint(x,y),target=under&&under.closest?under.closest(lensTargets):null;
+      setLensTarget(target&&!target.closest(".liquid-cursor,.bg-companion")?target:null);syncLens();
+      if(isCoarse){liquidCursor.style.transform="translate3d("+(x-36).toFixed(2)+"px,"+(y-36).toFixed(2)+"px,0)";}
+      else if(!cursorRaf)cursorRaf=requestAnimationFrame(paintCursor);
     }
     function showCursor(event){
+      if(isCoarse&&event.pointerType!=="touch")return;
       if(hideTimer){clearTimeout(hideTimer);hideTimer=0;}
-      if(isCoarse||event.pointerType==="touch"){
-        if(cursorVisible){touchAnchorX=cursorX;touchAnchorY=cursorY;}
-        else{touchAnchorX=event.clientX;touchAnchorY=event.clientY;cursorX=touchAnchorX;cursorY=touchAnchorY;renderX=cursorX;renderY=cursorY;}
-        touchStartX=event.clientX;touchStartY=event.clientY;touchActive=true;
-      }
-      cursorVisible=true;liquidCursor.style.opacity="1";liquidCursor.style.visibility="visible";liquidCursor.classList.add("is-pressing");
-      if(!isCoarse&&event.pointerType!=="touch")moveCursorTo(event.clientX,event.clientY);
-      else if(!cursorRaf)paintLiquidCursor();
+      activePointerId=event.pointerId;
+      const now=performance.now();
+      lastX=event.clientX;lastY=event.clientY;lastTime=now;velocityX=0;velocityY=0;stretch=1;
+      liquidCursor.style.setProperty("--cursor-stretch-x","1");liquidCursor.style.setProperty("--cursor-stretch-y","1");
+      liquidCursor.style.setProperty("--cursor-angle","0deg");
+      liquidCursor.style.opacity="1";liquidCursor.style.visibility="visible";liquidCursor.classList.add("is-pressing");
+      liquidCursor.dataset.renderX=String(event.clientX);liquidCursor.dataset.renderY=String(event.clientY);
+      setPosition(event.clientX,event.clientY,now);
+    }
+    function moveCursor(event){
+      if(isCoarse){
+        if(activePointerId===null||event.pointerId!==activePointerId)return;
+      }else if(event.pointerType==="touch"&&activePointerId!==event.pointerId)return;
+      setPosition(event.clientX,event.clientY,performance.now());
     }
     function releaseCursor(event){
-      liquidCursor.classList.remove("is-pressing");
-      if(isCoarse||event.pointerType==="touch"){
-        touchActive=false;
+      if(activePointerId!==null&&event.pointerId!==activePointerId)return;
+      if(isCoarse&&event.pointerType!=="touch")return;
+      if(Number.isFinite(event.clientX)&&Number.isFinite(event.clientY))setPosition(event.clientX,event.clientY,performance.now());
+      activePointerId=null;liquidCursor.classList.remove("is-pressing");
+      liquidCursor.style.setProperty("--cursor-stretch-x","1");liquidCursor.style.setProperty("--cursor-stretch-y","1");
+      liquidCursor.style.setProperty("--cursor-angle","0deg");
+      if(isCoarse){
         if(hideTimer)clearTimeout(hideTimer);
-        hideTimer=window.setTimeout(()=>{liquidCursor.style.opacity="0";setLensTarget(null);hideTimer=0;cursorVisible=false;},1000);
+        hideTimer=window.setTimeout(()=>{liquidCursor.style.opacity="0";setLensTarget(null);hideTimer=0;},1000);
       }
     }
     window.addEventListener("pointerdown",showCursor,{passive:true});
-    window.addEventListener("pointermove",event=>{
-      if(event.pointerType==="touch"||isCoarse){
-        if(!touchActive)return;
-        if(hideTimer){clearTimeout(hideTimer);hideTimer=0;}
-        const x=touchAnchorX+(event.clientX-touchStartX),y=touchAnchorY+(event.clientY-touchStartY);
-        liquidCursor.style.opacity="1";moveCursorTo(x,y);
-      }else moveCursorTo(event.clientX,event.clientY);
-    },{passive:true});
+    window.addEventListener("pointermove",moveCursor,{passive:true});
     window.addEventListener("pointerup",releaseCursor,{passive:true});
     window.addEventListener("pointercancel",releaseCursor,{passive:true});
     document.addEventListener("pointerleave",event=>{if(!isCoarse&&event.pointerType!=="touch"){setLensTarget(null);liquidCursor.style.opacity="0";}},{passive:true});
