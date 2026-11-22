@@ -39,10 +39,16 @@
         float fresnel=pow(1.0-max(dot(n,viewDir),0.0),5.0);
         float rim=pow(1.0-z/radius,2.4);
         vec3 reflected=reflect(-viewDir,n);
+        vec3 refracted=refract(-viewDir,n,1.0/1.46);
         float envA=softLight(reflected.xy,vec2(-.52,.48),.27,.12);
         float envB=softLight(reflected.xy,vec2(.58,.25),.18,.32);
         float envC=softLight(reflected.xy,vec2(-.18,-.68),.45,.09);
-        vec3 environment=vec3(.035,.047,.033)+vec3(.62,.72,.48)*envA+vec3(.48,.62,.74)*envB+vec3(.75,.82,.59)*envC;
+        vec3 reflectionEnv=vec3(.035,.047,.033)+vec3(.62,.72,.48)*envA+vec3(.48,.62,.74)*envB+vec3(.75,.82,.59)*envC;
+        float transA=softLight(refracted.xy,vec2(-.4,.34),.34,.16);
+        float transB=softLight(refracted.xy,vec2(.46,-.18),.24,.3);
+        float transC=softLight(refracted.xy,vec2(.05,-.62),.4,.1);
+        vec3 transmissionEnv=vec3(.065,.085,.052)+vec3(.4,.52,.27)*transA+vec3(.25,.38,.46)*transB+vec3(.48,.57,.34)*transC;
+        vec3 environment=mix(transmissionEnv,reflectionEnv,fresnel);
         float spec1=pow(max(dot(reflect(normalize(vec3(-.45,.72,.85)),n),viewDir),0.0),42.0);
         float spec2=pow(max(dot(reflect(normalize(vec3(.72,-.5,.8)),n),viewDir),0.0),72.0);
         float sheen=softLight(p,vec2(-.36,.53),.22,.075)+.48*softLight(p,vec2(.47,-.42),.12,.22);
