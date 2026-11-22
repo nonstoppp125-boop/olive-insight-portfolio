@@ -196,8 +196,8 @@
     root.style.setProperty("--glass-alpha",String(settings.opacity/100));
     root.style.setProperty("--radius",settings.radius+"px");
     root.style.setProperty("--capsule-speed",settings.capsuleSpeed+"s");root.style.setProperty("--border-speed",settings.borderSpeed+"s");
-    const fontStacks={system:'ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',editorial:'ui-serif,Georgia,Cambria,"Times New Roman",serif',technical:'ui-monospace,SFMono-Regular,Consolas,monospace'};
-    const displayStacks={system:'"Palatino Linotype","Book Antiqua",Palatino,Georgia,ui-serif,serif',editorial:fontStacks.editorial,technical:fontStacks.technical};
+    const fontStacks={system:'"Trebuchet MS",Arial,Helvetica,sans-serif',editorial:'Georgia,"Times New Roman",serif',technical:'ui-monospace,SFMono-Regular,Consolas,monospace'};
+    const displayStacks={system:'"Bodoni MT","Didot","Bodoni 72","Palatino Linotype",Georgia,serif',editorial:fontStacks.editorial,technical:fontStacks.technical};
     root.style.setProperty("--font",fontStacks[settings.font]||fontStacks.system);
     root.style.setProperty("--display-font",displayStacks[settings.font]||displayStacks.system);
     const density={compact:[40,56,22,11],balanced:[55,75,30,15],spacious:[68,90,38,20]}[settings.density]||[55,75,30,15];
