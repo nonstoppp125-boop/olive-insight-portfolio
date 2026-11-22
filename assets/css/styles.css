@@ -552,3 +552,29 @@ body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!
   width:14px!important;
   height:14px!important;
 }
+
+
+/* Fix companion scale at the layout level so every robot part stays connected. */
+#bgCompanion .bg-mascot{
+  zoom:.35!important;
+  transform:none!important;
+  transform-origin:top left!important;
+}
+#bgCompanion .mascot-body{z-index:2!important}
+#bgCompanion .mascot-arm{
+  z-index:1!important;
+  top:190px!important;
+  width:18px!important;
+  height:43px!important;
+  transform-origin:50% 8px!important;
+}
+#bgCompanion .arm-left{left:43px!important;transform:rotate(18deg)!important}
+#bgCompanion .arm-right{right:43px!important;transform:rotate(-18deg)!important}
+#bgCompanion .mascot-arm:after{
+  bottom:-3px!important;
+  width:14px!important;
+  height:14px!important;
+}
+@media(max-width:680px){
+  #bgCompanion .bg-mascot{zoom:.33!important}
+}
