@@ -40,9 +40,9 @@
         vec3 reflected=reflect(-viewDir,n),refracted=refract(-viewDir,n,1.0/1.46);
         vec3 refractedR=refract(-viewDir,n,1.0/1.455),refractedB=refract(-viewDir,n,1.0/1.475);
         float envA=softLight(reflected.xy,vec2(-.52,.48),.27,.12),envB=softLight(reflected.xy,vec2(.58,.25),.18,.32),envC=softLight(reflected.xy,vec2(-.18,-.68),.45,.09);
-        vec3 reflectionEnv=u_root*.24+vec3(.62,.72,.48)*envA+vec3(.48,.62,.74)*envB+vec3(.75,.82,.59)*envC;
+        vec3 reflectionEnv=u_root*.18+vec3(.44,.88,.35)*envA+vec3(.25,.68,.39)*envB+vec3(.78,.96,.56)*envC;
         float transA=softLight(refracted.xy,vec2(-.4,.34),.34,.16),transB=softLight(refracted.xy,vec2(.46,-.18),.24,.3),transC=softLight(refracted.xy,vec2(.05,-.62),.4,.1);
-        vec3 transmissionEnv=u_root*.42+u_accent*.62*transA+vec3(.25,.38,.46)*transB+vec3(.48,.57,.34)*transC;
+        vec3 transmissionEnv=u_root*.22+vec3(.26,.86,.34)*transA+vec3(.13,.43,.24)*transB+vec3(.58,.82,.36)*transC;
         float dispersion=length(refractedR-refractedB)*2.8;
         vec3 environment=mix(transmissionEnv,reflectionEnv,fresnel);
         float spec1=pow(max(dot(reflect(normalize(vec3(-.45,.72,.85)),n),viewDir),0.0),42.0);
@@ -55,11 +55,11 @@
         float wave=.026*sin(p.x*7.2+u_time*1.45)+.012*sin(p.x*15.0-u_time*1.1)+.006*sin(p.x*24.0+u_time*.72);
         float liquidLine=mix(-radius-.04,radius+.025,progress)+wave;
         float inLiquid=step(p.y,liquidLine)*step(r,radius),depth=clamp((liquidLine-p.y)/(radius*2.0),0.0,1.0);
-        vec3 liquidTop=mix(vec3(.94,.97,.91),u_accent,.26),liquidMid=mix(u_accent,vec3(.42,.58,.75),.2),liquidDeep=mix(u_accent*.36,u_root*.18,.32);
+        vec3 liquidTop=vec3(.84,1.0,.69),liquidMid=vec3(.25,.91,.37),liquidDeep=vec3(.025,.31,.13);
         float caustic=sin(p.x*17.0+u_time*1.2+sin(p.y*9.0))*sin(p.y*13.0-u_time*.8);
         vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.42,depth));
         liquid=mix(liquid,liquidDeep,smoothstep(.48,1.0,depth));
-        liquid+=u_accent*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
+        liquid+=vec3(.16,.78,.29)*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
         float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
         liquid+=vec3(.9,.97,1.0)*boundaryGlow*(.48+.8*interfaceGlint);
@@ -67,7 +67,7 @@
         float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0011)*step(p.y,liquidLine);
         liquid+=vec3(.85,.96,1.0)*(bubbleA+bubbleB)*.72;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
-        vec3 prism=spectrum(prismHue);
+        vec3 prism=mix(vec3(.08,.72,.31),vec3(.78,1.0,.34),smoothstep(.08,.92,prismHue));
         float iridescence=clamp(fresnel*.72+dispersion*.7+boundaryGlow*.22,0.0,.72);
         vec3 color=mix(glass,liquid,inLiquid*.94);
         color=mix(color,prism,iridescence*(.17+rim*.23));
@@ -575,22 +575,15 @@
       const delta=y-previousY;
       if(Math.abs(delta)>.25)lastDirection=delta>0?1:-1;
       previousY=y;
-      if(window.matchMedia("(max-width:760px)").matches){
-        nav.style.removeProperty("--nav-drift");
-        nav.style.removeProperty("gap");
-        links.forEach(link=>link.style.setProperty("--nav-x","0px"));
-        nav.dataset.scrollDirection="static";
-        return;
-      }
-      const phase=(Math.sin(y/230)+1)/2;
-      const gap=14+(phase*10);
-      const fan=(phase-.5)*5;
+      const phase=(Math.sin(y/185)+1)/2;
+      const gap=9+(phase*16);
+      const fan=(phase-.5)*18;
       const directionFlow=lastDirection===0?0:(lastDirection>0?-1:1);
-      nav.style.setProperty("--nav-drift",(directionFlow*3.5).toFixed(2)+"px");
+      nav.style.setProperty("--nav-drift",(directionFlow*9).toFixed(2)+"px");
       nav.style.gap=gap.toFixed(2)+"px";
       links.forEach((link,index)=>{
         const center=index-(links.length-1)/2;
-        const serial=directionFlow*index*1.45;
+        const serial=directionFlow*index*4.2;
         const offset=center*fan+serial;
         link.style.setProperty("--nav-x",offset.toFixed(2)+"px");
       });
