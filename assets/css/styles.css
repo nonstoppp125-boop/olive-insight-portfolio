@@ -43,14 +43,16 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}body{margin:0;background:ra
 .feature-card,.research-grid article,.future-item,.timeline-card,.card,.empty-state,.progress-panel,.contact-card,.studio-tab,.button,.icon-button{transition:transform .24s ease,border-color .24s ease,background-color .24s ease,box-shadow .24s ease}
 .glass:hover{border-color:rgba(var(--accent-rgb),.25)}
 .feature-card:hover,.research-grid article:hover,.timeline-card:hover,.future-item:hover,.empty-state:hover,.progress-panel:hover,.contact-card:hover{transform:translateY(-3px)}
-/* Site-wide background character: atmospheric, never a foreground widget */
-.bg-companion{position:fixed;z-index:0;left:clamp(-48px,3vw,42px);bottom:clamp(-70px,4vh,30px);width:210px;height:300px;opacity:.16;pointer-events:none;transform:translate3d(var(--bg-x,0px),var(--bg-y,0px),0) rotate(var(--bg-tilt,0deg)) scale(.88);transform-origin:bottom center;transition:transform .65s cubic-bezier(.2,.75,.25,1),opacity .5s;will-change:transform;filter:saturate(.72)}
-.bg-companion:after{content:"";position:absolute;inset:12% -28% 0;border-radius:50%;background:radial-gradient(ellipse,rgba(var(--accent-rgb),.2),transparent 68%);z-index:-1}
-.bg-mascot{animation:bg-mascot-drift 11s ease-in-out infinite;filter:drop-shadow(0 10px 20px rgba(0,0,0,.16))}
-.bg-companion.is-reacting{opacity:.28;--bg-tilt:5deg}
+/* Site-wide background character: compact, draggable and edge-magnetic */
+.bg-companion{position:fixed;z-index:4;left:0;top:0;bottom:auto;width:104px;height:148px;opacity:.9;pointer-events:auto;touch-action:none;cursor:grab;transform:translate3d(var(--mascot-x,0px),var(--mascot-y,0px),0) rotate(var(--bg-tilt,0deg));transform-origin:top left;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .22s;will-change:transform;filter:saturate(.82)}
+.bg-companion:after{content:"";position:absolute;inset:8% -12%;border-radius:48%;background:radial-gradient(ellipse,rgba(var(--accent-rgb),.2),transparent 70%);z-index:-1;pointer-events:none}
+.bg-mascot{transform:scale(.48);transform-origin:top left;animation:bg-mascot-drift 11s ease-in-out infinite;filter:drop-shadow(0 6px 12px rgba(0,0,0,.18))}
+.bg-companion.is-dragging{transition:none;cursor:grabbing;opacity:1}
+.bg-companion.is-snapping{transition:transform .42s cubic-bezier(.18,.82,.22,1),opacity .22s}
+.bg-companion.is-reacting{opacity:1;--bg-tilt:4deg}
 .bg-companion.is-reacting .bg-mascot{animation:bg-mascot-react .9s cubic-bezier(.2,.8,.2,1)}
-@keyframes bg-mascot-drift{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
-@keyframes bg-mascot-react{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-17px) rotate(-6deg)}70%{transform:translateY(-4px) rotate(5deg)}}
+@keyframes bg-mascot-drift{0%,100%{transform:translateY(0) rotate(-2deg) scale(.48)}50%{transform:translateY(-6px) rotate(2deg) scale(.48)}}
+@keyframes bg-mascot-react{0%,100%{transform:translateY(0) rotate(0) scale(.48)}35%{transform:translateY(-9px) rotate(-6deg) scale(.48)}70%{transform:translateY(-2px) rotate(5deg) scale(.48)}}
 body.no-mascot .bg-companion{display:none}
 body.no-float .bg-mascot,body.no-float .bg-companion.is-reacting .bg-mascot{animation:none!important}
 .site-header,main,.footer,.studio-fab,.studio,.toast{position:relative;z-index:2}
