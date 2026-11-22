@@ -341,10 +341,10 @@
   });
   restoreMascotPosition();
 
-  // High-performance liquid magnifier cursor. Disabled for touch/coarse pointers.
+  // Liquid magnifier orb: supports mouse, trackpad and touch pointers.
   const liquidCursor=$("#liquidLensCursor");
   const liquidLensContent=$("#liquidLensContent");
-  if(liquidCursor&&liquidLensContent&&window.matchMedia("(hover: hover) and (pointer: fine)").matches&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  if(liquidCursor&&liquidLensContent&&(window.matchMedia("(hover: hover) and (pointer: fine)").matches||window.matchMedia("(pointer: coarse)").matches)){
     root.classList.add("has-liquid-cursor");
     const lensTargets=".glass,.card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card,.button,.main-nav a,.tag-list span,.profile-orb";
     let cursorX=-100,cursorY=-100,renderX=-100,renderY=-100,pointerX=0,pointerY=0,cursorRaf=0,currentTarget=null,cloneNode=null;

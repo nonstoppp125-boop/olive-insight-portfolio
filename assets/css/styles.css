@@ -624,5 +624,6 @@ html.has-liquid-cursor .liquid-cursor.is-pressing .liquid-lens-window{transform:
 .liquid-hover-target{transform:perspective(900px) translate3d(var(--liquid-shift-x,0px),var(--liquid-shift-y,0px),0) scale(.986)!important;transform-origin:center;transition:transform .42s cubic-bezier(.18,.78,.22,1),filter .42s ease!important;filter:saturate(1.08)}
 .liquid-hover-target:after{transition:opacity .35s ease}
 @media(hover:hover) and (pointer:fine){html.has-liquid-cursor,html.has-liquid-cursor body,html.has-liquid-cursor a,html.has-liquid-cursor button{cursor:none!important}}
-@media(max-width:800px),(hover:none),(pointer:coarse){.liquid-cursor{display:none!important}}
+/* Touch devices use the same visible orb during pointer contact; native scrolling remains enabled. */
+@media(hover:none),(pointer:coarse){.liquid-cursor{width:72px;height:72px}.liquid-cursor-core{inset:24px}.liquid-cursor-ring{inset:16px}.liquid-cursor.is-lens .liquid-cursor-ring{inset:8px}}
 @media(prefers-reduced-motion:reduce){.liquid-cursor,.liquid-cursor *,.liquid-hover-target{transition:none!important;animation:none!important}}
