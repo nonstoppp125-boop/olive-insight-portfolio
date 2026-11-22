@@ -818,3 +818,15 @@ p,.muted,.hero-lede,.intro p,.card p,.timeline-card p,.contact-card p,.detail-ro
 .ambient-particles.particles-off{display:none}
 @media(max-width:520px){.assistant-shortcuts{left:12px;top:auto;bottom:calc(18px + env(safe-area-inset-bottom));width:190px}.brand-mark-frame{width:36px;height:36px}.brand-mark{width:35px;height:35px}}
 @media(prefers-reduced-motion:reduce){.brand-mark{animation:none!important}}
+
+
+/* Final adaptive contrast pass for secondary labels, metadata and control chrome. */
+body{color:var(--text)!important}
+label,.section-heading label,.detail-row b,.timeline-card h3,.feature-card h3,.research-grid h3,.future-item h3,.empty-state h3,.progress-panel h3,.contact-card h3,.studio-heading h2,.studio-panel label,.studio-footer button,.studio-tab{color:var(--text)}
+.section-heading>small,.hero-index,.hero-bottom,.art-caption,.timeline-state,.eyebrow,.float-note,.hint,.detail-row span,.tag-list span,.timeline-card small{color:var(--muted)}
+.main-nav a,.text-link{color:var(--muted)}
+input,select,textarea{color:var(--text);background-color:rgba(var(--surface-rgb),.055);border-color:var(--line)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.studio,.assistant-shortcuts{background:var(--panel);border-color:var(--line)}
+.site-header .brand-name,.footer .brand-name{color:var(--text)}
+.skip-link{background:var(--accent-bright);color:var(--accent-contrast)}
