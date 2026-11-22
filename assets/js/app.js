@@ -12,7 +12,8 @@
     const canvas=$("#loaderOrbCanvas");
     if(!canvas)return;
     const fallback=()=>{canvas.classList.add("orb-unavailable");canvas.closest(".loader-vessel")?.classList.add("orb-fallback");};
-    const gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:false,powerPreference:"low-power"});
+    let gl=null;
+    try{gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:false,powerPreference:"low-power"});}catch(error){canvas.dataset.orbError=String(error.message||error);fallback();return;}
     if(!gl){fallback();return;}
     const vertex=`
       attribute vec2 a_position;
@@ -99,7 +100,7 @@
       raf=requestAnimationFrame(draw);
     };
     raf=requestAnimationFrame(draw);
-    canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();cancelAnimationFrame(raf);},{once:true});
+    canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();cancelAnimationFrame(raf);fallback();},{once:true});
   }
   createLoaderOrb();
   if(pageLoader){
