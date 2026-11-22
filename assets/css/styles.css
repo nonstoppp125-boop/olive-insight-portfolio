@@ -630,10 +630,9 @@ html.has-liquid-cursor .liquid-cursor.is-pressing .liquid-lens-window{transform:
 .loader-orb-canvas.orb-unavailable{opacity:0}
 .loader-vessel:before{content:"";position:absolute;z-index:2;inset:8px;border-radius:50%;pointer-events:none;opacity:0;background:linear-gradient(180deg,rgba(237,248,255,.9),rgba(var(--accent-rgb),.86) 42%,rgba(54,100,119,.94));clip-path:inset(calc(100% - var(--loader-progress,0%)) 0 0 0 round 50%);filter:saturate(1.22);box-shadow:inset 0 8px 14px rgba(255,255,255,.2),inset 0 -14px 22px rgba(0,0,0,.18)}
 .loader-vessel:after{content:"";position:absolute;z-index:2;inset:8px;border-radius:50%;pointer-events:none;opacity:0;background:linear-gradient(110deg,transparent 22%,rgba(255,255,255,.38) 34%,transparent 48%),radial-gradient(ellipse at 30% 18%,rgba(255,255,255,.3),transparent 32%);mix-blend-mode:screen}
-.loader-vessel:has(.loader-orb-canvas.orb-unavailable):before,.loader-vessel:has(.loader-orb-canvas.orb-unavailable):after{opacity:.92}
-.loader-vessel:has(.loader-orb-canvas.orb-unavailable) .loader-vessel-shine{z-index:4}
-.loader-vessel:has(.loader-orb-canvas.orb-unavailable) .loader-percent{z-index:5}
-@supports not selector(:has(*)){.loader-vessel:before{opacity:.0}.loader-orb-canvas.orb-unavailable{opacity:1}}
+.loader-vessel.orb-fallback:before,.loader-vessel.orb-fallback:after{opacity:.92}
+.loader-vessel.orb-fallback .loader-vessel-shine{z-index:4}
+.loader-vessel.orb-fallback .loader-percent{z-index:5}
 /* Scroll-direction-aware top navigation. Items fan out and reverse their drift on upward scroll. */
 .main-nav{--nav-drift:0px;transition:gap .42s cubic-bezier(.2,.8,.2,1),transform .42s cubic-bezier(.2,.8,.2,1);transform:translate3d(var(--nav-drift),0,0);will-change:transform}
 .main-nav a{transform:translate3d(var(--nav-x,0px),0,0);transition:transform .48s cubic-bezier(.2,.8,.2,1),color .25s,letter-spacing .48s}
