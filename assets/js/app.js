@@ -49,8 +49,8 @@
         float spec2=pow(max(dot(reflect(normalize(vec3(.72,-.5,.8)),n),viewDir),0.0),72.0);
         float broadSpec=pow(max(dot(reflect(normalize(vec3(-.72,.42,.9)),n),viewDir),0.0),18.0);
         float sheen=softLight(p,vec2(-.36,.53),.22,.075)+.48*softLight(p,vec2(.47,-.42),.12,.22);
-        vec3 glass=mix(u_root*.7,environment,.28+fresnel*.78);
-        glass+=u_accent*rim*.34+vec3(1.0)*spec1*.82+vec3(.76,.88,1.0)*spec2*.5+vec3(1.0)*sheen*.16+vec3(1.0)*broadSpec*.22;
+        vec3 glass=mix(u_root*.12,environment,.72+fresnel*.28);
+        glass+=u_accent*rim*.18+vec3(1.0)*spec1*.58+vec3(.9,1.0,.92)*spec2*.32+vec3(1.0)*sheen*.12+vec3(1.0)*broadSpec*.18;
         float progress=clamp(u_progress,0.0,1.0);
         float wave=.026*sin(p.x*7.2+u_time*1.45)+.012*sin(p.x*15.0-u_time*1.1)+.006*sin(p.x*24.0+u_time*.72);
         float liquidLine=mix(-radius-.04,radius+.025,progress)+wave;
@@ -62,18 +62,18 @@
         liquid+=vec3(.16,.78,.29)*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
         float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
-        liquid+=vec3(.9,.97,1.0)*boundaryGlow*(.48+.8*interfaceGlint);
+        liquid+=vec3(.86,1.0,.88)*boundaryGlow*(.32+.62*interfaceGlint);
         float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0014)*step(p.y,liquidLine);
         float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0011)*step(p.y,liquidLine);
-        liquid+=vec3(.85,.96,1.0)*(bubbleA+bubbleB)*.72;
+        liquid+=vec3(.82,1.0,.88)*(bubbleA+bubbleB)*.52;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
         vec3 prism=mix(vec3(.08,.72,.31),vec3(.78,1.0,.34),smoothstep(.08,.92,prismHue));
         float iridescence=clamp(fresnel*.72+dispersion*.7+boundaryGlow*.22,0.0,.72);
         vec3 color=mix(glass,liquid,inLiquid*.94);
-        color=mix(color,prism,iridescence*(.17+rim*.23));
-        color+=vec3(.82,.93,.99)*pow(1.0-z/radius,5.5)*.7;
+        color=mix(color,prism,iridescence*(.08+rim*.12));
+        color+=vec3(.94,1.0,.96)*pow(1.0-z/radius,5.5)*.48;
         float rimDistance=(r-radius+.012)/.012;float outerRim=exp(-rimDistance*rimDistance);
-        color+=mix(vec3(.92,.98,1.0),prism,.42)*outerRim*.92;
+        color+=mix(vec3(.94,1.0,.96),prism,.24)*outerRim*.78;
         float alpha=edge*clamp(.48+fresnel*.48+rim*.2,0.0,1.0);
         alpha=max(alpha,edge*inLiquid*.93);
         gl_FragColor=vec4(color,alpha);
@@ -562,32 +562,30 @@
     window.addEventListener("scroll",()=>{if(currentTarget&&!currentTarget.isConnected)setLensTarget(null);},{passive:true});
   }
 
-  // Scroll-reactive navigation: horizontal fan/cluster motion reverses with scroll direction.
+  // Scroll-responsive horizontal navigation: evenly paced at rest, then fans outward and fades; scrolling up reverses it.
   function setupScrollNav(){
     const nav=$("#mainNav");
     if(!nav)return;
     const links=Array.from(nav.querySelectorAll("a"));
-    links.forEach((link,index)=>link.style.setProperty("--nav-index",String(index)));
-    let previousY=window.scrollY,lastDirection=0,raf=0;
+    let raf=0;
     const paint=()=>{
       raf=0;
       const y=Math.max(0,window.scrollY);
-      const delta=y-previousY;
-      if(Math.abs(delta)>.25)lastDirection=delta>0?1:-1;
-      previousY=y;
-      const phase=(Math.sin(y/185)+1)/2;
-      const gap=9+(phase*16);
-      const fan=(phase-.5)*18;
-      const directionFlow=lastDirection===0?0:(lastDirection>0?-1:1);
-      nav.style.setProperty("--nav-drift",(directionFlow*9).toFixed(2)+"px");
-      nav.style.gap=gap.toFixed(2)+"px";
+      const progress=Math.max(0,Math.min(1,y/760));
+      const viewport=window.innerWidth||360;
+      const spread=Math.min(viewport*.145,progress*viewport*.145);
+      const gap=window.innerWidth<=680?12+progress*22:22+progress*42;
+      nav.style.gap=gap.toFixed(1)+"px";
+      nav.style.setProperty("--nav-spread",spread.toFixed(2)+"px");
       links.forEach((link,index)=>{
         const center=index-(links.length-1)/2;
-        const serial=directionFlow*index*4.2;
-        const offset=center*fan+serial;
+        const offset=center*spread*1.45;
         link.style.setProperty("--nav-x",offset.toFixed(2)+"px");
+        link.style.opacity=String(Math.max(0,1-progress*1.18));
+        link.style.pointerEvents=progress>.82?"none":"auto";
+        link.style.setProperty("--nav-scale",(1-progress*.16).toFixed(3));
       });
-      nav.dataset.scrollDirection=lastDirection>0?"down":lastDirection<0?"up":"static";
+      nav.dataset.scrollProgress=progress.toFixed(3);
     };
     const schedule=()=>{if(!raf)raf=requestAnimationFrame(paint);};
     window.addEventListener("scroll",schedule,{passive:true});
