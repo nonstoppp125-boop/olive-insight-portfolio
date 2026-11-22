@@ -766,3 +766,26 @@ h3,.about-main h3{letter-spacing:-.025em}
   .glass:before{animation-duration:var(--border-speed,28s)}
   .ambient{contain:strict}
 }
+
+
+/* Adaptive semantic palette: every surface and text tone is derived from the selected root colour. */
+:root{--surface-rgb:255,255,255;--accent-deep:#52613a;--accent-contrast:#fff;--loader-bg:#31060c}
+body{background:radial-gradient(ellipse at 80% 10%,rgba(var(--accent-rgb),.13),transparent 38%),var(--bg)!important;color:var(--text)!important}
+.glass{background:linear-gradient(135deg,rgba(var(--surface-rgb),.075),rgba(var(--surface-rgb),.018)),var(--panel)!important;border-color:var(--line)!important}
+.glass:after{background:linear-gradient(120deg,rgba(var(--surface-rgb),.055),transparent 38%,rgba(var(--accent-rgb),.045))!important}
+h1,h2,h3,h4,strong,b,.section-heading h2,.hero h1{color:var(--text)}
+h1 em,h2 em,h3 em,.intro em,.eyebrow b,.brand-symbol,.brand-name small,.main-nav a:hover,.text-link:hover,.section-heading label,.detail-row span,.timeline-state,.art-caption,.hero-index,.hero-bottom{color:var(--accent-bright)!important}
+p,.muted,.hero-lede,.intro p,.card p,.timeline-card p,.contact-card p,.detail-row,.hint,.tag-list span{color:var(--muted)}
+.button{background:linear-gradient(120deg,var(--accent),var(--accent-deep))!important;color:var(--accent-contrast)!important;border-color:rgba(var(--accent-rgb),.55)!important}
+.button-quiet,.icon-button,.studio-tab,.control input,.control select,.control textarea{border-color:var(--line)!important;color:var(--text)}
+.icon-button:hover,.studio-tab.active{background:rgba(var(--accent-rgb),.16)!important}
+.site-header,.studio,.studio-fab,.toast,.card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card{color:var(--text)}
+.brand-symbol{border-color:var(--accent)!important;box-shadow:inset 0 0 18px rgba(var(--accent-rgb),.18)}
+.ambient-one,.ambient-two{background:radial-gradient(circle,rgba(var(--accent-rgb),.28),transparent 70%)}
+.orbit,.art-grid{border-color:rgba(var(--accent-rgb),.3)}
+.planet{background:radial-gradient(circle at 30% 25%,#fff,var(--accent-bright) 12%,var(--accent) 40%,var(--accent-deep) 72%)}
+:where(input,select,textarea){accent-color:var(--accent)}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{outline-color:var(--accent-bright)}
+.studio-tabs,.rgb-mixer,.color-section{border-color:var(--line)}
+.detail-row,.timeline-card,.tag-list span{border-color:var(--line)}
+@media(prefers-reduced-motion:reduce){.glass:before{animation:none!important}}
