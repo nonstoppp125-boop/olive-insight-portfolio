@@ -63,8 +63,8 @@
         float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
         liquid+=vec3(.86,1.0,.88)*boundaryGlow*(.32+.62*interfaceGlint);
-        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0020)*step(p.y,liquidLine);
-        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0016)*step(p.y,liquidLine);
+        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0025)*step(p.y,liquidLine);
+        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0020)*step(p.y,liquidLine);
         liquid+=vec3(.82,1.0,.88)*(bubbleA+bubbleB)*.52;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
         vec3 prism=mix(vec3(.10,.48,.28),vec3(.66,.88,.72),smoothstep(.08,.92,prismHue));
@@ -681,13 +681,15 @@
     $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
   }
   function setupReveal(){
-    const targets=$$(".section,.intro,.contact-card,.hero-copy,.hero-art");
-    targets.forEach(element=>element.classList.add("reveal"));
-    if(!("IntersectionObserver" in window)){targets.forEach(element=>element.classList.add("visible"));return;}
+    const sections=$(".hero,.intro,.section,.contact");
+    sections.forEach(element=>element.classList.add("section-flow"));
+    const details=$(".contact-card,.hero-copy,.hero-art");
+    details.forEach(element=>element.classList.add("reveal"));
+    if(!("IntersectionObserver" in window)){details.forEach(element=>element.classList.add("visible"));return;}
     const observer=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("visible");observer.unobserve(entry.target);}});
     },{threshold:.08,rootMargin:"0px 0px -35px 0px"});
-    targets.forEach(element=>observer.observe(element));
+    details.forEach(element=>observer.observe(element));
   }
   try{
     const stored=localStorage.getItem("oliveInsightDesign");
