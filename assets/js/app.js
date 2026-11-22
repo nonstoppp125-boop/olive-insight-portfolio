@@ -170,7 +170,7 @@
   }
   function createAmbientParticles(){
     if($("#ambientParticles"))return;
-    const field=document.createElement("div");field.id="ambientParticles";field.className="ambient-particles";field.setAttribute("aria-hidden","true");
+    const field=$("#ambientParticles")||document.createElement("div");field.id="ambientParticles";field.className="ambient-particles";field.setAttribute("aria-hidden","true");
     const fragment=document.createDocumentFragment();
     for(let i=0;i<108;i++){
       const dot=document.createElement("i");dot.className="ambient-particle";
@@ -473,7 +473,6 @@
     mascotNextX=rect.left;mascotNextY=rect.top;
     bgCompanion.classList.add("is-dragging");
     try{bgCompanion.setPointerCapture(event.pointerId);}catch(_){}
-    event.preventDefault();
   }
   function dragMascot(event){
     if(!mascotDragging||event.pointerId!==mascotPointerId)return;
@@ -513,6 +512,22 @@
     }
     bgCompanion.classList.remove("is-dragging");
   }
+  const assistantButton=$("#bgCompanion"),assistantMenu=$("#assistantShortcuts");
+  if(assistantButton&&assistantMenu){
+    const closeAssistant=()=>{assistantMenu.hidden=true;assistantButton.setAttribute("aria-expanded","false");};
+    assistantButton.addEventListener("click",()=>{const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));});
+    assistantButton.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
+    assistantMenu.addEventListener("click",event=>{
+      const action=event.target.closest("[data-shortcut]")?.dataset.shortcut;if(!action)return;
+      closeAssistant();
+      if(action==="studio")$("#openStudio").click();
+      else if(action==="theme"){settings.theme=settings.theme==="olive"?"earth":settings.theme==="earth"?"forest":"olive";settings.rootColor=palettes[settings.theme].bg;settings.autoAccent=true;apply();save();notify("Theme changed");}
+      else if(action==="particles")$("#ambientParticles")?.classList.toggle("particles-off");
+      else{const target={home:"#home",about:"#about",projects:"#projects",contact:"#contact"}[action];if(target)$(target)?.scrollIntoView({behavior:"smooth",block:"start"});}
+    });
+    document.addEventListener("pointerdown",event=>{if(!assistantButton.contains(event.target)&&!assistantMenu.contains(event.target))closeAssistant();},{passive:true});
+    document.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
+  }
   bgCompanion.addEventListener("transitionend",event=>{
     if(event.propertyName==="transform")bgCompanion.classList.remove("is-snapping");
   });
@@ -527,100 +542,63 @@
   });
   restoreMascotPosition();
 
-  // Direct-touch liquid cursor: the orb tracks the finger's actual screen position.
-  // Velocity only deforms the glass body; it never offsets or delays the touch position.
-  const liquidCursor=$("#liquidLensCursor");
-  const liquidLensContent=$("#liquidLensContent");
-  if(liquidCursor&&liquidLensContent&&(window.matchMedia("(hover: hover) and (pointer: fine)").matches||window.matchMedia("(pointer: coarse)").matches)){
+  // Finger-locked liquid cursor. Touch Events keep tracking the finger during native page scrolling.
+  const liquidCursor=$("#liquidLensCursor"),liquidLensContent=$("#liquidLensContent");
+  if(liquidCursor&&liquidLensContent){
     root.classList.add("has-liquid-cursor");
-    const coarseQuery=window.matchMedia("(pointer: coarse)");
-    const isCoarse=coarseQuery.matches;
+    const coarse=window.matchMedia("(pointer: coarse)").matches;
     const lensTargets=".card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card,.button,.main-nav a,.tag-list span,.profile-orb";
-    let cursorX=-100,cursorY=-100,pointerX=-100,pointerY=-100,cursorRaf=0,currentTarget=null,cloneNode=null,hideTimer=0;
-    let activePointerId=null,lastX=0,lastY=0,lastTime=0,velocityX=0,velocityY=0,stretch=1;
-    const ease=.48;
-    function cleanClone(node){
-      node.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));node.removeAttribute("id");node.classList.add("liquid-lens-clone");
-      node.querySelectorAll("button,input,select,textarea").forEach(el=>{el.setAttribute("tabindex","-1");el.setAttribute("aria-hidden","true");});return node;
-    }
+    let cursorX=-100,cursorY=-100,currentTarget=null,cloneNode=null,hideTimer=0,activeTouchId=null,lastX=0,lastY=0,lastTime=0,raf=0;
+    function cleanClone(node){node.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));node.removeAttribute("id");node.classList.add("liquid-lens-clone");node.querySelectorAll("button,input,select,textarea").forEach(el=>{el.setAttribute("tabindex","-1");el.setAttribute("aria-hidden","true");});return node;}
     function setLensTarget(target){
       if(target===currentTarget)return;
       if(currentTarget){currentTarget.classList.remove("liquid-hover-target");currentTarget.style.removeProperty("--liquid-shift-x");currentTarget.style.removeProperty("--liquid-shift-y");}
       currentTarget=target;liquidLensContent.replaceChildren();cloneNode=null;
       if(!target){liquidCursor.classList.remove("is-lens");return;}
       target.classList.add("liquid-hover-target");cloneNode=cleanClone(target.cloneNode(true));
-      const rect=target.getBoundingClientRect();cloneNode.style.width=rect.width+"px";cloneNode.style.height=rect.height+"px";
-      liquidLensContent.appendChild(cloneNode);liquidCursor.classList.add("is-lens");
+      const rect=target.getBoundingClientRect();cloneNode.style.width=rect.width+"px";cloneNode.style.height=rect.height+"px";liquidLensContent.appendChild(cloneNode);liquidCursor.classList.add("is-lens");
     }
     function syncLens(){
       if(!currentTarget||!cloneNode||!currentTarget.isConnected)return;
-      const rect=currentTarget.getBoundingClientRect(),localX=Math.max(0,Math.min(rect.width,pointerX-rect.left)),localY=Math.max(0,Math.min(rect.height,pointerY-rect.top));
-      cloneNode.style.left=(36-localX)+"px";cloneNode.style.top=(36-localY)+"px";
-      cloneNode.style.setProperty("--lens-origin-x",localX+"px");cloneNode.style.setProperty("--lens-origin-y",localY+"px");
-      const nx=(localX/Math.max(1,rect.width)-.5)*2,ny=(localY/Math.max(1,rect.height)-.5)*2;
+      const rect=currentTarget.getBoundingClientRect(),x=Math.max(0,Math.min(rect.width,cursorX-rect.left)),y=Math.max(0,Math.min(rect.height,cursorY-rect.top));
+      cloneNode.style.left=(36-x)+"px";cloneNode.style.top=(36-y)+"px";
+      const nx=(x/Math.max(1,rect.width)-.5)*2,ny=(y/Math.max(1,rect.height)-.5)*2;
       currentTarget.style.setProperty("--liquid-shift-x",(nx*1.25).toFixed(2)+"px");currentTarget.style.setProperty("--liquid-shift-y",(ny*1.25).toFixed(2)+"px");
     }
-    function paintCursor(){
-      cursorRaf=0;
-      const fine=!isCoarse;
-      if(fine){
-        const dx=cursorX-parseFloat(liquidCursor.dataset.renderX||cursorX),dy=cursorY-parseFloat(liquidCursor.dataset.renderY||cursorY);
-        const rx=parseFloat(liquidCursor.dataset.renderX||cursorX)+dx*ease,ry=parseFloat(liquidCursor.dataset.renderY||cursorY)+dy*ease;
-        liquidCursor.dataset.renderX=String(rx);liquidCursor.dataset.renderY=String(ry);
-        liquidCursor.style.transform="translate3d("+(rx-36).toFixed(2)+"px,"+(ry-36).toFixed(2)+"px,0)";
-        if(Math.abs(cursorX-rx)>.2||Math.abs(cursorY-ry)>.2)cursorRaf=requestAnimationFrame(paintCursor);
-      }else liquidCursor.style.transform="translate3d("+(cursorX-36).toFixed(2)+"px,"+(cursorY-36).toFixed(2)+"px,0)";
-    }
-    function setPosition(x,y,now){
-      const dt=Math.max(8,Math.min(48,now-lastTime||16));
-      velocityX=(x-lastX)/dt;velocityY=(y-lastY)/dt;
-      const speed=Math.min(1,Math.hypot(velocityX,velocityY)/1.35);
-      const angle=Math.atan2(velocityY,velocityX)*180/Math.PI;
-      stretch=1+speed*.24;
-      liquidCursor.style.setProperty("--cursor-stretch-x",stretch.toFixed(3));
-      liquidCursor.style.setProperty("--cursor-stretch-y",(1-speed*.19).toFixed(3));
-      liquidCursor.style.setProperty("--cursor-angle",angle.toFixed(2)+"deg");
-      lastX=x;lastY=y;lastTime=now;cursorX=x;cursorY=y;pointerX=x;pointerY=y;
+    function positionAt(x,y,now){
+      const dt=Math.max(8,Math.min(48,now-lastTime||16)),vx=(x-lastX)/dt,vy=(y-lastY)/dt,speed=Math.min(1,Math.hypot(vx,vy)/1.2),angle=Math.atan2(vy,vx)*180/Math.PI;
+      liquidCursor.style.setProperty("--cursor-stretch-x",(1+speed*.3).toFixed(3));liquidCursor.style.setProperty("--cursor-stretch-y",(1-speed*.22).toFixed(3));liquidCursor.style.setProperty("--cursor-angle",angle.toFixed(2)+"deg");
+      lastX=x;lastY=y;lastTime=now;cursorX=x;cursorY=y;
       const under=document.elementFromPoint(x,y),target=under&&under.closest?under.closest(lensTargets):null;
       setLensTarget(target&&!target.closest(".liquid-cursor,.bg-companion")?target:null);syncLens();
-      if(isCoarse){liquidCursor.style.transform="translate3d("+(x-36).toFixed(2)+"px,"+(y-36).toFixed(2)+"px,0)";}
-      else if(!cursorRaf)cursorRaf=requestAnimationFrame(paintCursor);
+      liquidCursor.style.transform="translate3d("+(x-36).toFixed(2)+"px,"+(y-36).toFixed(2)+"px,0)";
     }
-    function showCursor(event){
-      if(isCoarse&&event.pointerType!=="touch")return;
+    function revealAt(x,y,now,id=null){
       if(hideTimer){clearTimeout(hideTimer);hideTimer=0;}
-      activePointerId=event.pointerId;
-      const now=performance.now();
-      lastX=event.clientX;lastY=event.clientY;lastTime=now;velocityX=0;velocityY=0;stretch=1;
-      liquidCursor.style.setProperty("--cursor-stretch-x","1");liquidCursor.style.setProperty("--cursor-stretch-y","1");
-      liquidCursor.style.setProperty("--cursor-angle","0deg");
-      liquidCursor.style.opacity="1";liquidCursor.style.visibility="visible";liquidCursor.classList.add("is-pressing");
-      liquidCursor.dataset.renderX=String(event.clientX);liquidCursor.dataset.renderY=String(event.clientY);
-      setPosition(event.clientX,event.clientY,now);
+      activeTouchId=id;lastX=x;lastY=y;lastTime=now;
+      liquidCursor.style.setProperty("--cursor-stretch-x","1");liquidCursor.style.setProperty("--cursor-stretch-y","1");liquidCursor.style.setProperty("--cursor-angle","0deg");
+      liquidCursor.style.opacity="1";liquidCursor.style.visibility="visible";liquidCursor.classList.add("is-pressing");positionAt(x,y,now);
     }
-    function moveCursor(event){
-      if(isCoarse){
-        if(activePointerId===null||event.pointerId!==activePointerId)return;
-      }else if(event.pointerType==="touch"&&activePointerId!==event.pointerId)return;
-      setPosition(event.clientX,event.clientY,performance.now());
+    function releaseAt(x,y,now){
+      if(Number.isFinite(x)&&Number.isFinite(y))positionAt(x,y,now);
+      activeTouchId=null;liquidCursor.classList.remove("is-pressing");
+      liquidCursor.style.setProperty("--cursor-stretch-x","1");liquidCursor.style.setProperty("--cursor-stretch-y","1");liquidCursor.style.setProperty("--cursor-angle","0deg");
+      if(hideTimer)clearTimeout(hideTimer);
+      hideTimer=window.setTimeout(()=>{liquidCursor.style.opacity="0";setLensTarget(null);hideTimer=0;},1000);
     }
-    function releaseCursor(event){
-      if(activePointerId!==null&&event.pointerId!==activePointerId)return;
-      if(isCoarse&&event.pointerType!=="touch")return;
-      if(Number.isFinite(event.clientX)&&Number.isFinite(event.clientY))setPosition(event.clientX,event.clientY,performance.now());
-      activePointerId=null;liquidCursor.classList.remove("is-pressing");
-      liquidCursor.style.setProperty("--cursor-stretch-x","1");liquidCursor.style.setProperty("--cursor-stretch-y","1");
-      liquidCursor.style.setProperty("--cursor-angle","0deg");
-      if(isCoarse){
-        if(hideTimer)clearTimeout(hideTimer);
-        hideTimer=window.setTimeout(()=>{liquidCursor.style.opacity="0";setLensTarget(null);hideTimer=0;},1000);
-      }
+    if(coarse){
+      const findTouch=list=>Array.from(list||[]).find(t=>activeTouchId===null||t.identifier===activeTouchId);
+      window.addEventListener("touchstart",event=>{const t=event.changedTouches[0];if(t)revealAt(t.clientX,t.clientY,performance.now(),t.identifier);},{passive:true});
+      window.addEventListener("touchmove",event=>{const t=findTouch(event.touches);if(t)positionAt(t.clientX,t.clientY,performance.now());},{passive:true});
+      window.addEventListener("touchend",event=>{const t=Array.from(event.changedTouches).find(v=>v.identifier===activeTouchId);if(t)releaseAt(t.clientX,t.clientY,performance.now());},{passive:true});
+      window.addEventListener("touchcancel",event=>{const t=Array.from(event.changedTouches).find(v=>v.identifier===activeTouchId);if(t)releaseAt(t.clientX,t.clientY,performance.now());},{passive:true});
+    }else{
+      let pointerId=null;
+      window.addEventListener("pointerdown",event=>{if(event.pointerType==="touch")return;pointerId=event.pointerId;revealAt(event.clientX,event.clientY,performance.now());},{passive:true});
+      window.addEventListener("pointermove",event=>{if(pointerId===event.pointerId)positionAt(event.clientX,event.clientY,performance.now());else if(event.pointerType==="mouse"){cursorX=event.clientX;cursorY=event.clientY;positionAt(cursorX,cursorY,performance.now());liquidCursor.style.opacity="1";}},{passive:true});
+      window.addEventListener("pointerup",event=>{if(pointerId===event.pointerId){pointerId=null;liquidCursor.classList.remove("is-pressing");}},{passive:true});
+      document.addEventListener("pointerleave",()=>{if(pointerId===null)liquidCursor.style.opacity="0";},{passive:true});
     }
-    window.addEventListener("pointerdown",showCursor,{passive:true});
-    window.addEventListener("pointermove",moveCursor,{passive:true});
-    window.addEventListener("pointerup",releaseCursor,{passive:true});
-    window.addEventListener("pointercancel",releaseCursor,{passive:true});
-    document.addEventListener("pointerleave",event=>{if(!isCoarse&&event.pointerType!=="touch"){setLensTarget(null);liquidCursor.style.opacity="0";}},{passive:true});
     window.addEventListener("scroll",()=>{if(currentTarget&&!currentTarget.isConnected)setLensTarget(null);else syncLens();},{passive:true});
   }
 
