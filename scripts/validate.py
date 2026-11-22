@@ -155,8 +155,8 @@ def main():
         errors.append("scroll ball dragging must track pointer position instantly without a grab offset jump")
     if "scale(1.19)" not in css or "scale(1.2)" not in css or "transition:box-shadow .12s ease,transform .12s ease" not in css:
         errors.append("scroll ball must grow smoothly while dragging without changing its layout geometry")
-    if 'style.scrollBehavior="auto"' not in js or "railPreviousBehavior" not in js:
-        errors.append("direct ball dragging must bypass smooth-scroll easing to prevent lag")
+    if 'document.documentElement.style.scrollBehavior="auto"' not in js or 'document.body.style.scrollBehavior="auto"' not in js or "previousScrollBehavior" not in js:
+        errors.append("direct ball dragging must bypass smooth-scroll easing and restore prior scroll behavior")
     if ".scroll-rail-progress" not in css or "touch-action:none" not in css:
         errors.append("scroll rail must reveal progress and support direct touch dragging")
     if 'id="pageLoader"' not in html or ".page-loader" not in css or "dismissLoader" not in js:
