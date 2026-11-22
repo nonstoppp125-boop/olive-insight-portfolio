@@ -185,7 +185,7 @@
     field.appendChild(fragment);body.prepend(field);
   }
   createAmbientParticles();
-  const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",autoAccent:true,blur:18,opacity:58,radius:24,font:"system",typographyV2:true,density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
+  const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",autoAccent:true,blur:18,opacity:58,radius:24,font:"system",typographyV2:true,density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true,particles:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
     earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
@@ -221,7 +221,7 @@
     root.style.setProperty("--font",fontStacks[settings.font]||fontStacks.system);root.style.setProperty("--display-font",displayStacks[settings.font]||displayStacks.system);
     const density={compact:[40,56,22,11],balanced:[55,75,30,15],spacious:[68,90,38,20]}[settings.density]||[55,75,30,15];
     root.style.setProperty("--section-space",density[0]+"px");root.style.setProperty("--section-bottom",density[1]+"px");root.style.setProperty("--card-padding",density[2]+"px");root.style.setProperty("--grid-gap",density[3]+"px");
-    body.classList.toggle("no-border",!settings.borders);body.classList.toggle("no-capsule",!settings.capsule);body.classList.toggle("no-mascot",!settings.mascot);body.classList.toggle("no-float",!settings.float);body.classList.toggle("no-reveal",!settings.reveal);
+    body.classList.toggle("no-border",!settings.borders);body.classList.toggle("no-capsule",!settings.capsule);body.classList.toggle("no-mascot",!settings.mascot);body.classList.toggle("no-float",!settings.float);body.classList.toggle("no-reveal",!settings.reveal);body.classList.toggle("no-particles",!settings.particles);
     syncControls();
   }
   function rgbToHex(red,green,blue){return "#"+[red,green,blue].map(value=>Number(value).toString(16).padStart(2,"0")).join("");}
@@ -345,7 +345,7 @@
       if(["system","editorial","technical"].includes(incoming.font))valid.font=incoming.font;
       if(["compact","balanced","spacious"].includes(incoming.density))valid.density=incoming.density;
       if(["standard","high"].includes(incoming.contrast))valid.contrast=incoming.contrast;
-      for(const key of ["capsule","borders","mascot","float","reveal"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
+      for(const key of ["capsule","borders","mascot","float","reveal","particles"])if(typeof incoming[key]==="boolean")valid[key]=incoming[key];
       settings=valid;apply();save();notify("Design settings imported");
     }catch(_){notify("Invalid design settings file");}
     event.target.value="";
@@ -380,6 +380,10 @@
     if(/system font|system typography|clean typography/.test(prompt)){settings.font="system";changed=true;}
     if(/editorial font|serif font|elegant typography/.test(prompt)){settings.font="editorial";changed=true;}
     if(/technical font|mono font|monospace/.test(prompt)){settings.font="technical";changed=true;}
+    if(/hide particles|hide stars|disable particles/.test(prompt)){settings.particles=false;changed=true;}
+    if(/show particles|show stars|enable particles/.test(prompt)){settings.particles=true;changed=true;}
+    if(/hide borders|disable borders|remove animated borders/.test(prompt)){settings.borders=false;changed=true;}
+    if(/show borders|enable borders|animated borders/.test(prompt)){settings.borders=true;changed=true;}
     if(/disable floating|stop floating|still mascot/.test(prompt)){settings.float=false;changed=true;}
     if(/enable floating|floating mascot/.test(prompt)){settings.float=true;changed=true;}
     if(/hide capsule|remove capsule|disable capsule|stop capsule/.test(prompt)){settings.capsule=false;changed=true;}
@@ -528,7 +532,7 @@
   let suppressMascotClick=false;
   if(assistantButton&&assistantMenu){
     const closeAssistant=()=>{assistantMenu.hidden=true;assistantButton.setAttribute("aria-expanded","false");};
-    assistantButton.addEventListener("click",event=>{if(suppressMascotClick){suppressMascotClick=false;event.preventDefault();return;}const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));if(open){const rect=assistantButton.getBoundingClientRect(),menuWidth=Math.min(210,window.innerWidth-24);assistantMenu.style.left=Math.max(12,Math.min(window.innerWidth-menuWidth,rect.right+12))+"px";assistantMenu.style.top=Math.max(12,Math.min(window.innerHeight-320,rect.top))+"px";assistantMenu.style.bottom="auto";}});
+    assistantButton.addEventListener("click",event=>{if(suppressMascotClick){suppressMascotClick=false;event.preventDefault();return;}const open=assistantMenu.hidden;assistantMenu.hidden=!open;assistantButton.setAttribute("aria-expanded",String(open));if(open){const rect=assistantButton.getBoundingClientRect(),menuWidth=Math.min(210,window.innerWidth-24),menuHeight=assistantMenu.scrollHeight;assistantMenu.style.left=Math.max(12,Math.min(window.innerWidth-menuWidth,rect.right+12))+"px";assistantMenu.style.top=Math.max(12,Math.min(window.innerHeight-menuHeight-12,rect.top))+"px";assistantMenu.style.bottom="auto";}});
     assistantButton.addEventListener("keydown",event=>{if(event.key==="Escape")closeAssistant();});
     assistantMenu.addEventListener("click",event=>{
       const action=event.target.closest("[data-shortcut]")?.dataset.shortcut;if(!action)return;
@@ -539,7 +543,7 @@
       else if(action==="reset")$("#resetDesign").click();
       else if(action==="export")$("#exportDesign").click();
       else if(action==="theme"){settings.theme=settings.theme==="olive"?"earth":settings.theme==="earth"?"forest":"olive";settings.rootColor=palettes[settings.theme].bg;settings.autoAccent=true;apply();save();notify("Theme changed");}
-      else if(action==="particles")$("#ambientParticles")?.classList.toggle("particles-off");
+      else if(action==="particles"){settings.particles=!settings.particles;apply();save();}
       else{const target={home:"#home",about:"#about",projects:"#projects",contact:"#contact"}[action];if(target)$(target)?.scrollIntoView({behavior:"smooth",block:"start"});}
     });
     assistantMenu.addEventListener("submit",event=>{
