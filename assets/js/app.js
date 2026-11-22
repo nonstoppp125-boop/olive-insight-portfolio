@@ -24,65 +24,60 @@
       uniform vec2 u_resolution;
       uniform float u_time;
       uniform float u_progress;
-      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
+      uniform vec3 u_accent;
+      uniform vec3 u_root;
       float softLight(vec2 p,vec2 c,float sx,float sy){vec2 d=(p-c)/vec2(sx,sy);return exp(-dot(d,d));}
+      vec3 spectrum(float h){vec3 p=abs(fract(h+vec3(0.0,.6666667,.3333333))*6.0-3.0);return clamp(p-1.0,0.0,1.0);}
       void main(){
-        vec2 p=(v_uv-.5)*2.0;
-        p.x*=u_resolution.x/u_resolution.y;
-        float r=length(p);
-        float radius=.84;
-        float edge=1.0-smoothstep(radius-.008,radius+.008,r);
-        if(edge<=0.001){gl_FragColor=vec4(0.0);return;}
+        vec2 p=(v_uv-.5)*2.0;p.x*=u_resolution.x/u_resolution.y;
+        float r=length(p),radius=.84,edge=1.0-smoothstep(radius-.009,radius+.009,r);
+        if(edge<=.001){gl_FragColor=vec4(0.0);return;}
         float z=sqrt(max(0.0,radius*radius-dot(p,p)));
-        vec3 n=normalize(vec3(p,z));
-        vec3 viewDir=vec3(0.0,0.0,1.0);
-        float fresnel=pow(1.0-max(dot(n,viewDir),0.0),5.0);
-        float rim=pow(1.0-z/radius,2.4);
-        vec3 reflected=reflect(-viewDir,n);
-        vec3 refracted=refract(-viewDir,n,1.0/1.46);
-        float envA=softLight(reflected.xy,vec2(-.52,.48),.27,.12);
-        float envB=softLight(reflected.xy,vec2(.58,.25),.18,.32);
-        float envC=softLight(reflected.xy,vec2(-.18,-.68),.45,.09);
-        vec3 reflectionEnv=vec3(.035,.047,.033)+vec3(.62,.72,.48)*envA+vec3(.48,.62,.74)*envB+vec3(.75,.82,.59)*envC;
-        float transA=softLight(refracted.xy,vec2(-.4,.34),.34,.16);
-        float transB=softLight(refracted.xy,vec2(.46,-.18),.24,.3);
-        float transC=softLight(refracted.xy,vec2(.05,-.62),.4,.1);
-        vec3 transmissionEnv=vec3(.065,.085,.052)+vec3(.4,.52,.27)*transA+vec3(.25,.38,.46)*transB+vec3(.48,.57,.34)*transC;
+        vec3 n=normalize(vec3(p,z)),viewDir=vec3(0.0,0.0,1.0);
+        float facing=max(dot(n,viewDir),0.0),fresnel=pow(1.0-facing,5.0),rim=pow(1.0-z/radius,2.15);
+        vec3 reflected=reflect(-viewDir,n),refracted=refract(-viewDir,n,1.0/1.46);
+        vec3 refractedR=refract(-viewDir,n,1.0/1.455),refractedB=refract(-viewDir,n,1.0/1.475);
+        float envA=softLight(reflected.xy,vec2(-.52,.48),.27,.12),envB=softLight(reflected.xy,vec2(.58,.25),.18,.32),envC=softLight(reflected.xy,vec2(-.18,-.68),.45,.09);
+        vec3 reflectionEnv=u_root*.24+vec3(.62,.72,.48)*envA+vec3(.48,.62,.74)*envB+vec3(.75,.82,.59)*envC;
+        float transA=softLight(refracted.xy,vec2(-.4,.34),.34,.16),transB=softLight(refracted.xy,vec2(.46,-.18),.24,.3),transC=softLight(refracted.xy,vec2(.05,-.62),.4,.1);
+        vec3 transmissionEnv=u_root*.42+u_accent*.62*transA+vec3(.25,.38,.46)*transB+vec3(.48,.57,.34)*transC;
+        float dispersion=length(refractedR-refractedB)*2.8;
         vec3 environment=mix(transmissionEnv,reflectionEnv,fresnel);
         float spec1=pow(max(dot(reflect(normalize(vec3(-.45,.72,.85)),n),viewDir),0.0),42.0);
         float spec2=pow(max(dot(reflect(normalize(vec3(.72,-.5,.8)),n),viewDir),0.0),72.0);
+        float broadSpec=pow(max(dot(reflect(normalize(vec3(-.72,.42,.9)),n),viewDir),0.0),18.0);
         float sheen=softLight(p,vec2(-.36,.53),.22,.075)+.48*softLight(p,vec2(.47,-.42),.12,.22);
-        vec3 glass=mix(vec3(.12,.17,.105),environment,.2+fresnel*.82);
-        glass+=vec3(.62,.75,.48)*rim*.48;
-        glass+=vec3(1.0)*spec1*.72+vec3(.76,.88,1.0)*spec2*.42+vec3(1.0)*sheen*.13;
+        vec3 glass=mix(u_root*.7,environment,.28+fresnel*.78);
+        glass+=u_accent*rim*.34+vec3(1.0)*spec1*.82+vec3(.76,.88,1.0)*spec2*.5+vec3(1.0)*sheen*.16+vec3(1.0)*broadSpec*.22;
         float progress=clamp(u_progress,0.0,1.0);
-        float wave=.025*sin(p.x*7.2+u_time*1.45)+.012*sin(p.x*15.0-u_time*1.1);
+        float wave=.026*sin(p.x*7.2+u_time*1.45)+.012*sin(p.x*15.0-u_time*1.1)+.006*sin(p.x*24.0+u_time*.72);
         float liquidLine=mix(-radius-.04,radius+.025,progress)+wave;
-        float inLiquid=step(p.y,liquidLine)*step(r,radius);
-        float depth=clamp((liquidLine-p.y)/(radius*2.0),0.0,1.0);
-        vec3 liquidTop=vec3(.78,.87,.55);
-        vec3 liquidMid=vec3(.43,.56,.27);
-        vec3 liquidDeep=vec3(.12,.20,.09);
-        vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.38,depth));
-        liquid=mix(liquid,liquidDeep,smoothstep(.45,1.0,depth));
-        float liquidLight=softLight(p,vec2(-.25,.22),.32,.38)*.22;
-        liquid+=vec3(.55,.7,.32)*liquidLight;
-        float interface=exp(-pow((p.y-liquidLine)/.018,2.0))*step(.005,progress)*step(progress,.995);
+        float inLiquid=step(p.y,liquidLine)*step(r,radius),depth=clamp((liquidLine-p.y)/(radius*2.0),0.0,1.0);
+        vec3 liquidTop=mix(vec3(.94,.97,.91),u_accent,.26),liquidMid=mix(u_accent,vec3(.42,.58,.75),.2),liquidDeep=mix(u_accent*.36,u_root*.18,.32);
+        float caustic=sin(p.x*17.0+u_time*1.2+sin(p.y*9.0))*sin(p.y*13.0-u_time*.8);
+        vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.42,depth));
+        liquid=mix(liquid,liquidDeep,smoothstep(.48,1.0,depth));
+        liquid+=u_accent*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
+        float interface=exp(-pow((p.y-liquidLine)/.014,2.0))*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
-        liquid+=vec3(.82,.94,.62)*interface*(.3+.7*interfaceGlint);
+        liquid+=vec3(.9,.97,1.0)*interface*(.48+.8*interfaceGlint);
         float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0014)*step(p.y,liquidLine);
         float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0011)*step(p.y,liquidLine);
-        liquid+=vec3(.8,.91,.64)*(bubbleA+bubbleB)*.55;
+        liquid+=vec3(.85,.96,1.0)*(bubbleA+bubbleB)*.72;
+        float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
+        vec3 prism=spectrum(prismHue);
+        float iridescence=clamp(fresnel*.72+dispersion*.7+interface*.22,0.0,.72);
         vec3 color=mix(glass,liquid,inLiquid*.94);
-        float edgeReflection=pow(1.0-z/radius,5.5);
-        color+=vec3(.82,.93,.66)*edgeReflection*.72;
+        color=mix(color,prism,iridescence*(.17+rim*.23));
+        color+=vec3(.82,.93,.99)*pow(1.0-z/radius,5.5)*.7;
         float outerRim=exp(-pow((r-radius+.012)/.012,2.0));
-        color+=vec3(.93,1.0,.79)*outerRim*.75;
-        float alpha=edge*clamp(.52+fresnel*.44+rim*.18,0.0,1.0);
-        alpha=max(alpha,edge*inLiquid*.91);
+        color+=mix(vec3(.92,.98,1.0),prism,.42)*outerRim*.92;
+        float alpha=edge*clamp(.48+fresnel*.48+rim*.2,0.0,1.0);
+        alpha=max(alpha,edge*inLiquid*.93);
         gl_FragColor=vec4(color,alpha);
       }
     `;
+
     const compile=(type,source)=>{const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){gl.deleteShader(shader);throw new Error(gl.getShaderInfoLog(shader)||"Orb shader compile failed");}return shader;};
     let program;
     try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)||"Orb shader link failed");}
@@ -90,7 +85,7 @@
     gl.useProgram(program);
     const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
     const position=gl.getAttribLocation(program,"a_position");gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-    const resolution=gl.getUniformLocation(program,"u_resolution"),time=gl.getUniformLocation(program,"u_time"),progress=gl.getUniformLocation(program,"u_progress");
+    const resolution=gl.getUniformLocation(program,"u_resolution"),time=gl.getUniformLocation(program,"u_time"),progress=gl.getUniformLocation(program,"u_progress"),accentColor=gl.getUniformLocation(program,"u_accent"),rootColorUniform=gl.getUniformLocation(program,"u_root");
     let raf=0,start=performance.now(),lastWidth=0,lastHeight=0;
     const draw=now=>{
       if(!canvas.isConnected){cancelAnimationFrame(raf);gl.deleteBuffer(buffer);gl.deleteProgram(program);return;}
@@ -99,7 +94,7 @@
       const raw=getComputedStyle(pageLoader).getPropertyValue("--loader-progress").trim();
       const amount=Math.max(0,Math.min(1,(parseFloat(raw)||0)/100));
       gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform2f(resolution,w,h);gl.uniform1f(time,(now-start)/1000);gl.uniform1f(progress,amount);gl.drawArrays(gl.TRIANGLES,0,6);
+      const toRgb=value=>{const n=parseInt(value.replace("#",""),16);return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255];};const ac=toRgb(getComputedStyle(root).getPropertyValue("--accent").trim()||"#87945b"),rc=toRgb(getComputedStyle(root).getPropertyValue("--bg").trim()||"#10130e");gl.uniform2f(resolution,w,h);gl.uniform1f(time,(now-start)/1000);gl.uniform1f(progress,amount);gl.uniform3f(accentColor,ac[0],ac[1],ac[2]);gl.uniform3f(rootColorUniform,rc[0],rc[1],rc[2]);gl.drawArrays(gl.TRIANGLES,0,6);
       raf=requestAnimationFrame(draw);
     };
     raf=requestAnimationFrame(draw);
@@ -171,7 +166,7 @@
       requestAnimationFrame(revealWhenPainted);
     });
   }
-  const defaults = {theme:"olive",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
+  const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",blur:18,opacity:58,radius:24,font:"system",density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true};
   const palettes = {
     olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
     earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
@@ -189,7 +184,9 @@
     const palette = palettes[settings.theme] || palettes.olive;
     const accent = settings.accent || palette.accent;
     root.style.setProperty("--accent",accent);
-    root.style.setProperty("--bg",palette.bg);
+    const rootColor=settings.rootColor||palette.bg;
+    root.style.setProperty("--bg",rootColor);
+    root.style.setProperty("--root-rgb",hexToRgb(rootColor));
     root.style.setProperty("--accent-bright",palette.bright);
     root.style.setProperty("--accent-rgb",hexToRgb(accent));
     root.style.setProperty("--blur",settings.blur+"px");root.style.setProperty("--ambient-softness",Math.round(55+settings.blur*1.1)+"%");
@@ -217,6 +214,7 @@
   }
   function syncControls(){
     $("#themeSelect").value=settings.theme; $("#accentPicker").value=settings.accent||palettes[settings.theme].accent;
+    const rootColor=settings.rootColor||palettes[settings.theme].bg;$("#rootColorPicker").value=rootColor;$("#rootColorHex").value=rootColor.toUpperCase();$("#rootColorValue").textContent=rootColor.toUpperCase();const rootChannels=hexToRgb(rootColor).split(",").map(Number);["rootRed","rootGreen","rootBlue"].forEach((id,index)=>{$("#"+id).value=rootChannels[index];$("#"+id+"Value").textContent=String(rootChannels[index]);});$("#rootRgbSummary").textContent=rootChannels.join(" · ");
     $("#blurControl").value=settings.blur; $("#opacityControl").value=settings.opacity; $("#radiusControl").value=settings.radius;
     $("#fontSelect").value=settings.font; $("#densitySelect").value=settings.density; $("#contrastSelect").value=settings.contrast; $("#speedControl").value=settings.capsuleSpeed; $("#borderSpeedControl").value=settings.borderSpeed;
     $("#mascotToggle").checked=settings.mascot; $("#capsuleToggle").checked=settings.capsule; $("#borderToggle").checked=settings.borders;
@@ -265,8 +263,12 @@
     $$(".studio-panel").forEach(panel=>panel.hidden=panel.dataset.panel!==tab.dataset.tab);
   }));
   $("#themeSelect").addEventListener("change",event=>{
-    settings.theme=event.target.value;settings.accent=palettes[settings.theme].accent;apply();save();notify("Color direction updated");
+    settings.theme=event.target.value;settings.accent=palettes[settings.theme].accent;settings.rootColor=palettes[settings.theme].bg;apply();save();notify("Color direction updated");
   });
+  $("#rootColorPicker").addEventListener("input",event=>{settings.rootColor=event.target.value;apply();save();});
+  $("#rootColorHex").addEventListener("change",event=>{const value=event.target.value.trim();if(!/^#[0-9a-f]{6}$/i.test(value)){notify("Enter a valid root HEX color");syncControls();return;}settings.rootColor=value.toLowerCase();apply();save();});
+  function updateRootRgb(){const values=["rootRed","rootGreen","rootBlue"].map(id=>Number($("#"+id).value));settings.rootColor=rgbToHex(...values);apply();save();}
+  ["rootRed","rootGreen","rootBlue"].forEach(id=>$("#"+id).addEventListener("input",updateRootRgb));
   $("#accentPicker").addEventListener("input",event=>{settings.accent=event.target.value;apply();save();});
   $("#accentHex").addEventListener("change",event=>{
     const value=event.target.value.trim();
@@ -301,6 +303,7 @@
       if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error("Invalid settings");
       valid.theme=Object.hasOwn(palettes,incoming.theme)?incoming.theme:defaults.theme;
       valid.accent=typeof incoming.accent==="string"&&/^#[0-9a-f]{6}$/i.test(incoming.accent)?incoming.accent:palettes[valid.theme].accent;
+      valid.rootColor=typeof incoming.rootColor==="string"&&/^#[0-9a-f]{6}$/i.test(incoming.rootColor)?incoming.rootColor:palettes[valid.theme].bg;
       for(const key of ["blur","opacity","radius","capsuleSpeed","borderSpeed"])if(Number.isFinite(Number(incoming[key])))valid[key]=Math.max(({blur:4,opacity:20,radius:8,capsuleSpeed:12,borderSpeed:12})[key],Math.min(({blur:32,opacity:85,radius:40,capsuleSpeed:90,borderSpeed:60})[key],Number(incoming[key])));
       if(Number.isFinite(Number(incoming.speed))&&!Number.isFinite(Number(incoming.capsuleSpeed)))valid.capsuleSpeed=Math.max(12,Math.min(90,Number(incoming.speed)));
       if(["system","editorial","technical"].includes(incoming.font))valid.font=incoming.font;
