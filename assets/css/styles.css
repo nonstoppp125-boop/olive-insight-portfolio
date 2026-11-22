@@ -640,3 +640,25 @@ html.has-liquid-cursor .liquid-cursor.is-pressing .liquid-lens-window{transform:
 .main-nav[data-scroll-direction="up"] a{letter-spacing:0}
 @media(max-width:680px){.main-nav{transform:none!important;gap:0!important}.main-nav a{transform:none!important;letter-spacing:0!important}}
 @media(prefers-reduced-motion:reduce){.main-nav,.main-nav a{transition:none!important}}
+
+
+/* Signature typography: expressive headings, highly legible interface text. */
+:root{--font:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--display-font:"Space Grotesk","Manrope",ui-sans-serif,system-ui,sans-serif}
+body{font-family:var(--font)}
+h1,h2,h3,.section-heading h2,.about-main h3{font-family:var(--display-font);font-optical-sizing:auto;letter-spacing:-.045em}
+h1{letter-spacing:-.065em}
+h2{letter-spacing:-.05em}
+h3{letter-spacing:-.035em}
+.main-nav{flex:1;min-width:0;justify-content:center;gap:clamp(12px,1.8vw,25px)}
+.main-nav a{white-space:nowrap;font-family:var(--font);font-weight:650;letter-spacing:.005em}
+.site-header{gap:clamp(12px,1.6vw,22px)}
+@media(max-width:900px){.main-nav{gap:11px}.main-nav a{font-size:10px}.site-header{gap:12px}.header-actions{gap:8px}}
+@media(max-width:760px){
+  .main-nav{display:none;position:absolute;top:calc(100% + 9px);left:0;right:0;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(18,23,14,.96);backdrop-filter:blur(22px);flex-direction:column;align-items:stretch;gap:0;transform:none!important}
+  .main-nav.open{display:flex}
+  .main-nav a{padding:12px 8px;font-size:12px;border-bottom:1px solid var(--line);transform:none!important;letter-spacing:0!important}
+  .main-nav a:last-child{border:0}
+  .header-actions .button{display:none}
+  .menu-toggle{display:grid}
+}
+@media(prefers-reduced-motion:reduce){.main-nav,.main-nav a{transition:none!important}}
