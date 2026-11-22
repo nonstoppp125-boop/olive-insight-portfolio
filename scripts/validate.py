@@ -139,8 +139,8 @@ def main():
         errors.append("typography presets must use available local font stacks")
     if 'root.style.setProperty("--bg",rootColor)' not in js or "deriveRootPalette(rootColor)" not in js or "autoAccentToggle" not in js:
         errors.append("root colour must derive adaptive semantic surfaces, contrast and optional automatic accent matching")
-    if 'id="assistantShortcuts"' not in html or 'data-shortcut="studio"' not in html or "assistantMenu.addEventListener" not in js:
-        errors.append("background assistant must expose working multi-action shortcuts")
+    if 'id="assistantShortcuts"' not in html or 'id="assistantCommandForm"' not in html or 'data-shortcut="motion"' not in html or "assistantMenu.addEventListener" not in js:
+        errors.append("background assistant must expose working shortcuts and local command controls")
     if 'src="assets/insight-mark.svg"' not in html or "brand-mark" not in css:
         errors.append("dimensional portfolio identity mark must be integrated")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
