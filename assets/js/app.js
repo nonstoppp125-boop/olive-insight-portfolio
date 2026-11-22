@@ -12,7 +12,7 @@
     const percentNode=$("#loaderPercent");
     const statusNode=$("#loaderStatus");
     const trackNode=$("#loaderTrackFill");
-    let progress=0,targetProgress=7,frame=0,completed=false;
+    let progress=0,targetProgress=7,frame=0,completed=false,dismissed=false;
     const paint=()=>{
       frame=0;
       progress+=(targetProgress-progress)*.085;
@@ -21,7 +21,7 @@
       pageLoader.style.setProperty("--loader-progress",shown+"%");
       if(percentNode)percentNode.textContent=shown+"%";
       if(trackNode)trackNode.style.width=shown+"%";
-      if(progress<targetProgress-.12||targetProgress<100)frame=requestAnimationFrame(paint);
+      if(progress<targetProgress-.12)frame=requestAnimationFrame(paint);
       else if(completed)finishLoader();
     };
     const setProgress=(value,label)=>{
@@ -30,7 +30,8 @@
       if(!frame)frame=requestAnimationFrame(paint);
     };
     const finishLoader=()=>{
-      if(!completed||progress<99.8)return;
+      if(dismissed||!completed||progress<99.8)return;
+      dismissed=true;
       if(percentNode)percentNode.textContent="100%";
       pageLoader.style.setProperty("--loader-progress","100%");
       if(trackNode)trackNode.style.width="100%";
