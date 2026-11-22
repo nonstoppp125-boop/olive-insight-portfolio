@@ -63,8 +63,8 @@
         float waveDistance=(p.y-liquidLine)/.014;float boundaryGlow=exp(-waveDistance*waveDistance)*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
         liquid+=vec3(.86,1.0,.88)*boundaryGlow*(.32+.62*interfaceGlint);
-        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0025)*step(p.y,liquidLine);
-        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0020)*step(p.y,liquidLine);
+        float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0030)*step(p.y,liquidLine);
+        float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0024)*step(p.y,liquidLine);
         liquid+=vec3(.82,1.0,.88)*(bubbleA+bubbleB)*.52;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
         vec3 prism=mix(vec3(.10,.48,.28),vec3(.66,.88,.72),smoothstep(.08,.92,prismHue));
@@ -680,10 +680,38 @@
     },{rootMargin:"80px"});
     $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
   }
+  function setupSectionFlow(sections){
+    if(!sections.length||(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)||body.classList.contains("no-motion"))return;
+    let frame=0;
+    const paint=()=>{
+      frame=0;
+      const viewport=window.innerHeight||1;
+      const center=viewport*.5;
+      const range=Math.max(240,viewport*.72);
+      sections.forEach(section=>{
+        const rect=section.getBoundingClientRect();
+        const above=rect.bottom<center;
+        const below=rect.top>center;
+        const gap=above?center-rect.bottom:below?rect.top-center:0;
+        const raw=Math.min(1,gap/range);
+        const eased=raw*raw*(3-2*raw);
+        const direction=below?1:-1;
+        section.style.setProperty("--section-opacity",(1-.58*eased).toFixed(3));
+        section.style.setProperty("--section-y",(direction*26*eased).toFixed(2)+"px");
+        section.style.setProperty("--section-scale",(1-.018*eased).toFixed(4));
+      });
+    };
+    const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
+    window.addEventListener("scroll",schedule,{passive:true});
+    window.addEventListener("resize",schedule,{passive:true});
+    window.addEventListener("orientationchange",schedule,{passive:true});
+    paint();
+  }
   function setupReveal(){
-    const sections=$$(".hero,.intro,.section,.contact");
+    const sections=$(".hero,.intro,.section,.contact");
     sections.forEach(element=>element.classList.add("section-flow"));
-    const details=$$(".contact-card,.hero-copy,.hero-art");
+    setupSectionFlow(sections);
+    const details=$(".contact-card,.hero-copy,.hero-art");
     details.forEach(element=>element.classList.add("reveal"));
     if(!("IntersectionObserver" in window)){details.forEach(element=>element.classList.add("visible"));return;}
     const observer=new IntersectionObserver(entries=>{
