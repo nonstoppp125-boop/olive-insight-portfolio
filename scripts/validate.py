@@ -97,6 +97,10 @@ def main():
         errors.append("mascot position must update through GPU-friendly transforms")
     if "touch-action:none" not in css or ".bg-companion.is-dragging" not in css:
         errors.append("background character drag must support smooth touch interaction")
+    if "width:104px;height:148px" not in css or "transform:scale(.48)" not in css or "border-radius:48%" not in css:
+        errors.append("background companion must remain compact and have a rounded, cute character silhouette")
+    if "pointer-events:auto;opacity:.9" not in css or ".bg-companion.is-snapping" not in css or "const edgeInset=8" not in js:
+        errors.append("background companion must be directly draggable and smoothly magnet-snap to all four screen edges")
     if re.search(r'fonts\.googleapis|fonts\.gstatic|unpkg\.com', html + css):
         errors.append("avoid remote font/icon dependencies on the critical render path")
     if "backdrop-filter:blur(13px) saturate(145%)" not in css:

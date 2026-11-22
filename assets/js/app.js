@@ -306,10 +306,12 @@
     const y=Math.max(0,Math.min(maxY,mascotNextY));
     const edges=[{edge:"left",distance:x},{edge:"right",distance:maxX-x},{edge:"top",distance:y},{edge:"bottom",distance:maxY-y}];
     edges.sort((a,b)=>a.distance-b.distance);
-    if(edges[0].edge==="left")mascotNextX=0;
-    else if(edges[0].edge==="right")mascotNextX=maxX;
-    else if(edges[0].edge==="top")mascotNextY=0;
-    else mascotNextY=maxY;
+    const edgeInset=8;
+    if(edges[0].edge==="left")mascotNextX=edgeInset;
+    else if(edges[0].edge==="right")mascotNextX=Math.max(edgeInset,maxX-edgeInset);
+    else if(edges[0].edge==="top")mascotNextY=edgeInset;
+    else mascotNextY=Math.max(edgeInset,maxY-edgeInset);
+    bgCompanion.classList.add("is-snapping");
     applyMascotPosition(mascotNextX,mascotNextY,true);
   }
   function finishMascotDrag(event){
@@ -326,6 +328,9 @@
     }
     bgCompanion.classList.remove("is-dragging");
   }
+  bgCompanion.addEventListener("transitionend",event=>{
+    if(event.propertyName==="transform")bgCompanion.classList.remove("is-snapping");
+  });
   bgCompanion.addEventListener("pointerdown",startMascotDrag);
   window.addEventListener("pointermove",dragMascot,{passive:false});
   window.addEventListener("pointerup",finishMascotDrag);
