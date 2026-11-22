@@ -469,3 +469,68 @@ body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!
   .bg-companion,.bg-companion.is-snapping{transition:none!important}
   .bg-companion .bg-mascot{animation:none!important}
 }
+
+
+/* Final BG companion cleanup: remove detached decorative pieces and simplify silhouette */
+.bg-companion:before,
+.bg-companion:after{content:none!important;display:none!important}
+.bg-companion{
+  width:74px!important;height:106px!important;
+  opacity:.48!important;
+  overflow:visible;
+  transition:transform .72s cubic-bezier(.16,1.25,.3,1),opacity .18s ease!important;
+}
+.bg-companion .bg-mascot{
+  width:210px!important;height:300px!important;
+  transform:scale(.35)!important;
+  transform-origin:top left!important;
+  animation:bg-mascot-drift 8s ease-in-out infinite!important;
+}
+.bg-companion .antenna{
+  top:23px!important;left:103px!important;width:3px!important;height:19px!important;
+  border-radius:3px!important;
+  background:linear-gradient(var(--accent-bright),transparent)!important;
+}
+.bg-companion .antenna:before,
+.bg-companion .antenna:after{content:none!important;display:none!important}
+.bg-companion .mascot-head:after{content:none!important;display:none!important}
+.bg-companion .mascot-head{
+  top:43px!important;left:20px!important;width:170px!important;height:143px!important;
+  border-radius:48% 48% 46% 46%!important;
+}
+.bg-companion .visor{left:26px!important;right:26px!important;top:54px!important;height:31px!important;gap:28px!important;border-radius:999px!important}
+.bg-companion .visor i{width:9px!important;height:13px!important;border-radius:999px!important}
+.bg-companion .mascot-neck{top:181px!important;left:94px!important;width:22px!important;height:14px!important}
+.bg-companion .mascot-body{
+  top:190px!important;left:53px!important;width:104px!important;height:83px!important;
+  border-radius:38px 38px 32px 32px!important;
+}
+.bg-companion .mascot-body span{top:25px!important;left:40px!important;width:22px!important;height:22px!important}
+.bg-companion .mascot-arm{
+  top:199px!important;width:17px!important;height:43px!important;
+  border-radius:999px!important;
+}
+.bg-companion .arm-left{left:40px!important;transform:rotate(23deg)!important}
+.bg-companion .arm-right{right:40px!important;transform:rotate(-23deg)!important}
+.bg-companion .mascot-arm:after{
+  content:"";position:absolute;display:block;bottom:-4px;left:50%;
+  width:17px;height:16px;border-radius:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(145deg,#dfe9c4,#83966a 52%,#33422a);
+  border:1px solid rgba(222,236,187,.8);
+}
+.bg-companion .mascot-foot{width:31px!important;height:18px!important}
+.bg-companion .foot-left{left:60px!important}
+.bg-companion .foot-right{right:60px!important}
+.bg-companion.is-dragging{opacity:1!important;transition:none!important}
+.bg-companion.is-snapping{transition:transform .72s cubic-bezier(.16,1.25,.3,1),opacity .18s ease!important}
+.bg-companion.is-snapping .bg-mascot{animation:bg-mascot-land .72s cubic-bezier(.2,.8,.25,1)!important}
+@media(max-width:680px){
+  .bg-companion{width:70px!important;height:100px!important;opacity:.46!important}
+  .bg-companion .bg-mascot{transform:scale(.33)!important}
+  .bg-companion.is-dragging{opacity:1!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .bg-companion,.bg-companion.is-snapping{transition:none!important}
+  .bg-companion .bg-mascot{animation:none!important}
+}
