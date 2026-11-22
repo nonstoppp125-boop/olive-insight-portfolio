@@ -816,7 +816,7 @@ p,.muted,.hero-lede,.intro p,.card p,.timeline-card p,.contact-card p,.detail-ro
 .assistant-shortcuts button{width:100%;min-height:36px;padding:8px 10px;text-align:left;border:1px solid transparent;border-radius:10px;background:rgba(var(--surface-rgb),.045);color:var(--text);font-size:11px;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
 .assistant-shortcuts button:hover{background:rgba(var(--accent-rgb),.18);border-color:var(--line);transform:translateX(2px)}
 .ambient-particles.particles-off{display:none}
-@media(max-width:520px){.assistant-shortcuts{left:12px;top:auto;bottom:calc(18px + env(safe-area-inset-bottom));width:190px}.brand-mark-frame{width:36px;height:36px}.brand-mark{width:35px;height:35px}}
+@media(max-width:520px){.assistant-shortcuts{width:190px}.brand-mark-frame{width:36px;height:36px}.brand-mark{width:35px;height:35px}}
 @media(prefers-reduced-motion:reduce){.brand-mark{animation:none!important}}
 
 
