@@ -618,6 +618,24 @@ html.has-liquid-cursor .liquid-cursor.is-lens .liquid-cursor-ring{inset:9px;bord
 html.has-liquid-cursor .liquid-cursor.is-pressing .liquid-lens-window{transform:scale(.91)}
 .liquid-hover-target{transform:perspective(900px) translate3d(var(--liquid-shift-x,0px),var(--liquid-shift-y,0px),0) scale(.986)!important;transform-origin:center;transition:transform .42s cubic-bezier(.18,.78,.22,1),filter .42s ease!important;filter:saturate(1.08)}
 .liquid-hover-target:after{transition:opacity .35s ease}
+
+/* Finger-locked, velocity-reactive liquid glass body. */
+.liquid-cursor-core,.liquid-cursor-ring{
+  transform:rotate(var(--cursor-angle,0deg)) scale(var(--cursor-stretch-x,1),var(--cursor-stretch-y,1));
+  transform-origin:50% 50%;
+  transition:transform .16s cubic-bezier(.2,.8,.2,1),inset .24s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s;
+}
+.liquid-cursor-core{box-shadow:inset 0 1px 7px rgba(255,255,255,.58),inset -3px -5px 9px rgba(var(--accent-rgb),.18),0 0 22px rgba(var(--accent-rgb),.24)}
+.liquid-cursor-ring{filter:drop-shadow(0 0 4px rgba(226,245,197,.18))}
+@media(hover:none),(pointer:coarse){
+  .liquid-cursor{width:72px;height:72px;transition:opacity .16s ease,visibility .16s ease}
+  .liquid-cursor-core{inset:23px;backdrop-filter:blur(3px)}
+  .liquid-cursor-ring{inset:14px}
+  .liquid-cursor.is-lens .liquid-cursor-ring{inset:7px}
+  .liquid-cursor.is-pressing .liquid-cursor-core{inset:20px}
+  .liquid-cursor.is-pressing .liquid-cursor-ring{inset:11px}
+  .liquid-cursor-core,.liquid-cursor-ring{transition:transform .09s linear,inset .12s cubic-bezier(.2,.8,.2,1),border-color .12s,box-shadow .12s}
+}
 @media(hover:hover) and (pointer:fine){html.has-liquid-cursor,html.has-liquid-cursor body,html.has-liquid-cursor a,html.has-liquid-cursor button{cursor:none!important}}
 /* Touch devices use the same visible orb during pointer contact; native scrolling remains enabled. */
 @media(hover:none),(pointer:coarse){.liquid-cursor{width:72px;height:72px}.liquid-cursor-core{inset:24px}.liquid-cursor-ring{inset:16px}.liquid-cursor.is-lens .liquid-cursor-ring{inset:8px}}
