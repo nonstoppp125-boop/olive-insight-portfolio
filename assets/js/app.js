@@ -361,9 +361,9 @@
     if(rootHex){settings.rootColor=rootHex[1].toLowerCase();settings.autoAccent=true;changed=true;}
     else if(namedRoot){settings.rootColor=namedColors[namedRoot[1].toLowerCase()];settings.autoAccent=true;changed=true;}
     if(accentHex){settings.accent=accentHex[1].toLowerCase();settings.autoAccent=false;changed=true;}
-    if(/brown|earth|warm|copper|tan/.test(prompt)){settings.theme="earth";settings.rootColor=palettes.earth.bg;settings.autoAccent=true;changed=true;}
-    else if(/forest|green|sage/.test(prompt)){settings.theme="forest";settings.rootColor=palettes.forest.bg;settings.autoAccent=true;changed=true;}
-    else if(/olive/.test(prompt)){settings.theme="olive";settings.rootColor=palettes.olive.bg;settings.autoAccent=true;changed=true;}
+    if(!rootHex&&!namedRoot&&/brown|earth|warm|copper|tan/.test(prompt)){settings.theme="earth";settings.rootColor=palettes.earth.bg;settings.autoAccent=true;changed=true;}
+    else if(!rootHex&&!namedRoot&&/forest|green|sage/.test(prompt)){settings.theme="forest";settings.rootColor=palettes.forest.bg;settings.autoAccent=true;changed=true;}
+    else if(!rootHex&&!namedRoot&&/olive/.test(prompt)){settings.theme="olive";settings.rootColor=palettes.olive.bg;settings.autoAccent=true;changed=true;}
     if(/more blur|blurrier|frosted/.test(prompt)){settings.blur=26;changed=true;}
     if(/less blur|sharper|crisp/.test(prompt)){settings.blur=8;changed=true;}
     if(/rounder|rounded|softer corners/.test(prompt)){settings.radius=32;changed=true;}
