@@ -300,14 +300,14 @@ body.no-border .studio-tab:before,body.no-border .studio .control select:before,
 @font-face{font-family:"Bodoni Moda Loader";src:url("../fonts/BodoniModa-Italic.ttf") format("truetype");font-style:italic;font-weight:400 900;font-display:swap}
 .page-loader{--loader-progress:0%;position:fixed;inset:0;z-index:9999;display:grid;align-content:center;justify-items:center;gap:17px;padding:24px;background:radial-gradient(ellipse at 50% 45%,rgba(var(--accent-rgb),.2),transparent 38%),radial-gradient(ellipse at 50% 62%,rgba(0,0,0,.32),transparent 56%),var(--bg,#10130e);opacity:1;visibility:visible;transition:opacity .48s cubic-bezier(.2,.7,.2,1),visibility .48s ease}
 .page-loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
-.loader-vessel{position:relative;width:660px;height:660px;display:grid;place-items:center;isolation:isolate;overflow:visible}
+.loader-vessel{position:relative;width:165px;height:165px;display:grid;place-items:center;isolation:isolate;overflow:visible}
 .loader-orb-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;filter:drop-shadow(0 16px 22px rgba(0,0,0,.34))}
 .loader-vessel-shine{position:absolute;z-index:3;inset:7px;border:1px solid rgba(255,255,255,.16);border-radius:50%;box-shadow:inset 0 0 22px rgba(255,255,255,.045),0 0 15px rgba(255,255,255,.025);pointer-events:none}
 .loader-percent{position:relative;z-index:5;font-family:"Bodoni Moda Loader","Bodoni 72","Didot",serif;font-size:43px;font-weight:500;font-style:italic;letter-spacing:-.055em;color:#fffef4;text-shadow:0 2px 12px rgba(0,0,0,.58),0 0 24px rgba(255,255,255,.22);font-variant-numeric:tabular-nums}
 .loader-label{font-family:"Bodoni Moda Loader","Bodoni 72","Didot",serif;font-size:16px;font-weight:600;font-style:italic;letter-spacing:.19em;color:rgba(250,250,238,.97);text-shadow:0 2px 14px rgba(0,0,0,.52)}
 .loader-track{width:172px;height:2px;overflow:hidden;background:rgba(255,255,255,.14);border-radius:9px;box-shadow:0 1px 5px rgba(0,0,0,.22)}
 .loader-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#839654,#e2edb7);box-shadow:0 0 13px rgba(var(--accent-rgb),.7);transition:width .18s linear}
-@media(max-width:480px){.loader-vessel{width:612px;height:612px}.loader-percent{font-size:41px}.loader-label{font-size:15px}}
+@media(max-width:480px){.loader-vessel{width:153px;height:153px}.loader-percent{font-size:41px}.loader-label{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.page-loader{transition-duration:.01ms}}
 /* STEP 02 — ambient background atmosphere (compositor-friendly motion) */
 .ambient{opacity:.22;will-change:transform;contain:paint}
@@ -854,3 +854,8 @@ body.no-particles #ambientParticles{display:none}.assistant-shortcuts{max-height
 }
 body.no-motion .section-flow{opacity:1!important;transform:none!important;transition:none!important}
 @media(prefers-reduced-motion:reduce){.section-flow{opacity:1!important;transform:none!important;transition:none!important}}
+
+/* Loading-screen micro stars: dense, near-invisible white pinpoints with independent random twinkle. */
+.page-loader{isolation:isolate;overflow:hidden}
+.loader-stars{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;pointer-events:none;opacity:.92}
+.loader-vessel,.loader-label,.loader-track{position:relative;z-index:2}
