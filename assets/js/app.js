@@ -184,6 +184,7 @@
     const palette = palettes[settings.theme] || palettes.olive;
     const accent = settings.accent || palette.accent;
     root.style.setProperty("--accent",accent);
+    root.style.setProperty("--bg",palette.bg);
     const rootColor=settings.rootColor||palette.bg;
     root.style.setProperty("--bg",rootColor);
     root.style.setProperty("--root-rgb",hexToRgb(rootColor));
