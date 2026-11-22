@@ -8,7 +8,36 @@
   const backdrop = $("#studioBackdrop");
   const toast = $("#toast");
   const pageLoader=$("#pageLoader");
-  function createLoaderOrb(){
+  function createLoaderStars(){
+    const canvas=$("#loaderStars");if(!canvas)return;
+    const ctx=canvas.getContext("2d",{alpha:true});if(!ctx)return;
+    const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let dots=[],width=0,height=0,dpr=1,raf=0,last=0;
+    const seed=()=>{
+      const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);dpr=Math.min(window.devicePixelRatio||1,1.5);
+      canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+      dots=[];const spacing=4.2;
+      for(let y=1.5;y<height;y+=spacing)for(let x=1.5;x<width;x+=spacing){
+        const alpha=.025+Math.random()*.16;
+        dots.push({x:x+(Math.random()-.5)*1.5,y:y+(Math.random()-.5)*1.5,a:alpha,target:alpha,wait:Math.random()*90,size:.48+Math.random()*.28});
+      }
+    };
+    const draw=now=>{
+      if(!canvas.isConnected||!pageLoader||pageLoader.classList.contains("is-hidden")){cancelAnimationFrame(raf);return;}
+      if(now-last<42){raf=requestAnimationFrame(draw);return;}last=now;
+      ctx.clearRect(0,0,width,height);
+      for(const dot of dots){
+        if(!reduce){if(dot.wait>0)dot.wait--;else{dot.target=.018+Math.random()*.48;dot.wait=18+Math.random()*95;}}
+        dot.a+=(dot.target-dot.a)*.075;
+        ctx.fillStyle="rgba(255,255,255,"+dot.a.toFixed(3)+")";ctx.fillRect(dot.x,dot.y,dot.size,dot.size);
+      }
+      raf=requestAnimationFrame(draw);
+    };
+    seed();raf=requestAnimationFrame(draw);
+    window.addEventListener("resize",()=>{if(!canvas.isConnected)return;seed();},{passive:true});
+  }
+  createLoaderStars();
+    function createLoaderOrb(){
     const canvas=$("#loaderOrbCanvas");
     if(!canvas)return;
     const fallback=()=>{canvas.classList.add("orb-unavailable");canvas.closest(".loader-vessel")?.classList.add("orb-fallback");};
