@@ -681,9 +681,9 @@
     $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
   }
   function setupReveal(){
-    const sections=$(".hero,.intro,.section,.contact");
+    const sections=$$(".hero,.intro,.section,.contact");
     sections.forEach(element=>element.classList.add("section-flow"));
-    const details=$(".contact-card,.hero-copy,.hero-art");
+    const details=$$(".contact-card,.hero-copy,.hero-art");
     details.forEach(element=>element.classList.add("reveal"));
     if(!("IntersectionObserver" in window)){details.forEach(element=>element.classList.add("visible"));return;}
     const observer=new IntersectionObserver(entries=>{
