@@ -82,9 +82,9 @@ def main():
         if marker not in html + js + css:
             errors.append(f"missing expected feature marker: {marker}")
 
-    background_character = re.search(r'<div\b[^>]*id="bgCompanion"[^>]*>', html)
-    if not background_character or 'aria-hidden="true"' not in background_character.group(0):
-        errors.append("background character must be decorative and accessible")
+    background_character = re.search(r'<button\b[^>]*id="bgCompanion"[^>]*>', html)
+    if not background_character or 'aria-label="Open assistant shortcuts"' not in background_character.group(0) or 'aria-expanded="false"' not in background_character.group(0):
+        errors.append("background assistant must be keyboard-accessible and expose its expanded state")
     elif html.find(background_character.group(0)) < html.find("</main>"):
         errors.append("background character must be outside main content")
     if not re.search(r'\.bg-companion\s*\{[^}]*position:\s*fixed', css):
@@ -137,8 +137,12 @@ def main():
         errors.append("avoid expensive large-area ambient blur filters")
     if 'font:"system"' not in js or "fontStacks={system:" not in js or 'value="editorial"' not in html or 'value="technical"' not in html:
         errors.append("typography presets must use available local font stacks")
-    if 'root.style.setProperty("--bg",palette.bg)' not in js or '--ambient-softness' not in js:
-        errors.append("palette background and softness controls must apply to the rendered page")
+    if 'root.style.setProperty("--bg",rootColor)' not in js or "deriveRootPalette(rootColor)" not in js or "autoAccentToggle" not in js:
+        errors.append("root colour must derive adaptive semantic surfaces, contrast and optional automatic accent matching")
+    if 'id="assistantShortcuts"' not in html or 'data-shortcut="studio"' not in html or "assistantMenu.addEventListener" not in js:
+        errors.append("background assistant must expose working multi-action shortcuts")
+    if 'src="assets/insight-mark.svg"' not in html or "brand-mark" not in css:
+        errors.append("dimensional portfolio identity mark must be integrated")
     if "studio-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))" not in css:
         errors.append("design studio tabs must use aligned equal-width columns")
 
