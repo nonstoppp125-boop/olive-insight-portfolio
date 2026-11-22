@@ -19,7 +19,7 @@
       void main(){v_uv=a_position*.5+.5;gl_Position=vec4(a_position,0.0,1.0);}
     `;
     const fragment=`
-      precision highp float;
+      precision mediump float;
       varying vec2 v_uv;
       uniform vec2 u_resolution;
       uniform float u_time;
@@ -58,15 +58,15 @@
         vec3 liquid=mix(liquidTop,liquidMid,smoothstep(0.0,.42,depth));
         liquid=mix(liquid,liquidDeep,smoothstep(.48,1.0,depth));
         liquid+=u_accent*(.055+caustic*.035)*softLight(p,vec2(-.25,.12),.6,.55);
-        float interface=exp(-pow((p.y-liquidLine)/.014,2.0))*step(.005,progress)*step(progress,.995);
+        float boundaryGlow=exp(-pow((p.y-liquidLine)/.014,2.0))*step(.005,progress)*step(progress,.995);
         float interfaceGlint=pow(max(0.0,1.0-abs(p.x)/radius),2.0);
-        liquid+=vec3(.9,.97,1.0)*interface*(.48+.8*interfaceGlint);
+        liquid+=vec3(.9,.97,1.0)*boundaryGlow*(.48+.8*interfaceGlint);
         float bubbleA=exp(-pow(length(p-vec2(.22,-.28+mod(u_time*.075,.46))),2.0)/.0014)*step(p.y,liquidLine);
         float bubbleB=exp(-pow(length(p-vec2(-.31,-.46+mod(u_time*.052,.5))),2.0)/.0011)*step(p.y,liquidLine);
         liquid+=vec3(.85,.96,1.0)*(bubbleA+bubbleB)*.72;
         float prismHue=fract(.58+p.x*.19+p.y*.12+rim*.22+u_time*.012);
         vec3 prism=spectrum(prismHue);
-        float iridescence=clamp(fresnel*.72+dispersion*.7+interface*.22,0.0,.72);
+        float iridescence=clamp(fresnel*.72+dispersion*.7+boundaryGlow*.22,0.0,.72);
         vec3 color=mix(glass,liquid,inLiquid*.94);
         color=mix(color,prism,iridescence*(.17+rim*.23));
         color+=vec3(.82,.93,.99)*pow(1.0-z/radius,5.5)*.7;
@@ -81,7 +81,7 @@
     const compile=(type,source)=>{const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){gl.deleteShader(shader);throw new Error(gl.getShaderInfoLog(shader)||"Orb shader compile failed");}return shader;};
     let program;
     try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)||"Orb shader link failed");}
-    catch(error){canvas.classList.add("orb-unavailable");return;}
+    catch(error){canvas.classList.add("orb-unavailable");canvas.dataset.orbError=String(error.message||error);console.warn("Liquid orb shader unavailable; CSS glass fallback enabled.",error);return;}
     gl.useProgram(program);
     const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
     const position=gl.getAttribLocation(program,"a_position");gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
@@ -557,6 +557,38 @@
     document.addEventListener("pointerleave",event=>{if(!isCoarse&&event.pointerType!=="touch"){setLensTarget(null);liquidCursor.style.opacity="0";}},{passive:true});
     window.addEventListener("scroll",()=>{if(currentTarget&&!currentTarget.isConnected)setLensTarget(null);},{passive:true});
   }
+
+  // Scroll-reactive navigation: horizontal fan/cluster motion reverses with scroll direction.
+  function setupScrollNav(){
+    const nav=$("#mainNav");
+    if(!nav)return;
+    const links=$("a",nav);
+    links.forEach((link,index)=>link.style.setProperty("--nav-index",String(index)));
+    let previousY=window.scrollY,lastDirection=1,raf=0;
+    const paint=()=>{
+      raf=0;
+      const y=Math.max(0,window.scrollY);
+      const delta=y-previousY;
+      if(Math.abs(delta)>0.25)lastDirection=delta>0?1:-1;
+      previousY=y;
+      const travel=Math.min(1,y/900);
+      const spread=3+Math.sin(y/190)*6+travel*2;
+      const drift=lastDirection*(1.4+Math.min(3,Math.abs(delta)*.12));
+      nav.style.setProperty("--nav-drift",(lastDirection*3.5)+"px");
+      nav.style.gap=(20+((Math.sin(y/230)+1)*4))+"px";
+      links.forEach((link,index)=>{
+        const center=index-(links.length-1)/2;
+        const offset=center*spread+index*drift;
+        link.style.setProperty("--nav-x",offset.toFixed(2)+"px");
+      });
+      nav.dataset.scrollDirection=lastDirection>0?"down":"up";
+    };
+    const schedule=()=>{if(!raf)raf=requestAnimationFrame(paint);};
+    window.addEventListener("scroll",schedule,{passive:true});
+    window.addEventListener("resize",schedule,{passive:true});
+    paint();
+  }
+  setupScrollNav();
 
   $("#menuToggle").addEventListener("click",()=>{
     const nav=$("#mainNav");const isOpen=nav.classList.toggle("open");
