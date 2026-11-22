@@ -10,27 +10,29 @@
   const pageLoader=$("#pageLoader");
   function createLoaderStars(){
     const canvas=$("#loaderStars");if(!canvas)return;
-    const ctx=canvas.getContext("2d",{alpha:true});if(!ctx)return;
+    const ctx=canvas.getContext("2d",{alpha:true,desynchronized:true});if(!ctx)return;
     const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let dots=[],width=0,height=0,dpr=1,raf=0,last=0;
     const seed=()=>{
-      const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);dpr=Math.min(window.devicePixelRatio||1,1.5);
+      const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);dpr=Math.min(window.devicePixelRatio||1,1);
       canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
       dots=[];const spacing=2.3;
       for(let y=1.5;y<height;y+=spacing)for(let x=1.5;x<width;x+=spacing){
         const alpha=.025+Math.random()*.16;
-        dots.push({x:x+(Math.random()-.5)*1.5,y:y+(Math.random()-.5)*1.5,a:alpha,target:alpha,wait:Math.random()*90,size:.48+Math.random()*.28});
+        dots.push({x:x+(Math.random()-.5)*1.5,y:y+(Math.random()-.5)*1.5,a:alpha,target:alpha,next:performance.now()+Math.random()*1800,size:.48+Math.random()*.28});
       }
     };
     const draw=now=>{
       if(!canvas.isConnected||!pageLoader||pageLoader.classList.contains("is-hidden")){cancelAnimationFrame(raf);return;}
-      if(now-last<42){raf=requestAnimationFrame(draw);return;}last=now;
-      ctx.clearRect(0,0,width,height);
+      if(now-last<50){raf=requestAnimationFrame(draw);return;}
+      const dt=Math.min(100,now-last||50);last=now;
+      ctx.clearRect(0,0,width,height);ctx.fillStyle="#fff";
       for(const dot of dots){
-        if(!reduce){if(dot.wait>0)dot.wait--;else{dot.target=.018+Math.random()*.48;dot.wait=18+Math.random()*95;}}
-        dot.a+=(dot.target-dot.a)*.075;
-        ctx.fillStyle="rgba(255,255,255,"+dot.a.toFixed(3)+")";ctx.fillRect(dot.x,dot.y,dot.size,dot.size);
+        if(!reduce&&now>=dot.next){dot.target=.018+Math.random()*.48;dot.next=now+450+Math.random()*2400;}
+        dot.a+=(dot.target-dot.a)*(1-Math.pow(.925,dt/16.67));
+        ctx.globalAlpha=dot.a;ctx.fillRect(dot.x,dot.y,dot.size,dot.size);
       }
+      ctx.globalAlpha=1;
       raf=requestAnimationFrame(draw);
     };
     seed();raf=requestAnimationFrame(draw);
@@ -117,15 +119,18 @@
     const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
     const position=gl.getAttribLocation(program,"a_position");gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
     const resolution=gl.getUniformLocation(program,"u_resolution"),time=gl.getUniformLocation(program,"u_time"),progress=gl.getUniformLocation(program,"u_progress"),accentColor=gl.getUniformLocation(program,"u_accent"),rootColorUniform=gl.getUniformLocation(program,"u_root");
-    let raf=0,start=performance.now(),lastWidth=0,lastHeight=0;
+    let raf=0,start=performance.now(),lastWidth=0,lastHeight=0,lastFrame=0,cachedColors=null;
+    const toRgb=value=>{const n=parseInt(value.replace("#",""),16);return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255];};
     const draw=now=>{
-      if(!canvas.isConnected){cancelAnimationFrame(raf);gl.deleteBuffer(buffer);gl.deleteProgram(program);return;}
-      const rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,1.65),w=Math.max(1,Math.round(rect.width*dpr)),h=Math.max(1,Math.round(rect.height*dpr));
+      if(!canvas.isConnected||!pageLoader||pageLoader.classList.contains("is-hidden")){cancelAnimationFrame(raf);gl.deleteBuffer(buffer);gl.deleteProgram(program);return;}
+      if(now-lastFrame<33){raf=requestAnimationFrame(draw);return;}lastFrame=now;
+      if(!cachedColors){const style=getComputedStyle(root);cachedColors={accent:toRgb(style.getPropertyValue("--accent").trim()||"#87945b"),root:toRgb(style.getPropertyValue("--bg").trim()||"#10130e")};}
+      const rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,1.25),w=Math.max(1,Math.round(rect.width*dpr)),h=Math.max(1,Math.round(rect.height*dpr));
       if(w!==lastWidth||h!==lastHeight){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);lastWidth=w;lastHeight=h;}
-      const raw=getComputedStyle(pageLoader).getPropertyValue("--loader-progress").trim();
+      const raw=pageLoader.style.getPropertyValue("--loader-progress")||"0%";
       const amount=Math.max(0,Math.min(1,(parseFloat(raw)||0)/100));
-      gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
-      const toRgb=value=>{const n=parseInt(value.replace("#",""),16);return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255];};const ac=toRgb(getComputedStyle(root).getPropertyValue("--accent").trim()||"#87945b"),rc=toRgb(getComputedStyle(root).getPropertyValue("--bg").trim()||"#10130e");gl.uniform2f(resolution,w,h);gl.uniform1f(time,(now-start)/1000);gl.uniform1f(progress,amount);gl.uniform3f(accentColor,ac[0],ac[1],ac[2]);gl.uniform3f(rootColorUniform,rc[0],rc[1],rc[2]);gl.drawArrays(gl.TRIANGLES,0,6);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform2f(resolution,w,h);gl.uniform1f(time,(now-start)/1000);gl.uniform1f(progress,amount);gl.uniform3f(accentColor,...cachedColors.accent);gl.uniform3f(rootColorUniform,...cachedColors.root);gl.drawArrays(gl.TRIANGLES,0,6);
       raf=requestAnimationFrame(draw);
     };
     raf=requestAnimationFrame(draw);
