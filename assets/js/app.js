@@ -340,6 +340,72 @@
     applyMascotPosition(mascotPosition.x*Math.max(0,window.innerWidth-bgCompanion.offsetWidth),mascotPosition.y*Math.max(0,window.innerHeight-bgCompanion.offsetHeight));
   });
   restoreMascotPosition();
+
+  // High-performance liquid magnifier cursor. Disabled for touch/coarse pointers.
+  const liquidCursor=$("#liquidLensCursor");
+  const liquidLensContent=$("#liquidLensContent");
+  if(liquidCursor&&liquidLensContent&&window.matchMedia("(hover: hover) and (pointer: fine)").matches&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    root.classList.add("has-liquid-cursor");
+    const lensTargets=".glass,.card,.timeline-card,.feature-card,.research-grid article,.future-item,.empty-state,.progress-panel,.contact-card,.button,.main-nav a,.tag-list span,.profile-orb";
+    let cursorX=-100,cursorY=-100,renderX=-100,renderY=-100,pointerX=0,pointerY=0,cursorRaf=0,currentTarget=null,cloneNode=null;
+    const cursorEase=.24;
+    function cleanClone(node){
+      node.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
+      node.removeAttribute("id");
+      node.classList.add("liquid-lens-clone");
+      node.querySelectorAll("button,input,select,textarea").forEach(el=>{el.setAttribute("tabindex","-1");el.setAttribute("aria-hidden","true");});
+      return node;
+    }
+    function setLensTarget(target){
+      if(target===currentTarget)return;
+      if(currentTarget){currentTarget.classList.remove("liquid-hover-target");currentTarget.style.removeProperty("--liquid-shift-x");currentTarget.style.removeProperty("--liquid-shift-y");}
+      currentTarget=target;
+      liquidLensContent.replaceChildren();
+      cloneNode=null;
+      if(!target){liquidCursor.classList.remove("is-lens");return;}
+      target.classList.add("liquid-hover-target");
+      cloneNode=cleanClone(target.cloneNode(true));
+      const rect=target.getBoundingClientRect();
+      cloneNode.style.width=rect.width+"px";
+      cloneNode.style.height=rect.height+"px";
+      liquidLensContent.appendChild(cloneNode);
+      liquidCursor.classList.add("is-lens");
+    }
+    function paintLiquidCursor(){
+      cursorRaf=0;
+      renderX+=(cursorX-renderX)*cursorEase;
+      renderY+=(cursorY-renderY)*cursorEase;
+      liquidCursor.style.transform="translate3d("+(renderX-38).toFixed(2)+"px,"+(renderY-38).toFixed(2)+"px,0)";
+      if(currentTarget&&cloneNode){
+        const rect=currentTarget.getBoundingClientRect();
+        const localX=Math.max(0,Math.min(rect.width,pointerX-rect.left));
+        const localY=Math.max(0,Math.min(rect.height,pointerY-rect.top));
+        cloneNode.style.left=(38-localX)+"px";
+        cloneNode.style.top=(38-localY)+"px";
+        cloneNode.style.setProperty("--lens-origin-x",localX+"px");
+        cloneNode.style.setProperty("--lens-origin-y",localY+"px");
+        const nx=(localX/Math.max(1,rect.width)-.5)*2;
+        const ny=(localY/Math.max(1,rect.height)-.5)*2;
+        currentTarget.style.setProperty("--liquid-shift-x",(nx*1.4).toFixed(2)+"px");
+        currentTarget.style.setProperty("--liquid-shift-y",(ny*1.4).toFixed(2)+"px");
+      }
+      if(Math.abs(cursorX-renderX)>.15||Math.abs(cursorY-renderY)>.15)cursorRaf=requestAnimationFrame(paintLiquidCursor);
+    }
+    function moveLiquidCursor(event){
+      pointerX=event.clientX;pointerY=event.clientY;cursorX=pointerX;cursorY=pointerY;
+      const under=document.elementFromPoint(pointerX,pointerY);
+      const target=under&&under.closest?under.closest(lensTargets):null;
+      setLensTarget(target&&!target.closest(".liquid-cursor")?target:null);
+      if(!cursorRaf)cursorRaf=requestAnimationFrame(paintLiquidCursor);
+    }
+    window.addEventListener("pointermove",moveLiquidCursor,{passive:true});
+    window.addEventListener("pointerdown",()=>liquidCursor.classList.add("is-pressing"),{passive:true});
+    window.addEventListener("pointerup",()=>liquidCursor.classList.remove("is-pressing"),{passive:true});
+    document.addEventListener("pointerleave",()=>{setLensTarget(null);liquidCursor.style.opacity="0";});
+    document.addEventListener("pointerenter",()=>{liquidCursor.style.opacity="1";});
+    window.addEventListener("scroll",()=>{if(currentTarget&&!currentTarget.isConnected)setLensTarget(null);},{passive:true});
+  }
+
   $("#menuToggle").addEventListener("click",()=>{
     const nav=$("#mainNav");const isOpen=nav.classList.toggle("open");
     $("#menuToggle").setAttribute("aria-expanded",String(isOpen));

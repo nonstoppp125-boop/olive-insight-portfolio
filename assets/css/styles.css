@@ -605,3 +605,24 @@ body.no-motion .brand-symbol,body.no-motion .brand-symbol:before{animation:none!
 @media(max-width:680px){
   #bgCompanion .bg-mascot{transform:scale(.33)!important}
 }
+
+
+/* Precision liquid-lens cursor — desktop fine pointers only */
+.liquid-cursor{position:fixed;left:0;top:0;width:76px;height:76px;z-index:9999;pointer-events:none;opacity:0;visibility:hidden;transform:translate3d(-120px,-120px,0);will-change:transform;contain:layout style;transition:opacity .22s ease,visibility .22s ease}
+html.has-liquid-cursor .liquid-cursor{opacity:1;visibility:visible}
+.liquid-cursor-core{position:absolute;inset:25px;border-radius:50%;background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.72),rgba(220,235,190,.24) 24%,rgba(var(--accent-rgb),.18) 62%,rgba(12,17,10,.22));border:1px solid rgba(235,245,213,.78);box-shadow:inset 0 1px 5px rgba(255,255,255,.5),0 0 18px rgba(var(--accent-rgb),.2);backdrop-filter:blur(2px);transition:inset .24s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s}
+.liquid-cursor-core span{position:absolute;left:28%;top:22%;width:24%;height:13%;border-radius:50%;background:rgba(255,255,255,.68);filter:blur(2px);transform:rotate(-32deg)}
+.liquid-cursor-ring{position:absolute;inset:17px;border:1px solid rgba(225,239,197,.46);border-radius:50%;box-shadow:0 0 0 1px rgba(10,15,8,.16),inset 0 0 10px rgba(255,255,255,.08);transition:inset .28s cubic-bezier(.2,.8,.2,1),border-color .2s}
+.liquid-lens-window{position:absolute;inset:0;border-radius:50%;overflow:hidden;opacity:0;transform:scale(.72);border:1px solid rgba(237,246,217,.86);background:rgba(220,235,190,.08);box-shadow:inset 0 0 18px rgba(255,255,255,.16),0 4px 24px rgba(0,0,0,.22);backdrop-filter:blur(1.2px);transition:opacity .2s ease,transform .28s cubic-bezier(.16,1.2,.3,1)}
+.liquid-lens-content{position:absolute;inset:0;overflow:hidden;border-radius:inherit}
+.liquid-lens-content>.liquid-lens-clone{position:absolute!important;max-width:none!important;max-height:none!important;margin:0!important;pointer-events:none!important;transform:scale(1.22)!important;transform-origin:var(--lens-origin-x,50%) var(--lens-origin-y,50%)!important;filter:saturate(1.08) contrast(1.04)}
+.liquid-lens-glint{position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.26),transparent 32%,transparent 68%,rgba(211,232,172,.12));box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+html.has-liquid-cursor .liquid-cursor.is-lens .liquid-lens-window{opacity:1;transform:scale(1)}
+html.has-liquid-cursor .liquid-cursor.is-lens .liquid-cursor-core{inset:31px;border-color:rgba(235,245,213,.22);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12)}
+html.has-liquid-cursor .liquid-cursor.is-lens .liquid-cursor-ring{inset:9px;border-color:rgba(225,239,197,.72)}
+html.has-liquid-cursor .liquid-cursor.is-pressing .liquid-lens-window{transform:scale(.91)}
+.liquid-hover-target{transform:perspective(900px) translate3d(var(--liquid-shift-x,0px),var(--liquid-shift-y,0px),0) scale(.986)!important;transform-origin:center;transition:transform .42s cubic-bezier(.18,.78,.22,1),filter .42s ease!important;filter:saturate(1.08)}
+.liquid-hover-target:after{transition:opacity .35s ease}
+@media(hover:hover) and (pointer:fine){html.has-liquid-cursor,html.has-liquid-cursor body,html.has-liquid-cursor a,html.has-liquid-cursor button{cursor:none!important}}
+@media(max-width:800px),(hover:none),(pointer:coarse){.liquid-cursor{display:none!important}}
+@media(prefers-reduced-motion:reduce){.liquid-cursor,.liquid-cursor *,.liquid-hover-target{transition:none!important;animation:none!important}}
