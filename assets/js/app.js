@@ -394,8 +394,8 @@
     function moveLiquidCursor(event){
       pointerX=event.clientX;pointerY=event.clientY;cursorX=pointerX;cursorY=pointerY;
       const under=document.elementFromPoint(pointerX,pointerY);
-      const target=under&&under.closest?under.closest(lensTargets):null;
-      setLensTarget(target&&!target.closest(".liquid-cursor")?target:null);
+      const target=under&&under.closest?(under.closest(lensTargets)||under.closest("p,h1,h2,h3,h4,span,a,button,label,section,article,header,footer,main")||under):null;
+      setLensTarget(target&&target!==document.body&&target!==document.documentElement&&!target.closest(".liquid-cursor,.bg-companion")?target:null);
       if(!cursorRaf)cursorRaf=requestAnimationFrame(paintLiquidCursor);
     }
     window.addEventListener("pointermove",moveLiquidCursor,{passive:true});
