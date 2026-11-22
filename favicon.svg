@@ -1,1 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5e5a1"/><stop offset=".48" stop-color="#87945b"/><stop offset="1" stop-color="#303c24"/></linearGradient></defs><rect x="3" y="3" width="58" height="58" rx="17" fill="#151b11" stroke="#87945b"/><path d="M18 32a14 14 0 1 0 28 0a14 14 0 1 0-28 0" fill="none" stroke="url(#g)" stroke-width="5"/><path d="M37 22v20" stroke="#e4edc5" stroke-width="4" stroke-linecap="round"/><circle cx="43" cy="18" r="3" fill="#d5e5a1"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none">
+<defs>
+ <linearGradient id="a" x1="12" y1="12" x2="82" y2="86" gradientUnits="userSpaceOnUse"><stop stop-color="#F4FFF8"/><stop offset=".32" stop-color="#9BE5BD"/><stop offset=".68" stop-color="#4B9B78"/><stop offset="1" stop-color="#174C3A"/></linearGradient>
+ <linearGradient id="b" x1="20" y1="18" x2="78" y2="78" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF"/><stop offset=".5" stop-color="#9DEBC6" stop-opacity=".8"/><stop offset="1" stop-color="#438A70" stop-opacity=".25"/></linearGradient>
+ <radialGradient id="c" cx="0" cy="0" r="1" gradientTransform="matrix(48 48 -48 48 30 19)" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF" stop-opacity=".34"/><stop offset="1" stop-color="#8AE5BA" stop-opacity="0"/></radialGradient>
+ <filter id="g" x="0" y="0" width="96" height="96" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="2.5"/></filter>
+</defs>
+<path d="M48 5 86 27v42L48 91 10 69V27L48 5Z" fill="url(#c)" stroke="url(#b)" stroke-width="1.5"/>
+<g stroke="url(#a)" stroke-linejoin="round" stroke-width="3.2">
+ <path d="m48 15 27 15v31L48 77 21 61V30l27-15Z"/>
+ <path d="m48 15 0 31 27 15M48 46 21 61m27-46 0 31-27-16m27 16 0 31"/>
+ <path d="m31 24 27 15v31M65 24 38 39v31" opacity=".72"/>
+</g>
+<path d="m48 15 27 15-27 16-27-16 27-15Z" fill="url(#b)" fill-opacity=".23"/>
+<path d="m48 46 27 15-27 16-27-16 27-16Z" fill="url(#a)" fill-opacity=".13"/>
+<path d="M48 15 75 30 48 46 21 30 48 15Z" stroke="#F4FFF8" stroke-opacity=".9" stroke-width="1.2"/>
+<path d="m48 46 0 31" stroke="#F4FFF8" stroke-opacity=".7" stroke-width="1.3"/>
+<circle cx="48" cy="46" r="3.2" fill="#fff" filter="url(#g)"/><circle cx="48" cy="46" r="1.6" fill="#fff"/>
+</svg>
