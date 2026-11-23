@@ -164,8 +164,8 @@
       if(percentNode)percentNode.textContent="100%";
       pageLoader.style.setProperty("--loader-progress","100%");
       if(trackNode)trackNode.style.width="100%";
-      pageLoader.classList.add("is-hidden");
-      window.setTimeout(()=>pageLoader.remove(),520);
+      pageLoader.classList.add("is-exiting");
+      window.setTimeout(()=>pageLoader.remove(),1420);
     };
     const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const prepareExperience=async()=>{
