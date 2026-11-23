@@ -704,9 +704,9 @@
     let frame=0;const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
     const paint=()=>{frame=0;const vh=Math.max(1,window.innerHeight),mobile=window.matchMedia?.("(max-width: 680px)").matches;
       sections.forEach((section,index)=>{const r=section.getBoundingClientRect(),enter=clamp((vh-r.top)/(vh*.72),0,1),exit=clamp(-r.bottom/(vh*.58),0,1);
-        const y=(1-enter)*(mobile?22:34)-exit*(mobile?12:20),z=-clamp(1-Math.abs((r.top+r.height*.5-vh*.48)/vh),0,1)*18;
+        const proximity=clamp(1-Math.abs((r.top+r.height*.5-vh*.48)/vh),0,1),y=(1-enter)*(mobile?22:34)-exit*(mobile?12:20),z=-proximity*18;
         section.style.setProperty("--chapter-y",y.toFixed(2)+"px");section.style.setProperty("--chapter-z",z.toFixed(2)+"px");
-        section.style.setProperty("--chapter-scale",(1-(mobile?.006:.012)).toFixed(4));section.dataset.chapter=String(index+1).padStart(2,"0");});};
+        section.style.setProperty("--chapter-scale",(1-proximity*(mobile?.006:.012)).toFixed(4));section.dataset.chapter=String(index+1).padStart(2,"0");});};
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
     window.addEventListener("scroll",schedule,{passive:true});window.addEventListener("resize",schedule,{passive:true});paint();
   }
