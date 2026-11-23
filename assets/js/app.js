@@ -699,31 +699,39 @@
     $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
   }
   function setupSectionFlow(sections){
-    if(!sections.length||(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)||body.classList.contains("no-motion"))return;
+    if(!sections.length)return;
+    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const noMotion=body.classList.contains("no-motion");
+    if(reduced||noMotion)return;
     let frame=0;
     const clamp=value=>Math.max(0,Math.min(1,value));
     const smooth=value=>{const t=clamp(value);return t*t*(3-2*t);};
+    sections.forEach((section,index)=>{
+      section.style.zIndex=String(index+1);
+      section.style.setProperty("--stack-opacity","1");
+      section.style.setProperty("--stack-y","0px");
+      section.style.setProperty("--stack-scale","1");
+      section.style.setProperty("--stack-blur","0px");
+    });
     const paint=()=>{
       frame=0;
       const vh=window.innerHeight||1;
-      const enterRange=vh*.58,exitRange=vh*.62;
-      sections.forEach(section=>{
+      const stickyTop=Math.max(24,vh*.07);
+      const travel=Math.max(1,vh-stickyTop);
+      sections.forEach((section,index)=>{
         const rect=section.getBoundingClientRect();
-        // Incoming sections rise from below; outgoing sections fade and recede in depth.
-        const entering=smooth((vh*.92-rect.top)/enterRange);
-        const leaving=smooth((rect.bottom+vh*.30)/exitRange);
-        const visibility=Math.min(entering,leaving);
-        const entryProgress=1-entering;
-        const exitProgress=1-leaving;
-        const translateY=entryProgress*44-exitProgress*34;
-        const translateZ=-exitProgress*46;
-        const tilt=-exitProgress*1.35;
-        const scale=.955+visibility*.045;
-        section.style.setProperty("--section-opacity",visibility.toFixed(3));
-        section.style.setProperty("--section-y",translateY.toFixed(2)+"px");
-        section.style.setProperty("--section-z",translateZ.toFixed(2)+"px");
-        section.style.setProperty("--section-tilt",tilt.toFixed(3)+"deg");
-        section.style.setProperty("--section-scale",scale.toFixed(4));
+        const incoming=smooth((vh-rect.top)/travel);
+        const next=sections[index+1];
+        const nextTop=next?next.getBoundingClientRect().top:-vh;
+        const handoff=next?smooth((vh-nextTop)/travel):0;
+        const opacity=incoming*(1-handoff*.52);
+        const y=(1-incoming)*30-handoff*22;
+        const scale=.975+incoming*.025-handoff*.035;
+        const blur=handoff*4.5;
+        section.style.setProperty("--stack-opacity",opacity.toFixed(3));
+        section.style.setProperty("--stack-y",y.toFixed(2)+"px");
+        section.style.setProperty("--stack-scale",scale.toFixed(4));
+        section.style.setProperty("--stack-blur",blur.toFixed(2)+"px");
       });
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
