@@ -930,3 +930,145 @@ body.no-motion main>.contact{opacity:1!important;transform:none!important;filter
     opacity:1!important;transform:none!important;filter:none!important;will-change:auto;
   }
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   INSIGHT / SECTION ART DIRECTION 2026
+   Remove stacked-panel transition; give every chapter its own visual system.
+   ───────────────────────────────────────────────────────────── */
+html{scroll-behavior:smooth!important;scroll-snap-type:none!important;scroll-padding-top:92px}
+body{overflow-x:hidden}
+main{position:relative;isolation:auto}
+main>.hero,main>.intro,main>.section,main>.contact{
+  position:relative!important;top:auto!important;min-height:0!important;margin:0 auto!important;
+  padding:clamp(44px,6vw,82px) 0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;scroll-margin-top:0!important;
+  scroll-snap-align:none!important;scroll-snap-stop:normal!important;
+  opacity:1!important;transform:none!important;filter:none!important;will-change:auto!important;
+}
+main>.hero{min-height:calc(100svh - 88px)!important;padding-top:clamp(64px,8vh,110px)!important;padding-bottom:42px!important}
+main>.intro{width:min(1160px,calc(100% - 96px));display:grid;grid-template-columns:140px 1fr auto;align-items:center;gap:28px;padding:54px 0 64px!important;border-top:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}
+main>.intro>span{font:10px var(--mono);letter-spacing:.2em;color:var(--accent-bright)}
+main>.intro p{max-width:900px;margin:0;font-size:clamp(25px,4vw,48px);line-height:1.17;letter-spacing:-.055em}
+main>.intro small{font:10px var(--mono);color:var(--muted)}
+main>.section{position:relative!important;padding-top:clamp(62px,8vw,108px)!important;padding-bottom:clamp(66px,8vw,112px)!important}
+main>.section:before{content:"";position:absolute;z-index:-1;pointer-events:none;inset:18px -4vw 18px;border-radius:36px;opacity:.38;background:radial-gradient(ellipse at 85% 8%,rgba(var(--accent-rgb),.09),transparent 42%)}
+.section-heading{margin-bottom:clamp(28px,4vw,46px);align-items:end}
+.section-heading h2{font-size:clamp(38px,5.4vw,66px);letter-spacing:-.075em}
+.section-heading label{font-size:10px;letter-spacing:.17em}
+.section-heading>small{font-size:9px;letter-spacing:.14em}
+.section-reveal{opacity:0;transform:translate3d(0,22px,0);transition:opacity .72s cubic-bezier(.2,.75,.25,1),transform .82s cubic-bezier(.2,.75,.25,1)}
+.section-reveal.is-visible{opacity:1;transform:translate3d(0,0,0)}
+.section-reveal:nth-child(2){transition-delay:.07s}
+.section-reveal:nth-child(3){transition-delay:.13s}
+.section-reveal:nth-child(4){transition-delay:.19s}
+.section-reveal:nth-child(5){transition-delay:.25s}
+.section-reveal:nth-child(6){transition-delay:.31s}
+.feature-card,.research-grid article,.timeline-card,.future-item,.empty-state,.progress-panel,.contact-card{transition:transform .48s cubic-bezier(.2,.8,.2,1),border-color .35s ease,background .35s ease,box-shadow .45s ease}
+.feature-card:hover,.research-grid article:hover,.timeline-card:hover,.future-item:hover{transform:translateY(-7px)}
+/* 01 / ABOUT — editorial identity dossier */
+#about .about-grid{grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:20px}
+#about .about-main{min-height:420px;padding:clamp(28px,4vw,48px);background:linear-gradient(135deg,rgba(var(--accent-rgb),.13),rgba(255,255,255,.018) 62%),rgba(22,27,19,.82);border-color:rgba(var(--accent-rgb),.25)}
+#about .about-main h3{font-size:clamp(31px,4.2vw,52px);line-height:1.12;letter-spacing:-.065em;margin:34px 0 22px}
+#about .profile-card{justify-content:space-between;padding:30px;background:radial-gradient(circle at 72% 18%,rgba(var(--accent-rgb),.22),transparent 38%),rgba(18,23,16,.9);border-color:rgba(255,255,255,.1)}
+#about .profile-orb{width:82px;height:82px;border-radius:50%;border:1px solid rgba(var(--accent-rgb),.55);background:radial-gradient(circle at 32% 25%,rgba(255,255,255,.55),rgba(var(--accent-rgb),.24) 30%,rgba(10,15,10,.9) 72%);box-shadow:0 0 55px rgba(var(--accent-rgb),.18),inset 0 0 22px rgba(255,255,255,.12)}
+/* 02 / EDUCATION — archival timeline */
+#education:before{background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.055),transparent),radial-gradient(ellipse at 8% 70%,rgba(var(--accent-rgb),.1),transparent 42%)}
+#education .timeline{position:relative;gap:16px;padding-left:28px}
+#education .timeline:before{content:"";position:absolute;left:7px;top:18px;bottom:18px;width:1px;background:linear-gradient(var(--accent-bright),rgba(var(--accent-rgb),.08))}
+#education .timeline-card{position:relative;min-height:142px;padding:28px 30px;border-radius:20px;background:linear-gradient(110deg,rgba(var(--accent-rgb),.11),rgba(255,255,255,.018) 58%),rgba(20,25,17,.78);border-color:rgba(var(--accent-rgb),.17)}
+#education .timeline-card:before{content:"";position:absolute;left:-27px;top:36px;width:9px;height:9px;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 0 5px rgba(var(--accent-rgb),.12),0 0 18px rgba(var(--accent-rgb),.45)}
+#education .timeline-state{padding:7px 10px;border:1px solid rgba(var(--accent-rgb),.3);border-radius:99px;color:var(--accent-bright)}
+/* 03 / SKILLS — modular capability bento */
+#skills:before{inset:24px -3vw;border:1px solid rgba(var(--accent-rgb),.08);background:linear-gradient(135deg,rgba(var(--accent-rgb),.07),transparent 50%)}
+#skills .feature-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#skills .feature-card{position:relative;min-height:230px;padding:28px;border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(var(--accent-rgb),.035)),rgba(19,24,17,.82);border-color:rgba(255,255,255,.09);overflow:hidden}
+#skills .feature-card:after{content:"";position:absolute;width:150px;height:150px;right:-70px;bottom:-78px;border-radius:50%;border:1px solid rgba(var(--accent-rgb),.18);box-shadow:0 0 0 16px rgba(var(--accent-rgb),.025),0 0 0 34px rgba(var(--accent-rgb),.018);pointer-events:none}
+#skills .feature-card i{display:grid;place-items:center;width:44px;height:44px;margin-bottom:26px;border:1px solid rgba(var(--accent-rgb),.3);border-radius:14px;color:var(--accent-bright);background:rgba(var(--accent-rgb),.1)}
+#skills .feature-card label{position:absolute;right:25px;top:27px;color:rgba(255,255,255,.38)}
+#skills .feature-card h3{font-size:20px;letter-spacing:-.04em}
+#skills .feature-card p{max-width:280px}
+/* 04 / AI WORKFLOW — connected operating system */
+#ai-workflow:before{background:radial-gradient(ellipse at 50% 50%,rgba(90,150,115,.12),transparent 64%)}
+#ai-workflow .feature-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+#ai-workflow .feature-card{position:relative;min-height:208px;padding:26px;border-radius:18px;background:rgba(17,25,20,.86);border-color:rgba(114,174,137,.18)}
+#ai-workflow .feature-card label{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin:0 0 20px;border-radius:50%;border:1px solid rgba(114,174,137,.45);color:#a8d1b1}
+#ai-workflow .feature-card i{float:right;color:#a8d1b1;font-size:18px}
+#ai-workflow .feature-card h3{font-size:18px;letter-spacing:-.035em}
+#ai-workflow .feature-card p{font-size:12px}
+/* 05 / RESEARCH — warm field-notes spread */
+#research{margin-top:28px!important;margin-bottom:28px!important;padding:clamp(34px,5vw,66px)!important;border-radius:30px!important;background:#e9e7da!important;color:#22271e!important;overflow:hidden}
+#research:before{inset:0!important;border-radius:inherit!important;opacity:.28;background-image:radial-gradient(rgba(39,49,34,.16) .7px,transparent .7px)!important;background-size:7px 7px!important;background-color:transparent!important}
+#research .section-heading label,#research .research-grid label{color:#69784b}
+#research .section-heading h2{color:#22271e}
+#research .section-heading h2 em{color:#6f8050}
+#research .section-heading>small{color:#727765}
+#research .research-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#research .research-grid article{min-height:250px;padding:28px;border-radius:18px;background:rgba(255,255,255,.58);border:1px solid rgba(37,48,32,.13);box-shadow:0 12px 30px rgba(31,38,25,.06)}
+#research .research-grid article:after{content:"↗";display:grid;place-items:center;width:32px;height:32px;margin-top:24px;border:1px solid rgba(75,92,53,.25);border-radius:50%;color:#657746}
+#research .research-grid h3{font-size:clamp(19px,2vw,24px);line-height:1.24;letter-spacing:-.045em;color:#252a21}
+#research .research-grid p{color:#626958;font-size:12px}
+/* 06 / PROJECTS — gallery index / no invented work */
+#projects .empty-state{position:relative;min-height:300px;grid-template-columns:90px 1fr auto;gap:28px;padding:clamp(28px,5vw,54px);border-radius:26px;background:radial-gradient(circle at 85% 45%,rgba(var(--accent-rgb),.18),transparent 28%),linear-gradient(120deg,rgba(var(--accent-rgb),.11),rgba(255,255,255,.02) 62%),rgba(18,23,16,.88);border-color:rgba(var(--accent-rgb),.2);overflow:hidden}
+#projects .empty-state:after{content:"";position:absolute;right:9%;top:50%;width:180px;height:180px;transform:translateY(-50%) rotate(28deg);border:1px solid rgba(var(--accent-rgb),.22);border-radius:34%;box-shadow:0 0 0 18px rgba(var(--accent-rgb),.035),0 0 0 38px rgba(var(--accent-rgb),.025);pointer-events:none}
+#projects .empty-icon{width:68px;height:68px;border-radius:20px;background:rgba(var(--accent-rgb),.13);border:1px solid rgba(var(--accent-rgb),.3)}
+#projects .empty-state>div:nth-child(2){position:relative;z-index:1}
+#projects .empty-state h3{font-size:clamp(24px,3vw,34px);letter-spacing:-.05em}
+#projects .empty-state>small{position:relative;z-index:1}
+/* 07 / PROGRESS — learning lab notebook */
+#progress:before{inset:30px -3vw;background:linear-gradient(90deg,rgba(var(--accent-rgb),.055) 1px,transparent 1px),linear-gradient(rgba(var(--accent-rgb),.055) 1px,transparent 1px);background-size:32px 32px;opacity:.32}
+#progress .progress-panel{position:relative;min-height:280px;padding:clamp(28px,5vw,54px);border-radius:24px;background:linear-gradient(135deg,rgba(196,210,151,.1),transparent 54%),rgba(19,25,17,.86);border-color:rgba(var(--accent-rgb),.22);overflow:hidden}
+#progress .progress-panel>i{display:grid;place-items:center;width:48px;height:48px;margin-bottom:26px;border-radius:15px;background:rgba(var(--accent-rgb),.14);color:var(--accent-bright)}
+#progress .progress-panel p{max-width:620px}
+#progress .blank-lines{display:flex;gap:10px;margin-top:28px}
+#progress .blank-lines i{display:block;width:78px;height:4px;border-radius:10px;background:rgba(var(--accent-rgb),.28)}
+/* 08 / FUTURE — roadmap constellation */
+#future:before{background:radial-gradient(ellipse at 80% 50%,rgba(104,150,113,.12),transparent 48%),linear-gradient(90deg,transparent 49.9%,rgba(var(--accent-rgb),.08) 50%,transparent 50.1%)}
+#future .future-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#future .future-item{position:relative;min-height:88px;padding:22px 24px;border-radius:16px;background:linear-gradient(105deg,rgba(var(--accent-rgb),.1),rgba(255,255,255,.018) 70%),rgba(18,24,17,.82);border-color:rgba(var(--accent-rgb),.17);overflow:hidden}
+#future .future-item span{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(var(--accent-rgb),.32);color:var(--accent-bright);font:10px var(--mono)}
+#future .future-item b{font-size:14px;letter-spacing:-.02em}
+#future .future-item i{margin-left:auto;color:var(--accent-bright);font-style:normal;transition:transform .3s}
+#future .future-item:hover i{transform:translate(4px,-4px)}
+/* CONTACT — one clear, luminous closing statement */
+main>.contact{padding-top:clamp(50px,7vw,88px)!important;padding-bottom:clamp(60px,8vw,110px)!important}
+#contact .contact-card{position:relative;min-height:330px;padding:clamp(30px,6vw,70px);border-radius:30px;background:radial-gradient(circle at 82% 25%,rgba(206,223,155,.2),transparent 32%),linear-gradient(120deg,rgba(var(--accent-rgb),.2),rgba(19,25,16,.96) 68%);border-color:rgba(var(--accent-rgb),.28);overflow:hidden}
+#contact .contact-card h2{font-size:clamp(44px,6.5vw,78px);line-height:.98;letter-spacing:-.075em}
+#contact .contact-card p{max-width:430px}
+#contact .contact-mark{font-size:clamp(100px,16vw,190px);color:rgba(225,238,193,.055);letter-spacing:-.12em}
+/* Smooth, restrained micro-interactions */
+.button,.main-nav a,.text-link,.icon-button{transition:transform .32s cubic-bezier(.2,.8,.2,1),color .25s ease,background .3s ease,border-color .3s ease}
+.button:hover{transform:translateY(-3px)}
+.main-nav a{position:relative}
+.main-nav a:after{content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:var(--accent-bright);transition:right .3s ease}
+.main-nav a:hover:after{right:0}
+@media(max-width:900px){
+  #skills .feature-grid,#ai-workflow .feature-grid,#research .research-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #research .research-grid article:last-child{grid-column:1/-1}
+}
+@media(max-width:680px){
+  main>.hero,main>.intro,main>.section,main>.contact{padding-top:42px!important;padding-bottom:48px!important}
+  main>.hero{min-height:0!important;padding-top:55px!important}
+  main>.intro{width:calc(100% - 58px);grid-template-columns:1fr auto;gap:12px;padding:36px 0 42px!important}
+  main>.intro p{grid-column:1/-1;font-size:clamp(25px,7vw,34px)}
+  main>.section{padding-top:56px!important;padding-bottom:58px!important}
+  #about .about-grid,#skills .feature-grid,#ai-workflow .feature-grid,#research .research-grid,#future .future-grid{grid-template-columns:1fr}
+  #research{padding:28px 18px!important;border-radius:22px!important}
+  #research .research-grid article{min-height:0}
+  #research .research-grid article:last-child{grid-column:auto}
+  #education .timeline{padding-left:20px}
+  #education .timeline-card{padding:21px 18px;gap:12px}
+  #education .timeline-card:before{left:-19px}
+  #projects .empty-state{grid-template-columns:52px 1fr;gap:16px;padding:22px}
+  #projects .empty-icon{width:48px;height:48px}
+  #projects .empty-state>small{grid-column:2}
+  #projects .empty-state:after{right:-55px;opacity:.55}
+  #future .future-item{padding:17px}
+  #contact .contact-card{min-height:310px;padding:28px 22px}
+  .section-reveal{transition-duration:.55s}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  .section-reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .feature-card,.research-grid article,.timeline-card,.future-item,.empty-state,.progress-panel,.contact-card,.button{transition:none!important}
+}
