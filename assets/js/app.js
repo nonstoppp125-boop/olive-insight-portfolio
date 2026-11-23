@@ -451,6 +451,7 @@
       document.documentElement.style.scrollBehavior="auto";
       document.body.style.scrollBehavior="auto";
       scrollRail.classList.add("is-dragging");
+      document.body.classList.add("rail-scrubbing");
       try{scrollRailBall.setPointerCapture(event.pointerId);}catch(_){}
       scrubRail(event);
       event.preventDefault();
@@ -462,6 +463,18 @@
       document.documentElement.style.scrollBehavior=previousScrollBehavior.html;
       document.body.style.scrollBehavior=previousScrollBehavior.body;
       scrollRail.classList.remove("is-dragging");
+      document.body.classList.remove("rail-scrubbing");
+      const targets=Array.from(document.querySelectorAll("main > .hero,main > .intro,main > .section,main > .contact"));
+      if(targets.length){
+        const snapOffset=parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)||0;
+        let nearest=targets[0],nearestDistance=Infinity;
+        targets.forEach(target=>{
+          const distance=Math.abs(target.getBoundingClientRect().top-snapOffset);
+          if(distance<nearestDistance){nearest=target;nearestDistance=distance;}
+        });
+        const top=Math.max(0,nearest.getBoundingClientRect().top+window.scrollY-snapOffset);
+        window.scrollTo({top,left:0,behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});
+      }
     }
     scrollRailBall.addEventListener("pointerup",stopRailDrag);
     scrollRailBall.addEventListener("pointercancel",stopRailDrag);
