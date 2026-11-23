@@ -176,6 +176,15 @@ def main():
     if "scroll-behavior:smooth" not in css or "overflow-x:hidden" not in css:
         errors.append("native smooth vertical scrolling and horizontal overflow protection must remain")
 
+    if "scroll-snap-type:y mandatory" in css or "scroll-snap-stop:always" in css:
+        errors.append("section progression must remain natural and must not force scroll snapping")
+    if "function setupSectionFlow()" not in js or "setupSectionFlow();" not in js or "--chapter-opacity" not in js + css or "getBoundingClientRect()" not in js:
+        errors.append("reversible scroll-linked chapter transitions must update each section from live scroll progress")
+    if "margin-left:max(80px,calc((100% - 1160px)/2 + 32px))!important" not in css or "margin-left:42px!important;margin-right:16px!important" not in css:
+        errors.append("section content must align consistently around the fixed scroll rail on desktop and mobile")
+    if "@media(prefers-reduced-motion:reduce){main>.hero" not in css or 'window.matchMedia?.("(prefers-reduced-motion: reduce)")' not in js:
+        errors.append("chapter transitions must respect reduced-motion preferences")
+
     if errors:
         for error in errors:
             print("FAIL:", error)
