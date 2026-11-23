@@ -868,7 +868,7 @@ main>.hero,main>.intro,main>.section,main>.contact{
   scroll-snap-stop:always;
   scroll-margin-top:100px;
 }
-body.rail-scrubbing{scroll-snap-type:none}
+html.rail-scrubbing{scroll-snap-type:none}
 @media(max-width:680px){
   html{scroll-padding-top:76px}
   main>.hero,main>.intro,main>.section,main>.contact{scroll-margin-top:76px}
