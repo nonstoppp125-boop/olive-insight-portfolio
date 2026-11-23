@@ -698,59 +698,25 @@
     },{rootMargin:"80px"});
     $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
   }
-  function setupSectionFlow(sections){
-    if(!sections.length)return;
-    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const noMotion=body.classList.contains("no-motion");
-    if(reduced||noMotion)return;
-    let frame=0;
-    const clamp=value=>Math.max(0,Math.min(1,value));
-    const smooth=value=>{const t=clamp(value);return t*t*(3-2*t);};
-    sections.forEach((section,index)=>{
-      section.style.zIndex=String(index+1);
-      section.style.setProperty("--stack-opacity","1");
-      section.style.setProperty("--stack-y","0px");
-      section.style.setProperty("--stack-scale","1");
-      section.style.setProperty("--stack-blur","0px");
-    });
-    const paint=()=>{
-      frame=0;
-      const vh=window.innerHeight||1;
-      const stickyTop=Math.max(24,vh*.07);
-      const travel=Math.max(1,vh-stickyTop);
-      sections.forEach((section,index)=>{
-        const rect=section.getBoundingClientRect();
-        const incoming=smooth((vh-rect.top)/travel);
-        const next=sections[index+1];
-        const nextTop=next?next.getBoundingClientRect().top:-vh;
-        const handoff=next?smooth((vh-nextTop)/travel):0;
-        const opacity=incoming*(1-handoff*.52);
-        const y=(1-incoming)*30-handoff*22;
-        const scale=.975+incoming*.025-handoff*.035;
-        const blur=handoff*4.5;
-        section.style.setProperty("--stack-opacity",opacity.toFixed(3));
-        section.style.setProperty("--stack-y",y.toFixed(2)+"px");
-        section.style.setProperty("--stack-scale",scale.toFixed(4));
-        section.style.setProperty("--stack-blur",blur.toFixed(2)+"px");
-      });
-    };
-    const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
-    window.addEventListener("scroll",schedule,{passive:true});
-    window.addEventListener("resize",schedule,{passive:true});
-    window.addEventListener("orientationchange",schedule,{passive:true});
-    paint();
+  function setupSectionFlow(){
+    // Section-to-section stacking was intentionally removed. Motion now belongs to each section's own content.
   }
   function setupReveal(){
-    const sections=$(".hero,.intro,.section,.contact,.footer");
-    sections.forEach(element=>element.classList.add("section-flow"));
-    setupSectionFlow(sections);
     const details=$(".contact-card,.hero-copy,.hero-art");
     details.forEach(element=>element.classList.add("reveal"));
-    if(!("IntersectionObserver" in window)){details.forEach(element=>element.classList.add("visible"));return;}
+    const targets=$(".section-heading,.about-grid>*,.timeline-card,.feature-card,.research-grid article,.empty-state,.progress-panel,.future-item,.intro p");
+    targets.forEach(element=>element.classList.add("section-reveal"));
+    if(!("IntersectionObserver" in window)){
+      details.forEach(element=>element.classList.add("visible"));
+      targets.forEach(element=>element.classList.add("is-visible"));
+      return;
+    }
     const observer=new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("visible");observer.unobserve(entry.target);}});
-    },{threshold:.08,rootMargin:"0px 0px -35px 0px"});
-    details.forEach(element=>observer.observe(element));
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){entry.target.classList.add(entry.target.classList.contains("section-reveal")?"is-visible":"visible");observer.unobserve(entry.target);}
+      });
+    },{threshold:.12,rootMargin:"0px 0px -42px 0px"});
+    [...details,...targets].forEach(element=>observer.observe(element));
   }
   try{
     const stored=localStorage.getItem("oliveInsightDesign");
