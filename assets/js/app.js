@@ -204,11 +204,11 @@
     field.appendChild(fragment);body.prepend(field);
   }
   createAmbientParticles();
-  const defaults = {theme:"olive",rootColor:"#10130e",accent:"#87945b",autoAccent:true,blur:18,opacity:58,radius:24,font:"system",typographyV2:true,density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true,particles:true};
+  const defaults = {theme:"midnight",rootColor:"#080d16",accent:"#58aaff",autoAccent:true,blur:18,opacity:58,radius:24,font:"system",typographyV2:true,density:"balanced",contrast:"standard",capsuleSpeed:36,borderSpeed:24,capsule:true,borders:true,mascot:true,float:true,reveal:true,particles:true};
   const palettes = {
-    olive:{accent:"#87945b",bright:"#c3ce8d",rgb:"135,148,91",bg:"#10130e"},
-    earth:{accent:"#987252",bright:"#d2ad8b",rgb:"152,114,82",bg:"#15110e"},
-    forest:{accent:"#527b62",bright:"#a6d0ae",rgb:"82,123,98",bg:"#0d1511"}
+    midnight:{accent:"#58aaff",bright:"#b6ddff",rgb:"88,170,255",bg:"#080d16"},
+    arctic:{accent:"#55d6c2",bright:"#a8fff0",rgb:"85,214,194",bg:"#081513"},
+    violet:{accent:"#a78bfa",bright:"#ddd0ff",rgb:"167,139,250",bg:"#100d1c"}
   };
   let settings = {...defaults};
   let toastTimer;
@@ -219,7 +219,7 @@
   }
   function save(){try{localStorage.setItem("oliveInsightDesign",JSON.stringify(settings));}catch(_){}}
   function apply(){
-    const palette=palettes[settings.theme]||palettes.olive;
+    const palette=palettes[settings.theme]||palettes.midnight;
     const rootColor=settings.rootColor||palette.bg;
     const derived=deriveRootPalette(rootColor);
     const accent=settings.autoAccent?derived.accent:(settings.accent||palette.accent);
@@ -701,33 +701,14 @@
   function setupSectionFlow(){
     const sections=$("main>.hero,main>.intro,main>.section,main>.contact");
     if(!sections.length||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
-    let frame=0;
-    const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
-    const paint=()=>{
-      frame=0;
-      const viewport=Math.max(1,window.innerHeight);
-      const compact=window.matchMedia?.("(max-width: 680px)").matches;
-      sections.forEach(section=>{
-        const rect=section.getBoundingClientRect();
-        const progress=clamp((viewport-rect.top)/(viewport+rect.height),0,1);
-        const enter=clamp(progress/.2,0,1);
-        const exit=clamp((progress-.78)/.22,0,1);
-        const opacity=enter*(1-exit*.64);
-        const y=(1-enter)*48-exit*26;
-        const z=-exit*82;
-        const scale=.985+enter*.015-exit*.022;
-        const blur=compact?0:(1-enter)*2.6+exit*1.35;
-        section.style.setProperty("--chapter-opacity",opacity.toFixed(3));
-        section.style.setProperty("--chapter-y",y.toFixed(2)+"px");
-        section.style.setProperty("--chapter-z",z.toFixed(2)+"px");
-        section.style.setProperty("--chapter-scale",scale.toFixed(4));
-        section.style.setProperty("--chapter-blur",blur.toFixed(2)+"px");
-      });
-    };
+    let frame=0;const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+    const paint=()=>{frame=0;const vh=Math.max(1,window.innerHeight),mobile=window.matchMedia?.("(max-width: 680px)").matches;
+      sections.forEach((section,index)=>{const r=section.getBoundingClientRect(),enter=clamp((vh-r.top)/(vh*.72),0,1),exit=clamp(-r.bottom/(vh*.58),0,1);
+        const y=(1-enter)*(mobile?22:34)-exit*(mobile?12:20),z=-clamp(1-Math.abs((r.top+r.height*.5-vh*.48)/vh),0,1)*18;
+        section.style.setProperty("--chapter-y",y.toFixed(2)+"px");section.style.setProperty("--chapter-z",z.toFixed(2)+"px");
+        section.style.setProperty("--chapter-scale",(1-(mobile?.006:.012)).toFixed(4));section.dataset.chapter=String(index+1).padStart(2,"0");});};
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
-    window.addEventListener("scroll",schedule,{passive:true});
-    window.addEventListener("resize",schedule,{passive:true});
-    paint();
+    window.addEventListener("scroll",schedule,{passive:true});window.addEventListener("resize",schedule,{passive:true});paint();
   }
   function setupReveal(){
     const details=$(".contact-card,.hero-copy,.hero-art");
@@ -748,7 +729,7 @@
   }
   try{
     const stored=localStorage.getItem("oliveInsightDesign");
-    if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed))); if(typeof parsed.borders!=="boolean")settings.borders=true; if(Number.isFinite(Number(parsed.borderSpeed)))settings.borderSpeed=Math.max(12,Math.min(60,Number(parsed.borderSpeed)));if(!parsed.typographyV2){settings.font="system";settings.typographyV2=true;}if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
+    if(stored){const parsed=JSON.parse(stored);if(["olive","earth","forest"].includes(parsed.theme)){parsed.theme="midnight";parsed.rootColor="#080d16";parsed.accent="#58aaff";parsed.autoAccent=true;}settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed))); if(typeof parsed.borders!=="boolean")settings.borders=true; if(Number.isFinite(Number(parsed.borderSpeed)))settings.borderSpeed=Math.max(12,Math.min(60,Number(parsed.borderSpeed)));if(!parsed.typographyV2){settings.font="system";settings.typographyV2=true;}if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
   }catch(_){}
   apply();setupSectionFlow();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
