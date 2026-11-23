@@ -844,16 +844,17 @@ input::placeholder,textarea::placeholder{color:var(--muted)}
 body.no-particles #ambientParticles{display:none}.assistant-shortcuts{max-height:calc(100vh - 24px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
 
 
-/* Scroll handoff: overlapping entry/exit envelopes make every section transition visibly. */
+/* Scroll handoff: true cross-fade with a restrained perspective depth retreat. */
 .section-flow{
   opacity:var(--section-opacity,1);
-  transform:translate3d(0,var(--section-y,0px),0) scale(var(--section-scale,1));
-  transform-origin:50% 50%;
+  transform:perspective(1400px) translate3d(0,var(--section-y,0px),var(--section-z,0px)) rotateX(var(--section-tilt,0deg)) scale(var(--section-scale,1));
+  transform-origin:50% 48%;
   backface-visibility:hidden;
+  will-change:transform,opacity;
   transition:none;
 }
-body.no-motion .section-flow{opacity:1!important;transform:none!important;transition:none!important}
-@media(prefers-reduced-motion:reduce){.section-flow{opacity:1!important;transform:none!important;transition:none!important}}
+body.no-motion .section-flow{opacity:1!important;transform:none!important;will-change:auto;transition:none!important}
+@media(prefers-reduced-motion:reduce){.section-flow{opacity:1!important;transform:none!important;will-change:auto;transition:none!important}}
 
 /* Loading-screen micro stars: dense, near-invisible white pinpoints with independent random twinkle. */
 .page-loader{isolation:isolate;overflow:hidden}
