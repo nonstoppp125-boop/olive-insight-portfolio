@@ -178,7 +178,7 @@ def main():
 
     if "scroll-snap-type:y mandatory" in css or "scroll-snap-stop:always" in css:
         errors.append("section progression must remain natural and must not force scroll snapping")
-    if "function setupSectionFlow()" not in js or "setupSectionFlow();" not in js or "--chapter-opacity" not in js + css or "getBoundingClientRect()" not in js:
+    if "function setupSectionFlow()" not in js or "setupSectionFlow();" not in js or "--chapter-y" not in js + css or "getBoundingClientRect()" not in js or "section.dataset.chapter" not in js:
         errors.append("reversible scroll-linked chapter transitions must update each section from live scroll progress")
     if "margin-left:max(80px,calc((100% - 1160px)/2 + 32px))!important" not in css or "margin-left:42px!important;margin-right:16px!important" not in css:
         errors.append("section content must align consistently around the fixed scroll rail on desktop and mobile")
