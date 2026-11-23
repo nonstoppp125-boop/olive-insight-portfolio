@@ -691,18 +691,23 @@
     const paint=()=>{
       frame=0;
       const vh=window.innerHeight||1;
-      const edge=vh*.62;
+      const enterRange=vh*.58,exitRange=vh*.62;
       sections.forEach(section=>{
         const rect=section.getBoundingClientRect();
-        const entering=smooth((vh-rect.top)/edge);
-        const leaving=smooth((rect.bottom+edge)/edge);
+        // Incoming sections rise from below; outgoing sections fade and recede in depth.
+        const entering=smooth((vh*.92-rect.top)/enterRange);
+        const leaving=smooth((rect.bottom+vh*.30)/exitRange);
         const visibility=Math.min(entering,leaving);
         const entryProgress=1-entering;
         const exitProgress=1-leaving;
-        const translateY=(entryProgress*38)-(exitProgress*38);
-        const scale=.972+visibility*.028;
-        section.style.setProperty("--section-opacity",(0.24+visibility*.76).toFixed(3));
+        const translateY=entryProgress*44-exitProgress*34;
+        const translateZ=-exitProgress*46;
+        const tilt=-exitProgress*1.35;
+        const scale=.955+visibility*.045;
+        section.style.setProperty("--section-opacity",visibility.toFixed(3));
         section.style.setProperty("--section-y",translateY.toFixed(2)+"px");
+        section.style.setProperty("--section-z",translateZ.toFixed(2)+"px");
+        section.style.setProperty("--section-tilt",tilt.toFixed(3)+"deg");
         section.style.setProperty("--section-scale",scale.toFixed(4));
       });
     };
@@ -713,7 +718,7 @@
     paint();
   }
   function setupReveal(){
-    const sections=$(".hero,.intro,.section,.contact");
+    const sections=$(".hero,.intro,.section,.contact,.footer");
     sections.forEach(element=>element.classList.add("section-flow"));
     setupSectionFlow(sections);
     const details=$(".contact-card,.hero-copy,.hero-art");
