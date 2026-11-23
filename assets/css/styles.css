@@ -874,3 +874,59 @@ html.rail-scrubbing{scroll-snap-type:none}
   main>.hero,main>.intro,main>.section,main>.contact{scroll-margin-top:76px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+
+/* Stacked panel choreography: each section pins in the visual center and the next panel slides over it. */
+html{scroll-snap-type:none!important;scroll-behavior:auto}
+body{overflow-x:clip}
+main{position:relative;isolation:isolate}
+main>.hero,
+main>.intro,
+main>.section,
+main>.contact{
+  position:sticky;
+  top:7vh;
+  min-height:86vh;
+  margin-bottom:7vh;
+  padding:clamp(24px,4vw,54px);
+  border:1px solid rgba(var(--accent-rgb),.18);
+  border-radius:clamp(22px,3vw,34px);
+  background:
+    radial-gradient(ellipse at 82% 8%,rgba(var(--accent-rgb),.11),transparent 48%),
+    linear-gradient(145deg,rgba(23,29,20,.97),rgba(10,14,11,.985));
+  box-shadow:0 28px 90px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.07);
+  scroll-snap-align:none;
+  scroll-snap-stop:normal;
+  scroll-margin-top:0;
+  transform-origin:50% 48%;
+  opacity:var(--stack-opacity,1);
+  transform:translate3d(0,var(--stack-y,0px),0) scale(var(--stack-scale,1));
+  filter:blur(var(--stack-blur,0px));
+  will-change:transform,opacity,filter;
+  backface-visibility:hidden;
+}
+main>.hero{min-height:86vh;align-content:center}
+main>.intro{display:flex;flex-direction:column;justify-content:center;gap:22px}
+main>.section{padding-top:clamp(30px,5vh,58px);padding-bottom:clamp(34px,5vh,62px)}
+main>.contact{display:flex;align-items:center;justify-content:center}
+main>.hero,.section-flow{transition:none}
+body.no-motion main>.hero,
+body.no-motion main>.intro,
+body.no-motion main>.section,
+body.no-motion main>.contact{opacity:1!important;transform:none!important;filter:none!important;will-change:auto}
+@media(max-width:680px){
+  main>.hero,main>.intro,main>.section,main>.contact{
+    top:4vh;
+    min-height:92vh;
+    margin-bottom:4vh;
+    padding:22px 18px;
+    border-radius:22px;
+  }
+  main>.hero{min-height:92vh}
+}
+@media(prefers-reduced-motion:reduce){
+  main>.hero,main>.intro,main>.section,main>.contact{
+    position:relative;top:auto;min-height:0;margin-bottom:28px;
+    opacity:1!important;transform:none!important;filter:none!important;will-change:auto;
+  }
+}
