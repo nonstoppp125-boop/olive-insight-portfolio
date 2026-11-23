@@ -699,7 +699,35 @@
     $(".glass").forEach(element=>{element.style.setProperty("--border-play","paused");observer.observe(element);});
   }
   function setupSectionFlow(){
-    // Section-to-section stacking was intentionally removed. Motion now belongs to each section's own content.
+    const sections=$("main>.hero,main>.intro,main>.section,main>.contact");
+    if(!sections.length||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+    let frame=0;
+    const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+    const paint=()=>{
+      frame=0;
+      const viewport=Math.max(1,window.innerHeight);
+      const compact=window.matchMedia?.("(max-width: 680px)").matches;
+      sections.forEach(section=>{
+        const rect=section.getBoundingClientRect();
+        const progress=clamp((viewport-rect.top)/(viewport+rect.height),0,1);
+        const enter=clamp(progress/.2,0,1);
+        const exit=clamp((progress-.78)/.22,0,1);
+        const opacity=enter*(1-exit*.64);
+        const y=(1-enter)*48-exit*26;
+        const z=-exit*82;
+        const scale=.985+enter*.015-exit*.022;
+        const blur=compact?0:(1-enter)*2.6+exit*1.35;
+        section.style.setProperty("--chapter-opacity",opacity.toFixed(3));
+        section.style.setProperty("--chapter-y",y.toFixed(2)+"px");
+        section.style.setProperty("--chapter-z",z.toFixed(2)+"px");
+        section.style.setProperty("--chapter-scale",scale.toFixed(4));
+        section.style.setProperty("--chapter-blur",blur.toFixed(2)+"px");
+      });
+    };
+    const schedule=()=>{if(!frame)frame=requestAnimationFrame(paint);};
+    window.addEventListener("scroll",schedule,{passive:true});
+    window.addEventListener("resize",schedule,{passive:true});
+    paint();
   }
   function setupReveal(){
     const details=$(".contact-card,.hero-copy,.hero-art");
@@ -722,7 +750,7 @@
     const stored=localStorage.getItem("oliveInsightDesign");
     if(stored){const parsed=JSON.parse(stored);settings={...defaults,...parsed};if(Number.isFinite(Number(parsed.speed))&&!Number.isFinite(Number(parsed.capsuleSpeed)))settings.capsuleSpeed=Math.max(12,Math.min(90,Number(parsed.speed))); if(typeof parsed.borders!=="boolean")settings.borders=true; if(Number.isFinite(Number(parsed.borderSpeed)))settings.borderSpeed=Math.max(12,Math.min(60,Number(parsed.borderSpeed)));if(!parsed.typographyV2){settings.font="system";settings.typographyV2=true;}if(!["system","editorial","technical"].includes(settings.font))settings.font="system";}
   }catch(_){}
-  apply();setupReveal();setupBorderMotion();
+  apply();setupSectionFlow();setupReveal();setupBorderMotion();
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)body.classList.add("no-motion");
 
 })();
